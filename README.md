@@ -46,9 +46,12 @@ print(f"Overlap: {hv.overlap(a, b)}")  # Near zero for random vectors
 
 # Bind and bundle operations
 bound = hv.bind(a, b)
+print(f'{hv.to_message(bound)} {hv.overlap(bound, a)=}, {hv.overlap(bound, b)=}')
+
 bundled = hv.bundle(hv.new_seed128(0, 0), a, b)
+print(f'{hv.to_message(bundled)} {hv.overlap(bundled, a)=}, {hv.overlap(bundled, b)=}')
 ```
 
 ## License
 
-MIT
+[MIT License](LICENSE)
