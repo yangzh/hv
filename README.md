@@ -10,19 +10,15 @@ pip install kongming-hv
 
 **Supported platforms:**
 - Linux (x86_64) - Python 3.10-3.14
+- macOS (Apple Silicon & Intel) - Python 3.10-3.14
 
-**Known issues:**
-- macOS: Segmentation faults on import due to gopy/CGO compatibility issues with Go 1.21+
-  - Tracking: [go-python/gopy#370](https://github.com/go-python/gopy/issues/370), [golang/go#65050](https://github.com/golang/go/issues/65050)
-  - Workarounds: Use Linux, Docker, WSL2, or cloud notebooks (Colab/Binder)
+## Try Online
 
-## Try Online (No Installation)
-
-For macOS users or quick experimentation:
+For quick experimentation without installation:
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb)
 
-Click the badge above to open the tutorial notebook in Google Colab (runs on Linux, fully supported).
+Click the badge above to open the tutorial notebook in Google Colab.
 
 ## Getting Started
 
