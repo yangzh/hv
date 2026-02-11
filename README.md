@@ -20,10 +20,9 @@ pip install kongming-hv
 
 For macOS users or quick experimentation:
 
-- **Google Colab**: Upload `notebook/first.ipynb` to [colab.research.google.com](https://colab.research.google.com), add `!pip install kongming-hv` as the first cell
-- **Binder**: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb)
 
-Both run on Linux and fully support this package.
+Click the badge above to open the tutorial notebook in Google Colab (runs on Linux, fully supported).
 
 ## Getting Started
 
