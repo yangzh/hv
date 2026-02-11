@@ -16,9 +16,14 @@ pip install kongming-hv
 
 For quick experimentation without installation:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true)
+| Platform | Link | Notes |
+|----------|------|-------|
+| Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true) | Faster startup, requires Google account |
+| Binder | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb) | No account needed, slower startup |
 
-Click the badge above to open the tutorial notebook in Google Colab.
+**Colab**: Click the badge, then run the first cell to install `kongming-hv`. Restart the runtime when prompted (Runtime → Restart runtime), then run all cells.
+
+**Binder**: Click the badge and wait for the environment to build (first launch takes 2-5 minutes). Dependencies are pre-installed via `requirements.txt`.
 
 ## Getting Started
 
