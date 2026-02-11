@@ -10,7 +10,9 @@ pip install kongming-hv
 
 **Supported platforms:**
 - Linux (x86_64) - Python 3.10-3.14
-- macOS (arm64, x86_64) - Python 3.10-3.14
+
+**Known issues:**
+- macOS: Currently experiencing segmentation faults on import due to [gopy compatibility issues](https://github.com/go-python/gopy/issues/370) with recent Go versions. Use Linux or Docker as a workaround.
 
 ## Getting Started
 
