@@ -16,7 +16,7 @@ pip install kongming-hv
 
 For quick experimentation without installation:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true)
 
 Click the badge above to open the tutorial notebook in Google Colab.
 
