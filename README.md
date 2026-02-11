@@ -40,6 +40,7 @@ from kongming import api, hv
 # Create hypervectors
 a = hv.new_sparkle_with_word(api.MODEL_16M_12BIT, hv.d0(), "hello")
 b = hv.new_sparkle_with_word(api.MODEL_16M_12BIT, hv.d0(), "world")
+print(f'{hv.to_message(a)=}, {hv.to_message(b)=}')
 
 # Check orthogonality
 print(f"Overlap: {hv.overlap(a, b)}")  # Near zero for random vectors
