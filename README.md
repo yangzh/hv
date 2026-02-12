@@ -38,11 +38,12 @@ See the [notebooks](notebook/) for tutorials:
 from kongming import api, hv
 
 # Create hypervectors
-a = hv.new_sparkle_with_word(api.MODEL_16M_12BIT, hv.d0(), "hello")
-b = hv.new_sparkle_with_word(api.MODEL_16M_12BIT, hv.d0(), "world")
+a = hv.new_sparkle_with_word(api.MODEL_64K_8BIT, hv.d0(), "hello")
+b = hv.new_sparkle_with_word(api.MODEL_64K_8BIT, hv.d0(), "world")
 print(f'{a=}, detailed message: {hv.to_message(a)=}')
 print(f'{b=}, detailed message: {hv.to_message(b)=}')
-print(f"Overlap: {hv.overlap(a, b)}")  # Near orthogonal for random vectors.
+print(f'Overlap: {hv.overlap(a, b)}')  # Near orthogonal for random vectors.
+print(f'{(a.offsets(), b.offsets())}') # offsets from a
 
 # Bind and bundle operations
 bound = hv.bind(a, b)
