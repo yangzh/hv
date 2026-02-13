@@ -29,7 +29,7 @@ For quick experimentation without installation:
 
 See the [notebooks](notebook/) for tutorials:
 
-- `first.ipynb` - Introduction to hypervectors, operations, and composites
+- [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, operations, and composites;
 - More to come...
 
 ## Quick Example
@@ -40,19 +40,25 @@ from kongming import api, hv
 # Create hypervectors
 a = hv.new_sparkle_with_word(api.MODEL_64K_8BIT, hv.d0(), "hello")
 b = hv.new_sparkle_with_word(api.MODEL_64K_8BIT, hv.d0(), "world")
-print(f'{a=}, detailed message: {hv.to_message(a)=}')
-print(f'{b=}, detailed message: {hv.to_message(b)=}')
+print(f'{a=}\n{hv.to_message(a)=}')
+print(f'{b=}\n{hv.to_message(b)=}')
 print(f'Overlap: {hv.overlap(a, b)}')  # Near orthogonal for random vectors.
-print(f'{(a.offsets(), b.offsets())}') # offsets from a
+print(f'{(a.offsets(), b.offsets())=}') # offsets from a/b.
 
 # Bind and bundle operations
 bound = hv.bind(a, b)
-print(f'{bound=}, detailed message: {hv.to_message(bound)}')
+print(f'{bound=}\n{hv.to_message(bound)=}')
 print(f'{hv.overlap(bound, a)=}, {hv.overlap(bound, b)=}')
 
-bundled = hv.bundle(hv.new_seed128(0, 0), a, b)
-print(f'{bunded=}, detailed message: {hv.to_message(bundled)}')
-print(f'{hv.overlap(bundled, a)=}, {hv.overlap(bundled, b)=}')
+bundled1 = hv.bundle(hv.new_seed128(10, 1), a, b)
+print(f'{bundled1=}\n{hv.to_message(bundled1)=}')
+print(f'{bundled1.core().offsets()=}')
+print(f'{hv.overlap(bundled1, a)=}, {hv.overlap(bundled1, b)=}')
+
+bundled2 = hv.bundle(hv.new_seed128(10, 2), a, b)
+print(f'{bundled2=}\n{hv.to_message(bundled2)=}')
+print(f'{bundled2.core().offsets()=}')
+print(f'{hv.overlap(bundled2, a)=}, {hv.overlap(bundled2, b)=}')
 ```
 
 ## License
