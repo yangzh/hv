@@ -35,30 +35,31 @@ See the [notebooks](notebook/) for tutorials:
 ## Quick Example
 
 ```python
-from kongming import api, hv
+from kongming import api
+from kongming.hv import Sparkle, Seed128, d0, bind, bundle, overlap, to_message
 
 # Create hypervectors
-a = hv.new_sparkle_with_word(api.MODEL_64K_8BIT, hv.d0(), "hello")
-b = hv.new_sparkle_with_word(api.MODEL_64K_8BIT, hv.d0(), "world")
-print(f'{a=}\n{hv.to_message(a)=}')
-print(f'{b=}\n{hv.to_message(b)=}')
-print(f'Overlap: {hv.overlap(a, b)}')  # Near orthogonal for random vectors.
+a = Sparkle.from_word(api.MODEL_64K_8BIT, d0(), "hello")
+b = Sparkle.from_word(api.MODEL_64K_8BIT, d0(), "world")
+print(f'{a=}\n{to_message(a)=}')
+print(f'{b=}\n{to_message(b)=}')
+print(f'Overlap: {overlap(a, b)}')  # Near orthogonal for random vectors.
 print(f'{(a.offsets(), b.offsets())=}') # offsets from a/b.
 
 # Bind and bundle operations
-bound = hv.bind(a, b)
-print(f'{bound=}\n{hv.to_message(bound)=}')
-print(f'{hv.overlap(bound, a)=}, {hv.overlap(bound, b)=}')
+bound = bind(a, b)
+print(f'{bound=}\n{to_message(bound)=}')
+print(f'{overlap(bound, a)=}, {overlap(bound, b)=}')
 
-bundled1 = hv.bundle(hv.new_seed128(10, 1), a, b)
-print(f'{bundled1=}\n{hv.to_message(bundled1)=}')
+bundled1 = bundle(Seed128.create(10, 1), a, b)
+print(f'{bundled1=}\n{to_message(bundled1)=}')
 print(f'{bundled1.core().offsets()=}')
-print(f'{hv.overlap(bundled1, a)=}, {hv.overlap(bundled1, b)=}')
+print(f'{overlap(bundled1, a)=}, {overlap(bundled1, b)=}')
 
-bundled2 = hv.bundle(hv.new_seed128(10, 2), a, b)
-print(f'{bundled2=}\n{hv.to_message(bundled2)=}')
+bundled2 = bundle(Seed128.create(10, 2), a, b)
+print(f'{bundled2=}\n{to_message(bundled2)=}')
 print(f'{bundled2.core().offsets()=}')
-print(f'{hv.overlap(bundled2, a)=}, {hv.overlap(bundled2, b)=}')
+print(f'{overlap(bundled2, a)=}, {overlap(bundled2, b)=}')
 ```
 
 ## License
