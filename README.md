@@ -13,9 +13,9 @@ pip install kongming-rs-hv
 - Linux (x86_64) - Python 3.10-3.14
 - macOS (Apple Silicon & Intel) - Python 3.10-3.14
 
-> The Go-backed `kongming-hv` package provides the same API and bit-identical results,
-> but requires a working Xcode / Go toolchain on macOS. `kongming-rs-hv` is recommended
-> for most users — it ships as a pre-built universal binary with no build-time dependencies.
+> A Go-backed `kongming-hv` package with the same API and bit-identical results is also
+> available, but requires a working Xcode / Go toolchain on macOS. `kongming-rs-hv` is
+> recommended for most users — it ships as a pre-built universal binary with no build-time dependencies.
 
 ## Try Online
 
