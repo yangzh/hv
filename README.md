@@ -40,7 +40,7 @@ See the [notebooks](notebook/) for tutorials:
 ## Quick Example
 
 ```python
-from kongming_rs_hv import Sparkle, Seed128, d0, bind, bundle, overlap, to_message, MODEL_64K_8BIT
+from kongming_rs.hv import Sparkle, Seed128, d0, bind, bundle, overlap, to_message, MODEL_64K_8BIT
 
 # Create hypervectors
 a = Sparkle.from_word(MODEL_64K_8BIT, d0(), "hello")
