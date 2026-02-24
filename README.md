@@ -35,8 +35,8 @@ For quick experimentation without installation:
 
 See the [notebooks](notebook/) for tutorials:
 
-- [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, operations, and composites;
-- More to come...
+- [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, bind/bound operations, and composites;
+- More exposed features for memories (item memory and clean-up memory), and near-neighbor-based retrievals; 
 
 ## Quick Example
 
