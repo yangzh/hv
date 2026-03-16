@@ -25,6 +25,7 @@ For quick experimentation without installation:
 | Platform | Link | Notes |
 |----------|------|-------|
 | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true) | Faster startup, requires Google account |
+| Colab (LISP) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true) | VSA-based LISP interpreter demo |
 | Binder | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb) | No account needed, slower startup |
 
 **Colab**: Click the badge, then run the first cell to install `kongming-rs-hv`. Restart the runtime when prompted (Runtime → Restart runtime), then run all cells.
@@ -36,7 +37,8 @@ For quick experimentation without installation:
 See the [notebooks](notebook/) for tutorials:
 
 - [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, bind/bound operations, and composites;
-- More exposed features for memories (item memory and clean-up memory), and near-neighbor-based retrievals; 
+- [`lisp.ipynb`](notebook/lisp.ipynb) - VSA-based LISP interpreter where every data structure is a hypervector;
+- More exposed features for memories (item memory and clean-up memory), and near-neighbor-based retrievals;
 
 ## Quick Example
 
