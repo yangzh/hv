@@ -70,3 +70,9 @@ print(f'{hv.overlap(bundled2, a)=}, {hv.overlap(bundled2, b)=}')
 ## License
 
 [MIT License](LICENSE)
+
+## Supplements
+
+The library is based on the work outlined in [this arxiv paper](https://arxiv.org/abs/2310.18316), and here is the citation:
+
+> Yang Zhonghao (2023). Cognitive modeling and learning with sparse binary hypervectors. arXiv:2310.18316v1 [cs.AI]
