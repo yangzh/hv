@@ -37,8 +37,8 @@ For quick experimentation without installation:
 See the [notebooks](notebook/) for tutorials:
 
 - [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, bind/bound operations, and composites;
-- [`lisp.ipynb`](notebook/lisp.ipynb) - VSA-based LISP interpreter where every data structure is a hypervector;
-- More exposed features for memories (item memory and clean-up memory), and near-neighbor-based retrievals;
+- [`lisp.ipynb`](notebook/lisp.ipynb) - VSA-based LISP interpreter where every data structure is a hypervector, inspired by this ArXiv paper [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889);
+- More features to come, such as cleanup memory, and near-neighbor-based retrievals;
 
 ## Quick Example
 
@@ -77,7 +77,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 [MIT License](LICENSE)
 
-## Supplements
+## Supplements and references
 
 The library is based on the work outlined in [this arxiv paper](https://arxiv.org/abs/2310.18316), and here is the citation:
 
