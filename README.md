@@ -69,6 +69,10 @@ print(f'{bundled2.offsets()=}')
 print(f'{hv.overlap(bundled2, a)=}, {hv.overlap(bundled2, b)=}')
 ```
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
+
 ## License
 
 [MIT License](LICENSE)
