@@ -2,6 +2,11 @@
 
 All notable changes to `kongming-rs-hv` are documented here.
 
+## v3.2.3
+
+- unify InMemory and Fjall substrate backends via RwLock-based interior mutability
+- fix `first.ipynb`: remove octopus marker references, update Octopus extraction example
+
 ## v3.2.2
 
 - add per-user namespace isolation for `LispEnv` — multiple users sharing the same substrate won't interfere
