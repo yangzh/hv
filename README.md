@@ -25,6 +25,7 @@ For quick experimentation without installation:
 | Platform | Link | Notes |
 |----------|------|-------|
 | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true) | Faster startup, requires Google account |
+| Colab (Memory) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true) | In-memory storage, NNS, and persistent export |
 | Colab (LISP) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true) | VSA-based LISP interpreter demo |
 | Binder | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb) | No account needed, slower startup |
 
@@ -36,9 +37,9 @@ For quick experimentation without installation:
 
 See the [notebooks](notebook/) for tutorials:
 
-- [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, bind/bound operations, and composites;
+- [`first.ipynb`](notebook/first.ipynb) - Introduction to hypervectors, bind/bundle operations, and composites;
+- [`memory.ipynb`](notebook/memory.ipynb) - In-memory and persistent storage, near-neighbor search with attractors, and export to disk;
 - [`lisp.ipynb`](notebook/lisp.ipynb) - VSA-based LISP interpreter where every data structure is a hypervector, inspired by this ArXiv paper [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889);
-- More features to come, such as cleanup memory, and near-neighbor-based retrievals;
 
 ## Quick Example
 
