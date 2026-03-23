@@ -66,6 +66,13 @@ print(f'{bundled2.offsets()=}')
 print(f'{hv.overlap(bundled2, a)=}, {hv.overlap(bundled2, b)=}')
 ```
 
+## LISP Interpreter
+
+A LISP interpreter where every data structure is a hypervector, implementing
+McCarthy's original calculus on top of VSA algebra. Available as both a
+pure-Python implementation (for readability) and a Rust implementation
+(for performance). See [`pylisp/README.md`](pylisp/README.md) for details.
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
