@@ -3,6 +3,18 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.5.0 (2026-03-24)
+
+- Refactor pylisp: remove LispSubstrate, add store_chunk/first_picked_chunk APIs
+- add more references.
+- Add README.md to pylisp package (syncs to hv repo)
+- Changelog automation: add release dates, keep latest 10 entries
+- Auto-update hv CHANGELOG.md on release
+- Include source commit messages in pylisp sync commits
+- Clean up pylisp: remove ~ prefix, use DomainPrefix.LISP, fix import order, expose HvError properly, remove inline type hints
+- Add CI workflow to sync pylisp to public hv repo
+- Add DomainPrefix.LISP (λ) to proto and Rust hash labels
+- Add pure-Python LISP interpreter (kongming.pylisp)
 ## v3.4.0 (2026-03-23)
 
 - version api protos as `kongming.api.v1` (Kubernetes-style path versioning)
