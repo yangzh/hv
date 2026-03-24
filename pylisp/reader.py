@@ -4,15 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .types import HyperBinary
-
 from kongming_rs import hv
 
 from . import cons as cons_mod
+from .types import HyperBinary
 
 if TYPE_CHECKING:
     from .env import LispEnv
-
 
 
 def tokenize(input_str: str) -> list[str]:
@@ -22,7 +20,7 @@ def tokenize(input_str: str) -> list[str]:
 
 def parse(env: LispEnv, input_str: str) -> HyperBinary:
     """Parse an S-expression string into a hypervector representation."""
-    tokens: list[str] = tokenize(input_str)
+    tokens = tokenize(input_str)
     if not tokens:
         raise ValueError("empty input")
     return _parse_tokens(env, tokens)
@@ -31,7 +29,7 @@ def parse(env: LispEnv, input_str: str) -> HyperBinary:
 def _parse_tokens(env: LispEnv, tokens: list[str]) -> HyperBinary:
     if not tokens:
         raise ValueError("unexpected EOF")
-    token: str = tokens.pop(0)
+    token = tokens.pop(0)
     if token == "(":
         return _parse_list(env, tokens)
     elif token == ")":
@@ -41,7 +39,7 @@ def _parse_tokens(env: LispEnv, tokens: list[str]) -> HyperBinary:
 
 
 def _parse_list(env: LispEnv, tokens: list[str]) -> HyperBinary:
-    elements: list[HyperBinary] = []
+    elements = []
     while True:
         if not tokens:
             raise ValueError("missing )")
@@ -50,7 +48,7 @@ def _parse_list(env: LispEnv, tokens: list[str]) -> HyperBinary:
             break
         if tokens[0] == ".":
             tokens.pop(0)
-            cdr_val: HyperBinary = _parse_tokens(env, tokens)
+            cdr_val = _parse_tokens(env, tokens)
             if not tokens or tokens[0] != ")":
                 raise ValueError("missing ) after dotted pair")
             tokens.pop(0)
@@ -60,17 +58,17 @@ def _parse_list(env: LispEnv, tokens: list[str]) -> HyperBinary:
 
 
 def _build_list_with_cdr(env: LispEnv, elements: list[HyperBinary], cdr_val: HyperBinary) -> HyperBinary:
-    result: HyperBinary = cdr_val
+    result = cdr_val
     for elem in reversed(elements):
         result = cons_mod.cons(env, elem, result)
     return result
 
 
 def _parse_atom(env: LispEnv, token: str) -> hv.Sparkle:
-    upper: str = token.upper()
-    existing: hv.Sparkle | None = env.sparkle_of(upper)
+    upper = token.upper()
+    existing = env.sparkle_of(upper)
     if existing is not None:
         return existing
-    sparkle: hv.Sparkle = hv.Sparkle.from_word(env.model, env.sym_domain, upper)
+    sparkle = hv.Sparkle.from_word(env.model, env.sym_domain, upper)
     env._register_symbol(upper, sparkle)
     return sparkle

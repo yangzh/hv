@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .types import HyperBinary
-
 from kongming_rs import hv
 
 from . import cons as cons_mod
+from .types import HyperBinary
 
 if TYPE_CHECKING:
     from .env import LispEnv
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 
 def evlamb(env: LispEnv, lambda_expr: HyperBinary, args: list[HyperBinary]) -> HyperBinary:
     """Apply a lambda expression to arguments (curried, one at a time)."""
-    current: HyperBinary = lambda_expr
+    current = lambda_expr
     for arg in args:
         current = _evlambcurry(env, current, arg)
 
@@ -29,23 +28,23 @@ def evlamb(env: LispEnv, lambda_expr: HyperBinary, args: list[HyperBinary]) -> H
 
 def _evlambcurry(env: LispEnv, lambda_expr: HyperBinary, arg: HyperBinary) -> HyperBinary:
     """Apply one argument to a lambda via curried beta-reduction."""
-    _lambda_tag: HyperBinary = cons_mod.car(env, lambda_expr)  # LAMBDA
-    rest: HyperBinary = cons_mod.cdr(env, lambda_expr)
-    params: HyperBinary = cons_mod.car(env, rest)
-    body_rest: HyperBinary = cons_mod.cdr(env, rest)
-    body: HyperBinary = cons_mod.car(env, body_rest)
+    _lambda_tag = cons_mod.car(env, lambda_expr)  # LAMBDA
+    rest = cons_mod.cdr(env, lambda_expr)
+    params = cons_mod.car(env, rest)
+    body_rest = cons_mod.cdr(env, rest)
+    body = cons_mod.car(env, body_rest)
 
-    first_param: HyperBinary = cons_mod.car(env, params)
-    remaining_params: HyperBinary = cons_mod.cdr(env, params)
+    first_param = cons_mod.car(env, params)
+    remaining_params = cons_mod.cdr(env, params)
 
-    new_body: HyperBinary = evshorn(env, body, first_param, arg)
+    new_body = evshorn(env, body, first_param, arg)
 
     if cons_mod.is_atom(env, remaining_params) and hv.equal(remaining_params, env.nil):
         return new_body
     else:
         # Rebuild: (LAMBDA remaining_params new_body)
-        body_list: hv.Sparkle = cons_mod.cons(env, new_body, env.nil)
-        params_and_body: hv.Sparkle = cons_mod.cons(env, remaining_params, body_list)
+        body_list = cons_mod.cons(env, new_body, env.nil)
+        params_and_body = cons_mod.cons(env, remaining_params, body_list)
         return cons_mod.cons(env, env.sym_lambda, params_and_body)
 
 
@@ -62,18 +61,18 @@ def evshorn(env: LispEnv, expr: HyperBinary, param: HyperBinary, arg: HyperBinar
     if cons_mod.is_atom(env, expr):
         return expr
 
-    car_val: HyperBinary = cons_mod.car(env, expr)
-    cdr_val: HyperBinary = cons_mod.cdr(env, expr)
+    car_val = cons_mod.car(env, expr)
+    cdr_val = cons_mod.cdr(env, expr)
 
     # Respect shadowing
     if hv.equal(car_val, env.sym_lambda):
         if not cons_mod.is_atom(env, cdr_val):
-            formal_params: HyperBinary = cons_mod.car(env, cdr_val)
+            formal_params = cons_mod.car(env, cdr_val)
             if _param_in_list(env, param, formal_params):
                 return expr
 
-    new_car: HyperBinary = evshorn(env, car_val, param, arg)
-    new_cdr: HyperBinary = evshorn(env, cdr_val, param, arg)
+    new_car = evshorn(env, car_val, param, arg)
+    new_cdr = evshorn(env, cdr_val, param, arg)
     return cons_mod.cons(env, new_car, new_cdr)
 
 
@@ -88,7 +87,7 @@ def _param_in_list(env: LispEnv, param: HyperBinary, lst: HyperBinary) -> bool:
     if hv.equal(head, param):
         return True
     try:
-        tail: HyperBinary = cons_mod.cdr(env, lst)
+        tail = cons_mod.cdr(env, lst)
     except Exception:
         return False
     return _param_in_list(env, param, tail)
@@ -99,7 +98,7 @@ def _is_lambda(env: LispEnv, expr: HyperBinary) -> bool:
     if cons_mod.is_atom(env, expr):
         return False
     try:
-        head: HyperBinary = cons_mod.car(env, expr)
+        head = cons_mod.car(env, expr)
         return hv.equal(head, env.sym_lambda)
     except Exception:
         return False
