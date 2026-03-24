@@ -24,17 +24,14 @@ def cons_parcel(
     env: LispEnv, seed: hv.Seed128, a: HyperBinary, b: HyperBinary
 ) -> hv.Parcel:
     """Build a cons-encoded Parcel: bundle(bind(a, lhs), bind(b, rhs))."""
-    a_bound = hv.bind(a, env.lhs)
-    b_bound = hv.bind(b, env.rhs)
-    return hv.bundle(seed, a_bound, b_bound)
+    return hv.bundle(seed, hv.bind(a, env.lhs), hv.bind(b, env.rhs))
 
 
 def cons(env: LispEnv, a: HyperBinary, b: HyperBinary) -> hv.Sparkle:
     """Create a cons cell (a . b). Returns the id Sparkle."""
-    id = env.fresh_id()
-    seed = hv.Seed128(id.domain().id(), id.pod().seed())
-    cell = cons_parcel(env, seed, a, b)
-    env.substrate.store(id, code=cell)
+    id = env.random_sparkle()
+    cell = cons_parcel(env, hv.Seed128(id.domain().id(), id.pod().seed()), a, b)
+    env.storage.store_chunk(id, code=cell)
     return id
 
 
@@ -53,23 +50,26 @@ def cdr(env: LispEnv, id: hv.Sparkle) -> HyperBinary:
 
 
 def is_atom(env: LispEnv, v: HyperBinary) -> bool:
-    """Check if a value is an atom (not a cons cell)."""
+    """Check if a value is an atom (not a cons cell).
+
+    Cons cells are always created in cons_domain via random_sparkle().
+    Anything outside that domain is an atom.
+    """
     if not isinstance(v, hv.Sparkle):
         return True
-    if v.domain().id() != env.cons_domain.id():
-        return True
-    return env.substrate.get_code(v) is None
+    return v.domain().id() != env.cons_domain.id()
 
 
 def _lookup_cell(env: LispEnv, id: hv.Sparkle) -> HyperBinary:
     """Look up a cons cell's encoded content by its id."""
-    cell = env.substrate.get_code(id)
-    if cell is not None:
-        return cell
-    raise ValueError(f"cons cell not found: {id.stable_hash():#018x}")
+    return env.storage.get(id.domain(), id.pod())
 
 
 def cleanup(env: LispEnv, probe: HyperBinary) -> HyperBinary:
-    """Denoise a vector by finding the best match via near-neighbor search."""
+    """Denoise a vector by finding the best match via NNS.
+
+    Returns the chunk id (not code), matching Rust's ``chunk.id`` pattern.
+    """
     sel = memory.nns(memory.with_code(probe))
-    return memory.first_picked(env.substrate.new_view(), sel)
+    chunk_id, _code = memory.first_picked_chunk(env.storage.new_view(), sel)
+    return chunk_id

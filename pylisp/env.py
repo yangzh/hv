@@ -1,9 +1,6 @@
-"""LISP environment: domains, reserved symbols, lexicon, and substrate."""
+"""LISP environment: domains, reserved symbols, lexicon, and storage."""
 
 from __future__ import annotations
-
-import random
-from typing import Union
 
 from kongming_rs import hv, memory, HvError, REASON_NOT_FOUND
 from kongming_rs.api.v1.hv_pb2 import (
@@ -24,111 +21,62 @@ _RIGHT: int = Prewired.E.Value("RIGHT")
 
 DEFAULT_NAMESPACE: str = "default"
 
-
-class LispSubstrate:
-    """Storage layer for the LISP environment.
-
-    All data lives in the substrate (InMemory or Fjall). Two kinds of
-    chunks are stored:
-
-    - **Symbols and cons cell pointers** — stored via ``put()``, which
-      also indexes them for near-neighbor search (NNS). The ``cleanup()``
-      function uses NNS to denoise a noisy vector back to the nearest
-      known sparkle.
-    - **Cons cell content** (the Parcel encoding of ``(a . b)``) — stored
-      as a companion chunk in a separate ``code_domain`` with the same
-      pod as the cons pointer. Retrievable via ``get_code()``.
-    """
-
-    def __init__(
-        self,
-        model: int,
-        code_domain: hv.Domain,
-        inner: Union[memory.InMemory, memory.Fjall],
-    ) -> None:
-        self._inner = inner
-        self._code_domain: hv.Domain = code_domain
-        self._model: int = model
-
-    def new_view(self) -> memory.SubstrateView:
-        return self._inner.new_view()
-
-    def store(self, id: hv.Sparkle, code: HyperBinary | None = None) -> None:
-        """Store a chunk in the substrate (indexed for NNS).
-
-        If *code* is provided, it is stored as a companion chunk in
-        ``code_domain`` with the same pod, retrievable via ``get_code()``.
-        """
-        self._inner.put(id)
-        if code is not None and not hv.equal(id, code):
-            code_key = hv.Sparkle(self._model, self._code_domain, id.pod())
-            with self._inner.new_mutable_view() as view:
-                view.write_chunk(code_key, code=code)
-
-    def get_code(self, id: hv.Sparkle) -> HyperBinary | None:
-        """Retrieve the encoding for *id* from the code domain.
-
-        Returns None if the id has no stored encoding (i.e., it's a symbol).
-        Propagates all other exceptions.
-        """
-        with self._inner.new_view() as view:
-            try:
-                return view.read_chunk(self._code_domain, id.pod())
-            except HvError as e:
-                if e.code == REASON_NOT_FOUND:
-                    return None
-                raise
+# High seed for the PCG RNG used to generate cons cell sparkles.
+# ASCII "LISP" = 0x4C 0x49 0x53 0x50 → packed as a 32-bit big-endian integer.
+_RNG_SEED_HIGH: int = 0x4C495350
 
 
 class LispEnv:
-    """The LISP environment: substrate, reserved symbols, and lexicon.
+    """The LISP environment: storage, reserved symbols, and lexicon.
 
     Args:
         model: Model constant (default MODEL_64K_8BIT).
+        namespace: User namespace for cons/fn domains (default "default").
         path: If given, use Fjall disk-backed storage at this path.
-        namespace: User namespace for cons/fn domains (default "lisp.default").
     """
 
     def __init__(
         self,
         model: int = MODEL_64K_8BIT,
-        path: str | None = None,
         namespace: str | None = None,
+        path: str | None = None,
     ) -> None:
         ns = namespace or DEFAULT_NAMESPACE
-        self.model: int = model
+        self.model = model
 
         # Domains (all under the LISP prefix: λ)
-        self.sym_domain: hv.Domain = hv.Domain.with_prefix(_LISP_PREFIX, "sym")
-        self.cons_domain: hv.Domain = hv.Domain.with_prefix(_LISP_PREFIX, ns)
-        self.fn_domain: hv.Domain = hv.Domain.with_prefix(_LISP_PREFIX, f"{ns}.fn")
-        code_domain = hv.Domain.with_prefix(_LISP_PREFIX, f"{ns}.code")
+        self.sym_domain = hv.Domain.with_prefix(_LISP_PREFIX, "sym")
+        self.cons_domain = hv.Domain.with_prefix(_LISP_PREFIX, ns)
+        self.fn_domain = hv.Domain.with_prefix(_LISP_PREFIX, f"{ns}.fn")
+
+        # PCG-based RNG for generating unique cons cell sparkles.
+        self._rng = hv.SparseOperation(model, _RNG_SEED_HIGH, hv.curr_time_as_seed())
 
         if path is not None:
-            self.substrate = LispSubstrate(model, code_domain, memory.Fjall(model, path))
+            self.storage = memory.Fjall(model, path)
         else:
-            self.substrate = LispSubstrate(model, code_domain, memory.InMemory(model))
+            self.storage = memory.InMemory(model)
 
         # Reserved symbols
-        self.t: hv.Sparkle = hv.Sparkle.from_prewired(model, self.sym_domain, _TRUE)
-        self.f: hv.Sparkle = hv.Sparkle.from_prewired(model, self.sym_domain, _FALSE)
-        self.nil: hv.Sparkle = hv.Sparkle.from_prewired(model, self.sym_domain, _NIL)
-        self.lhs: hv.Sparkle = hv.Sparkle.from_prewired(model, self.sym_domain, _LEFT)
-        self.rhs: hv.Sparkle = hv.Sparkle.from_prewired(model, self.sym_domain, _RIGHT)
+        self.t = hv.Sparkle.from_prewired(model, self.sym_domain, _TRUE)
+        self.f = hv.Sparkle.from_prewired(model, self.sym_domain, _FALSE)
+        self.nil = hv.Sparkle.from_prewired(model, self.sym_domain, _NIL)
+        self.lhs = hv.Sparkle.from_prewired(model, self.sym_domain, _LEFT)
+        self.rhs = hv.Sparkle.from_prewired(model, self.sym_domain, _RIGHT)
 
         # McCarthy's 7 original primitives
-        self.sym_quote: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "QUOTE")
-        self.sym_atom: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "ATOM")
-        self.sym_eq: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "EQ")
-        self.sym_car: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "CAR")
-        self.sym_cdr: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "CDR")
-        self.sym_cons: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "CONS")
-        self.sym_cond: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "COND")
+        self.sym_quote = hv.Sparkle.from_word(model, self.sym_domain, "QUOTE")
+        self.sym_atom = hv.Sparkle.from_word(model, self.sym_domain, "ATOM")
+        self.sym_eq = hv.Sparkle.from_word(model, self.sym_domain, "EQ")
+        self.sym_car = hv.Sparkle.from_word(model, self.sym_domain, "CAR")
+        self.sym_cdr = hv.Sparkle.from_word(model, self.sym_domain, "CDR")
+        self.sym_cons = hv.Sparkle.from_word(model, self.sym_domain, "CONS")
+        self.sym_cond = hv.Sparkle.from_word(model, self.sym_domain, "COND")
 
         # Special forms
-        self.sym_lambda: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "LAMBDA")
-        self.sym_label: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "LABEL")
-        self.sym_define: hv.Sparkle = hv.Sparkle.from_word(model, self.sym_domain, "DEFINE")
+        self.sym_lambda = hv.Sparkle.from_word(model, self.sym_domain, "LAMBDA")
+        self.sym_label = hv.Sparkle.from_word(model, self.sym_domain, "LABEL")
+        self.sym_define = hv.Sparkle.from_word(model, self.sym_domain, "DEFINE")
 
         # Bidirectional lexicon
         self.name_to_sparkle: dict[str, hv.Sparkle] = {}
@@ -150,7 +98,7 @@ class LispEnv:
     def _register_symbol(self, name: str, sparkle: hv.Sparkle) -> None:
         self.name_to_sparkle[name] = sparkle
         self.hash_to_name[sparkle.stable_hash()] = name
-        self.substrate.store(sparkle)
+        self.storage.store_chunk(sparkle)
 
     def name_of(self, hb: HyperBinary) -> str | None:
         return self.hash_to_name.get(hb.stable_hash())
@@ -158,10 +106,9 @@ class LispEnv:
     def sparkle_of(self, name: str) -> hv.Sparkle | None:
         return self.name_to_sparkle.get(name)
 
-    def fresh_id(self) -> hv.Sparkle:
-        """Generate a fresh unique Sparkle id for a cons cell."""
-        seed = random.getrandbits(64)
-        return hv.Sparkle.from_seed(self.model, self.cons_domain, seed)
+    def random_sparkle(self) -> hv.Sparkle:
+        """Generate a random Sparkle in the cons domain (PCG-based)."""
+        return hv.Sparkle.from_seed(self.model, self.cons_domain, self._rng.uint64())
 
     def is_similar(self, a: HyperBinary, b: HyperBinary) -> bool:
         return hv.overlap(a, b) > hv.thres_noise(self.model)
@@ -171,19 +118,16 @@ class LispEnv:
     def eval(self, expr_str: str) -> str:
         """Parse and evaluate (single step), return display string."""
         from . import reader, evaluator, printer
-        parsed = reader.parse(self, expr_str)
-        result = evaluator.ev(self, parsed)
-        return printer.display(self, result)
+        return printer.display(self, 
+            evaluator.ev(self, reader.parse(self, expr_str)))
 
     def eval_full(self, expr_str: str) -> str:
         """Parse and evaluate until stable, return display string."""
         from . import reader, evaluator, printer
-        parsed = reader.parse(self, expr_str)
-        result = evaluator.ev_until_done(self, parsed)
-        return printer.display(self, result)
+        return printer.display(self,
+            evaluator.ev_until_done(self, reader.parse(self, expr_str)))
 
     def parse_display(self, expr_str: str) -> str:
         """Parse and display without evaluating."""
         from . import reader, printer
-        parsed = reader.parse(self, expr_str)
-        return printer.display(self, parsed)
+        return printer.display(self, reader.parse(self, expr_str))

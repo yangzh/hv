@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from kongming_rs import hv
+from kongming_rs import hv, HvError, REASON_NOT_FOUND
 
 from . import cons as cons_mod
 from . import lambda_
@@ -163,7 +163,7 @@ def _eval_define(env: LispEnv, args: HyperBinary) -> HyperBinary:
     fn_sparkle = hv.Sparkle.from_word(env.model, env.fn_domain, name_str)
     seed = hv.Seed128(fn_sparkle.domain().id(), fn_sparkle.pod().seed())
     cell = cons_mod.cons_parcel(env, seed, name, lambda_expr)
-    env.substrate.store(fn_sparkle, code=cell)
+    env.storage.store_chunk(fn_sparkle, code=cell)
 
     return env.nil
 
@@ -187,8 +187,9 @@ def _lookup_function(env: LispEnv, head: HyperBinary) -> HyperBinary | None:
     if name is None:
         return None
     fn_sparkle = hv.Sparkle.from_word(env.model, env.fn_domain, name)
-    cell = env.substrate.get_code(fn_sparkle)
-    if cell is None:
+    try:
+        cell = env.storage.get(fn_sparkle.domain(), fn_sparkle.pod())
+    except (HvError, ValueError):
         return None
     released = hv.release(cell, env.rhs)
     return cons_mod.cleanup(env, released)

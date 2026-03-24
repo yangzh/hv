@@ -5,7 +5,8 @@ Symbolic Architecture). Every data structure — atoms, cons cells, lists,
 closures — is a sparse binary hypervector. Every operation is VSA algebra:
 bind, bundle, release, and near-neighbor search.
 
-Inspired by [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889).
+Inspired by [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889), 
+which was originally developed by Peter Norvig [here](https://norvig.com/lispy.html).
 
 ## Two Implementations
 
