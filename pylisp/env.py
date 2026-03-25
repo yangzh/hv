@@ -82,20 +82,26 @@ class LispEnv:
         self.name_to_sparkle: dict[str, hv.Sparkle] = {}
         self.hash_to_name: dict[int, str] = {}
 
-        # Register reserved symbols
-        for name, sparkle in [("T", self.t), ("F", self.f), ("NIL", self.nil)]:
-            self._register_symbol(name, sparkle)
-
-        # Register builtins
+        # Register reserved symbols and builtins.
         for name, sparkle in [
-            ("CAR", self.sym_car), ("CDR", self.sym_cdr), ("CONS", self.sym_cons),
-            ("EQ", self.sym_eq), ("ATOM", self.sym_atom), ("QUOTE", self.sym_quote),
-            ("DEFINE", self.sym_define), ("COND", self.sym_cond),
-            ("LAMBDA", self.sym_lambda), ("LABEL", self.sym_label),
+            ("T", self.t), 
+            ("F", self.f), 
+            ("NIL", self.nil),
+            ("CAR", self.sym_car), 
+            ("CDR", self.sym_cdr), 
+            ("CONS", self.sym_cons),
+            ("EQ", self.sym_eq), 
+            ("ATOM", self.sym_atom), 
+            ("QUOTE", self.sym_quote),
+            ("DEFINE", self.sym_define), 
+            ("COND", self.sym_cond),
+            ("LAMBDA", self.sym_lambda), 
+            ("LABEL", self.sym_label),
         ]:
-            self._register_symbol(name, sparkle)
+            self.register_symbol(name, sparkle)
 
-    def _register_symbol(self, name: str, sparkle: hv.Sparkle) -> None:
+    def register_symbol(self, name: str, sparkle: hv.Sparkle) -> None:
+        """Register a new symbol: add to lexicon and store in substrate."""
         self.name_to_sparkle[name] = sparkle
         self.hash_to_name[sparkle.stable_hash()] = name
         self.storage.store_chunk(sparkle)

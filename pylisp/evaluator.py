@@ -160,10 +160,11 @@ def _eval_define(env: LispEnv, args: HyperBinary) -> HyperBinary:
     lambda_expr = cons_mod.car(env, rest)
 
     name_str = env.name_of(name) or "?"
-    fn_sparkle = hv.Sparkle.from_word(env.model, env.fn_domain, name_str)
-    seed = hv.Seed128(fn_sparkle.domain().id(), fn_sparkle.pod().seed())
-    cell = cons_mod.cons_parcel(env, seed, name, lambda_expr)
-    env.storage.store_chunk(fn_sparkle, code=cell)
+    fn_name = hv.Sparkle.from_word(env.model, env.fn_domain, name_str)
+    cell = cons_mod.cons_parcel(env, 
+        hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), 
+        name, lambda_expr)
+    env.storage.store_chunk(fn_name, code=cell)
 
     return env.nil
 
@@ -186,9 +187,9 @@ def _lookup_function(env: LispEnv, head: HyperBinary) -> HyperBinary | None:
     name = env.name_of(head)
     if name is None:
         return None
-    fn_sparkle = hv.Sparkle.from_word(env.model, env.fn_domain, name)
+    fn_name = hv.Sparkle.from_word(env.model, env.fn_domain, name)
     try:
-        cell = env.storage.get(fn_sparkle.domain(), fn_sparkle.pod())
+        cell = env.storage.get(fn_name.domain(), fn_name.pod())
     except (HvError, ValueError):
         return None
     released = hv.release(cell, env.rhs)

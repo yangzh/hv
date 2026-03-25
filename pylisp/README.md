@@ -14,11 +14,11 @@ The LISP interpreter ships in two forms, both feature-identical:
 
 | | Pure Python (`pylisp`) | Rust (`kongming_rs.lisp`) |
 |-|------------------------|--------------------------|
-| **Source** | This directory | Compiled into `kongming-rs-hv` |
-| **Import** | `from pylisp import LispEnv` | `from kongming_rs.lisp import LispEnv` |
+| **Source** | Included in `kongming-rs-hv`, also open-sourced here  | Compiled into `kongming-rs-hv` |
 | **Readable** | Yes — ~500 lines of annotated Python | No — compiled Rust binary |
 | **Performance** | Slower (Python overhead per operation) | Faster (native code) |
-| **Dependencies** | `kongming-rs-hv` (for hypervector ops) | Included in `kongming-rs-hv` |
+| **Import** | `from pylisp import LispEnv` | `from kongming_rs.lisp import LispEnv` |
+| **Dependencies** | `kongming-rs-hv` (for hypervector primitives) | Included in `kongming-rs-hv` |
 | **Use case** | Learning, debugging, extending | Production, notebooks |
 
 Both use the same API and produce identical results.

@@ -70,5 +70,5 @@ def _parse_atom(env: LispEnv, token: str) -> hv.Sparkle:
     if existing is not None:
         return existing
     sparkle = hv.Sparkle.from_word(env.model, env.sym_domain, upper)
-    env._register_symbol(upper, sparkle)
+    env.register_symbol(upper, sparkle)
     return sparkle
