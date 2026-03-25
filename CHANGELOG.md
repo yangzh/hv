@@ -3,6 +3,11 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.6.2 (2026-03-25)
+
+- Fix: include top-level buf package in wheel; bump to 3.6.2
+- Fix changelog filter: only exclude pure version bump commits
+- Opt into Node.js 24 for all workflows; remove unused deep_clone
 ## v3.6.1 (2026-03-25)
 
 - Fix: include pylisp module in wheel (resolve symlink before build)
