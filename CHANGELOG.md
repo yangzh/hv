@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.6.3 (2026-03-25)
+
+- Fix: ship kongming.api.annotations_pb2 and top-level buf in wheel
 ## v3.6.2 (2026-03-25)
 
 - Fix: include top-level buf package in wheel; bump to 3.6.2
@@ -80,11 +83,3 @@ Only the latest 10 releases are shown.
 - add `namespace` parameter to Python `LispEnv(namespace="alice")`
 - notebook uses random namespace per session
 
-## v3.2.1 (2026-03-16)
-
-- add VSA-based LISP interpreter (`kongming_rs.lisp.LispEnv`)
-- add fjall-backed persistent storage for LISP environments
-- add Jupyter notebook demo for VSA LISP interpreter
-- add --model flag to LISP REPL, default to 10bit
-- refactor LISP env: use prewired symbols
-- simplify LISP internals: random cons pointers, cons-encoded DEFINE
