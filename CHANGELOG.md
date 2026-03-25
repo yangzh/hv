@@ -3,6 +3,12 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.6.1 (2026-03-25)
+
+- Fix: include pylisp module in wheel (resolve symlink before build)
+- Opt into Node.js 24 for all GitHub Actions workflows
+- Remove unused `HvCore::deep_clone()` method
+
 ## v3.6.0 (2026-03-25)
 
 - Add notebook sync to release workflow; add lisp.ipynb with dual interpreter demo
