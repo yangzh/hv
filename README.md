@@ -1,5 +1,7 @@
 # hv
 
+[![Docs](https://img.shields.io/badge/docs-yangzh.github.io%2Fhv-blue)](https://yangzh.github.io/hv/)
+
 Public release of sparse binary hypervectors and associated learners,
 powered by the Rust-backed `kongming-rs-hv` package.
 
