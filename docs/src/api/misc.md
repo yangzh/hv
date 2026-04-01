@@ -60,36 +60,6 @@ In Rust, concrete types are wrapped in `HyperBinaryKind` (an enum) for dynamic d
 
 In Python, there is no explicit interface — all types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
 
-## Display (`__repr__`)
-
-All HyperBinary types implement `__repr__` in Python. When a variable is evaluated in an interactive Python shell or notebook cell, the repr is displayed automatically:
-
-```python
->>> a = hv.Sparkle.with_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
->>> a
-✨:🌐0x..c862,🫛0x..80e4
-```
-
-Each type has a compact emoji-prefixed representation that encodes domain, pod, and other metadata. This is useful for quick inspection without explicitly calling `print()` or serialization functions.
-
-The equivalent in Go and Rust is the `String()` / `Display` trait:
-
-{{#tabs}}
-{{#tab name="Go"}}
-```go
-fmt.Println(sparkle)          // uses String()
-fmt.Println(sparkle.Repr())   // YAML-style detailed repr
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-println!("{}", sparkle);      // uses Display trait
-```
-{{#endtab}}
-{{#endtabs}}
-
-## Utility Functions
-
 ## Shortcuts
 
 {{#tabs}}
