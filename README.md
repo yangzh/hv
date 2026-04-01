@@ -2,6 +2,8 @@
 
 [![Docs](https://img.shields.io/badge/docs-yangzh.github.io%2Fhv-blue)](https://yangzh.github.io/hv/)
 [![PyPI](https://img.shields.io/pypi/v/kongming-rs-hv)](https://pypi.org/project/kongming-rs-hv/)
+[![Python](https://img.shields.io/pypi/pyversions/kongming-rs-hv)](https://pypi.org/project/kongming-rs-hv/)
+[![License](https://img.shields.io/github/license/yangzh/hv)](LICENSE)
 
 Public release of sparse binary hypervectors and associated learners, powered by the Rust-backed `kongming-rs-hv` package.
 
