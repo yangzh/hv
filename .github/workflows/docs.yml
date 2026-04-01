@@ -23,13 +23,13 @@ jobs:
       - name: Install mdBook and plugins
         run: |
           mkdir -p $HOME/bin
-          curl -sSL https://github.com/rust-lang/mdBook/releases/latest/download/mdbook-v0.4.47-x86_64-unknown-linux-gnu.tar.gz \
+          curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.5.2/mdbook-v0.5.2-x86_64-unknown-linux-gnu.tar.gz \
             | tar -xz -C $HOME/bin
-          curl -sSL https://github.com/nicoulaj/mdbook-pdf/releases/latest/download/mdbook-pdf-x86_64-unknown-linux-gnu.tar.gz \
+          curl -sSL -o $HOME/bin/mdbook-pdf https://github.com/HollowMan6/mdbook-pdf/releases/download/v0.1.13/mdbook-pdf-v0.1.13-x86_64-unknown-linux-gnu \
+            && chmod +x $HOME/bin/mdbook-pdf
+          curl -sSL https://github.com/lzanini/mdbook-katex/releases/download/0.10.0-alpha-binaries/mdbook-katex-v0.10.0-alpha-x86_64-unknown-linux-gnu.tar.gz \
             | tar -xz -C $HOME/bin
-          curl -sSL https://github.com/lzanini/mdbook-katex/releases/download/v0.10.0-alpha/mdbook-katex-v0.10.0-alpha-x86_64-unknown-linux-gnu.tar.gz \
-            | tar -xz -C $HOME/bin
-          curl -sSL https://github.com/nicoulaj/mdbook-tabs/releases/latest/download/mdbook-tabs-x86_64-unknown-linux-gnu.tar.gz \
+          curl -sSL https://github.com/RustForWeb/mdbook-plugins/releases/download/v0.3.4/mdbook-tabs-v0.3.4-x86_64-unknown-linux-gnu.tar.gz \
             | tar -xz -C $HOME/bin
           echo "$HOME/bin" >> $GITHUB_PATH
       - name: Install tab assets
