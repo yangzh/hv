@@ -15,7 +15,7 @@
 - [Near-neighbor search](concepts/near_neighbor_search.md)
 - [Associative index](concepts/associative_index.md)
 
-# API Reference
+# API Reference — HV
 
 - [SparseSegmented](api/sparse_segmented.md)
 - [Sparkle](api/sparkle.md)
@@ -36,4 +36,4 @@
 
 # Applications
 
-- [LISP Interpreter (pylisp)](applications/pylisp.md)
+- [LISP Interpreter](applications/pylisp.md)

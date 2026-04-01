@@ -1,4 +1,4 @@
-# LISP Interpreter (pylisp)
+# LISP Interpreter
 
 A LISP interpreter built entirely on hyperdimensional computing. Every data structure — atoms, cons cells, lists, closures — is a sparse binary hypervector. Every operation is VSA algebra: bind, bundle, release, and near-neighbor search.
 
