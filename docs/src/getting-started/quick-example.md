@@ -3,12 +3,11 @@
 A minimal example showing the core operations:
 
 ```python
-from kongming_rs.api import v1 as apiv1
 from kongming_rs import hv
 
 # Create hypervectors
-a = hv.Sparkle.from_word(apiv1.MODEL_64K_8BIT, hv.d0(), "hello")
-b = hv.Sparkle.from_word(apiv1.MODEL_64K_8BIT, hv.d0(), "world")
+a = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
+b = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "world")
 print(f'{a=}\n{hv.to_message(a)=}')
 print(f'{b=}\n{hv.to_message(b)=}')
 print(f'Overlap: {hv.overlap(a, b)}')  # Near orthogonal for random vectors.
