@@ -5,7 +5,6 @@
 # Getting Started
 
 - [Installation](getting-started/installation.md)
-- [Quick Example](getting-started/quick-example.md)
 
 # Concepts
 

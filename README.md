@@ -21,7 +21,8 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 
 - [Concepts](https://yangzh.github.io/hv/concepts/hypervectors.html) — hypervectors, models, composites, operators, associative index, near-neighbor search
 - [API Reference](https://yangzh.github.io/hv/api/sparkle.html) — Python, Go, and Rust side by side
-- [Quick Start Guides](https://yangzh.github.io/hv/guides/python/quick-start.html) — Python and Notebook walkthroughs
+- [Python Quick Start](https://yangzh.github.io/hv/guides/python/quick-start.html) — installation, examples, and notebooks
+- [Notebook Quick Start](https://yangzh.github.io/hv/guides/notebook/quick-start.html) — cell-by-cell Jupyter walkthrough
 - [PDF download](https://yangzh.github.io/hv/kongming-hv.pdf)
 
 ## Try Online

@@ -6,6 +6,33 @@
 pip install kongming-rs-hv
 ```
 
+## Quick Example
+
+A minimal example showing the core operations:
+
+```python
+from kongming_rs import hv
+
+# Create hypervectors
+a = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
+b = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "world")
+print(f'Overlap: {hv.overlap(a, b)}')  # Near orthogonal (~1)
+
+# Bind: result is dissimilar to both inputs
+bound = hv.bind(a, b)
+print(f'{hv.overlap(bound, a)=}, {hv.overlap(bound, b)=}')  # ~1, ~1
+
+# Bundle: result is similar to both inputs
+bundled = hv.bundle(hv.Seed128(10, 1), a, b)
+print(f'{hv.overlap(bundled, a)=}, {hv.overlap(bundled, b)=}')  # high, high
+```
+
+**What's happening:**
+1. `Sparkle.from_word` generates a deterministic hypervector from a word. Same word always produces the same vector.
+2. Two unrelated vectors have near-zero overlap (~1) — random high-dimensional vectors are nearly orthogonal.
+3. `hv.bind(a, b)` produces a vector dissimilar to both (low overlap). Binding is reversible.
+4. `hv.bundle(seed, a, b)` produces a vector similar to both (high overlap). Different seeds produce different but equally valid results.
+
 ## Creating Vectors
 
 ```python
@@ -77,4 +104,18 @@ print(hv.overlap(learner, cat))  # higher
 print(hv.overlap(learner, dog))  # lower but above random
 ```
 
-See also: [Notebook Quick Start](../notebook/quick-start.md) for an interactive Jupyter walkthrough.
+## Interactive Notebooks
+
+For deeper walkthroughs, see the interactive notebooks:
+
+- [`first.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/first.ipynb) — Introduction to hypervectors, bind/bundle operations, and composites
+- [`memory.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/memory.ipynb) — In-memory and persistent storage, near-neighbor search with attractors, and export to disk
+- [`lisp.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/lisp.ipynb) — VSA-based LISP interpreter where every data structure is a hypervector
+
+See also: [Notebook Quick Start](../notebook/quick-start.md) for a cell-by-cell walkthrough.
+
+## LISP Interpreter
+
+A LISP interpreter where every data structure is a hypervector, implementing McCarthy's original calculus on top of VSA algebra. Available as both a pure-Python implementation (for readability) and a Rust implementation (for performance). See [`pylisp/README.md`](https://github.com/yangzh/hv/blob/main/pylisp/README.md) for details.
+
+Inspired by the ArXiv paper [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889).
