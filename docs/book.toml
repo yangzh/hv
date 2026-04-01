@@ -1,0 +1,28 @@
+[book]
+title = "Kongming HV Documentation"
+authors = ["Kevin Yang"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+git-repository-url = "https://github.com/yangzh/hv"
+edit-url-template = "https://github.com/yangzh/hv/edit/main/docs/src/{path}"
+site-url = "/hv/"
+default-theme = "light"
+preferred-dark-theme = "ayu"
+additional-css = ["theme/tabs.css"]
+additional-js = ["theme/tabs.js"]
+
+[output.html.search]
+enable = true
+
+[preprocessor.katex]
+renderers = ["html", "pdf"]
+
+[preprocessor.tabs]
+
+[output.pdf]
+title = "Kongming HV Documentation"
