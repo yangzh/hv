@@ -104,18 +104,4 @@ print(hv.overlap(learner, cat))  # higher
 print(hv.overlap(learner, dog))  # lower but above random
 ```
 
-## Interactive Notebooks
-
-For deeper walkthroughs, see the interactive notebooks:
-
-- [`first.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/first.ipynb) — Introduction to hypervectors, bind/bundle operations, and composites
-- [`memory.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/memory.ipynb) — In-memory and persistent storage, near-neighbor search with attractors, and export to disk
-- [`lisp.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/lisp.ipynb) — VSA-based LISP interpreter where every data structure is a hypervector
-
-See also: [Notebook Quick Start](../notebook/quick-start.md) for a cell-by-cell walkthrough.
-
-## LISP Interpreter
-
-A LISP interpreter where every data structure is a hypervector, implementing McCarthy's original calculus on top of VSA algebra. Available as both a pure-Python implementation (for readability) and a Rust implementation (for performance). See [`pylisp/README.md`](https://github.com/yangzh/hv/blob/main/pylisp/README.md) for details.
-
-Inspired by the ArXiv paper [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889).
+See also: [Notebook Quick Start](../notebook/quick-start.md) for interactive walkthroughs and notebook links.
