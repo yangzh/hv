@@ -1,6 +1,94 @@
 # Misc
 
-Utility functions that don't belong to a specific type.
+## HyperBinary Interface
+
+All vector types (SparseSegmented, Sparkle, Set, Sequence, Octopus, Knot, Parcel, Cyclone, Learner) conform to a common interface. In Go this is the `HyperBinary` interface; in Rust it is the `HyperBinary` trait. The two implementations are kept at **feature parity**.
+
+{{#tabs}}
+{{#tab name="Go"}}
+```go
+type HyperBinary interface {
+    Model() api.Model
+    Width() uint32
+    Cardinality() uint32
+    Hint() api.HyperBinaryProto_Hint
+    StableHash() uint64
+    Core() SparseSegmented
+    Domain() Domain
+    Pod() Pod
+    Exponent() int32
+    Power(p int32) HyperBinary
+    Clone() HyperBinary
+
+    // Display: String() returns compact emoji form;
+    // Repr() returns detailed YAML/proto form.
+    // Both are part of the interface in Go.
+    fmt.Stringer
+    Repr() string
+
+    // Serialization is part of the interface in Go.
+    ToProto(ctx context.Context) (*api.HyperBinaryProto, error)
+}
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+pub trait HyperBinary: std::fmt::Display {
+    fn model(&self) -> Model;
+    fn width(&self) -> u32;
+    fn cardinality(&self) -> u32;
+    fn hint(&self) -> HyperBinaryHint;
+    fn stable_hash(&self) -> u64;
+    fn core(&self) -> SparseSegmented;
+    fn domain(&self) -> &Domain;
+    fn pod(&self) -> &Pod;
+    fn exponent(&self) -> i32;
+    fn power(&self, p: i32) -> HyperBinaryKind;
+    fn clone_hb(&self) -> HyperBinaryKind;
+
+    // Display: via the std::fmt::Display supertrait (shown above).
+    // No separate Repr(); use Debug derive or per-type formatting.
+
+    // Serialization: to_proto() / from_proto() are inherent methods
+    // on each concrete type, not part of the trait.
+}
+```
+
+In Rust, concrete types are wrapped in `HyperBinaryKind` (an enum) for dynamic dispatch instead of Go's interface boxing.
+{{#endtab}}
+{{#endtabs}}
+
+In Python, there is no explicit interface — all types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
+
+## Display (`__repr__`)
+
+All HyperBinary types implement `__repr__` in Python. When a variable is evaluated in an interactive Python shell or notebook cell, the repr is displayed automatically:
+
+```python
+>>> a = hv.Sparkle.with_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
+>>> a
+✨:🌐0x..c862,🫛0x..80e4
+```
+
+Each type has a compact emoji-prefixed representation that encodes domain, pod, and other metadata. This is useful for quick inspection without explicitly calling `print()` or serialization functions.
+
+The equivalent in Go and Rust is the `String()` / `Display` trait:
+
+{{#tabs}}
+{{#tab name="Go"}}
+```go
+fmt.Println(sparkle)          // uses String()
+fmt.Println(sparkle.Repr())   // YAML-style detailed repr
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+println!("{}", sparkle);      // uses Display trait
+```
+{{#endtab}}
+{{#endtabs}}
+
+## Utility Functions
 
 ## Shortcuts
 
