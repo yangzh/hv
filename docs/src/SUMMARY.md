@@ -33,3 +33,7 @@
 
 - [Python Quick Start](guides/python/quick-start.md)
 - [Notebook Quick Start](guides/notebook/quick-start.md)
+
+# Applications
+
+- [LISP Interpreter (pylisp)](applications/pylisp.md)

@@ -141,8 +141,4 @@ For deeper walkthroughs, open these notebooks directly:
 - [`memory.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/memory.ipynb) — In-memory and persistent storage, near-neighbor search with attractors, and export to disk
 - [`lisp.ipynb`](https://github.com/yangzh/hv/blob/main/notebook/lisp.ipynb) — VSA-based LISP interpreter where every data structure is a hypervector
 
-## LISP Interpreter
-
-A LISP interpreter where every data structure is a hypervector, implementing McCarthy's original calculus on top of VSA algebra. Available as both a pure-Python implementation (for readability) and a Rust implementation (for performance). See [`pylisp/README.md`](https://github.com/yangzh/hv/blob/main/pylisp/README.md) for details.
-
-Inspired by the ArXiv paper [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889).
+See also: [LISP Interpreter (pylisp)](../applications/pylisp.md) — a full application built on the core API.
