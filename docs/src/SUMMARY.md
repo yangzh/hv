@@ -29,6 +29,7 @@
     - [Learner](api/learner.md)
     - [Model](api/model.md)
     - [Operators](api/operators.md)
+    - [Misc](api/misc.md)
 
 # Guides
 

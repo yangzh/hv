@@ -15,3 +15,4 @@ The core hypervector API. This module provides the building blocks for hyperdime
 | [Learner](learner.md) | Online Hebbian learning |
 | [Model](model.md) | Sparsity configuration and SparseOperation |
 | [Operators](operators.md) | Bind, bundle, overlap, and similarity metrics |
+| [Misc](misc.md) | Shortcuts, hashing, serialization, frame analysis |
