@@ -6,11 +6,26 @@ Kongming is a hyperdimensional computing library implementing sparse binary hype
 
 The core implementation is in **Go** with a parallel **Rust** implementation. Both strive to expose abstractions and features in parity and maintain wire-compatible protobuf serialization.
 
-## What is Hyperdimensional Computing?
+See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and the sparse binary representation.
 
-Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors and manipulates them with simple algebraic operations (bind, bundle, and permutation). The key insight is that random vectors in high-dimensional spaces are nearly orthogonal, giving each concept a unique, robust and almost interference-free representation.
+## Install
 
-Kongming focuses on **sparse binary** hypervectors **only**: only a small fraction of dimensions are "on" (set to 1). This enables efficient storage and fast bitwise operations while preserving the algebraic properties of HDC.
+```bash
+pip install kongming-rs-hv
+```
+
+See [Installation](guides/python/installation.md) for supported platforms and verification steps.
+
+## Published notebooks
+
+See [Notebook Platforms](guides/notebook/platforms.md) for all available notebooks and platform details. 
+
+## Guides
+
+| Guide | Description |
+|-------|-------------|
+| [Notebook Quick Start](guides/notebook/quick-start.md) | Platform setup, interactive notebooks, cell-by-cell walkthrough |
+| [Python Quick Start](guides/python/quick-start.md) | Installation, examples, and walkthrough |
 
 ## Language Support
 

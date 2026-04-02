@@ -10,7 +10,6 @@ before publishing.
 """
 
 import argparse
-import os
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -35,6 +34,7 @@ class TypeDoc:
 # ---------------------------------------------------------------------------
 # Go extractor
 # ---------------------------------------------------------------------------
+
 
 def extract_go(src_dir: Path) -> dict[str, TypeDoc]:
     """Extract exported types and their doc comments from Go source files."""
@@ -95,8 +95,11 @@ def extract_go(src_dir: Path) -> dict[str, TypeDoc]:
                 mname = m.group(2)
                 sig = f"func ({receiver}) {mname}{m.group(3).split('{')[0].rstrip()}"
                 fd = FuncDoc(
-                    name=mname, signature=sig, comment=comment,
-                    is_method=True, receiver=receiver,
+                    name=mname,
+                    signature=sig,
+                    comment=comment,
+                    is_method=True,
+                    receiver=receiver,
                 )
                 if receiver in types:
                     types[receiver].funcs.append(fd)
@@ -117,6 +120,7 @@ def extract_go(src_dir: Path) -> dict[str, TypeDoc]:
 # ---------------------------------------------------------------------------
 # Rust extractor
 # ---------------------------------------------------------------------------
+
 
 def extract_rust(src_dir: Path) -> dict[str, TypeDoc]:
     """Extract pub types and their doc comments from Rust source files."""
@@ -228,11 +232,24 @@ RUST_TYPE_MAP = {
 }
 
 OPERATOR_FUNCS = {
-    "Bind", "Release", "BindDirect", "Bundle", "BundleSet", "BundleDirect",
-    "NewTemplate", "ReplaceSingle", "Replace",
-    "Overlap", "Equal", "Inverse",
+    "Bind",
+    "Release",
+    "BindDirect",
+    "Bundle",
+    "BundleSet",
+    "BundleDirect",
+    "NewTemplate",
+    "ReplaceSingle",
+    "Replace",
+    "Overlap",
+    "Equal",
+    "Inverse",
     # Rust equivalents
-    "bind", "bind_direct", "bind_hb", "bundle_direct", "overlap",
+    "bind",
+    "bind_direct",
+    "bind_hb",
+    "bundle_direct",
+    "overlap",
 }
 
 
@@ -297,27 +314,23 @@ def write_files(out_dir: Path, go_sections: dict, rust_sections: dict):
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--go-src", type=Path, required=True,
-                        help="Path to Go hv/ source directory")
-    parser.add_argument("--rust-src", type=Path, required=True,
-                        help="Path to Rust hv/ source directory")
-    parser.add_argument("--out", type=Path, required=True,
-                        help="Output directory for API markdown files")
+    parser.add_argument("--go-src", type=Path, required=True, help="Path to Go hv/ source directory")
+    parser.add_argument("--rust-src", type=Path, required=True, help="Path to Rust hv/ source directory")
+    parser.add_argument("--out", type=Path, required=True, help="Output directory for API markdown files")
     args = parser.parse_args()
 
     args.out.mkdir(parents=True, exist_ok=True)
 
     print("Extracting Go docs...")
     go_types = extract_go(args.go_src)
-    print(f"  found {len(go_types)} types, "
-          f"{sum(len(t.funcs) for t in go_types.values())} functions")
+    print(f"  found {len(go_types)} types, {sum(len(t.funcs) for t in go_types.values())} functions")
 
     print("Extracting Rust docs...")
     rust_types = extract_rust(args.rust_src)
-    print(f"  found {len(rust_types)} types, "
-          f"{sum(len(t.funcs) for t in rust_types.values())} functions")
+    print(f"  found {len(rust_types)} types, {sum(len(t.funcs) for t in rust_types.values())} functions")
 
     go_sections = render_section("Go", go_types, TYPE_FILE_MAP)
     rust_sections = render_section("Rust", rust_types, RUST_TYPE_MAP)

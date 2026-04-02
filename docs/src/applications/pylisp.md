@@ -4,6 +4,8 @@ A LISP interpreter built entirely on hyperdimensional computing. Every data stru
 
 Inspired by [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889), with history tracing back to [Peter Norvig's post](https://norvig.com/lispy.html).
 
+**Try it now**: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true)
+
 ## Two Implementations
 
 The LISP interpreter ships in two forms, both feature-identical:

@@ -2,6 +2,15 @@
 
 Setup and behavior differ across Jupyter, Google Colab, and Binder. This page covers the key differences.
 
+## Try Online
+
+| Notebook | Platform | Link |
+|----------|----------|------|
+| `first.ipynb` | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true) |
+| `first.ipynb` | Binder | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb) |
+| `memory.ipynb` | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true) |
+| `lisp.ipynb` | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true) |
+
 ## Comparison
 
 | | Jupyter (local) | Google Colab | Binder |
