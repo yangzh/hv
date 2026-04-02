@@ -44,6 +44,9 @@
 # Guides
 
 - [Python Quick Start](guides/python/quick-start.md)
+    - [Installation](guides/python/installation.md)
+    - [Quick Example](guides/python/example.md)
+    - [Walkthrough](guides/python/walkthrough.md)
 - [Notebook Quick Start](guides/notebook/quick-start.md)
     - [Notebook Platforms](guides/notebook/platforms.md)
     - [Interactive Notebooks](guides/notebook/notebooks.md)
