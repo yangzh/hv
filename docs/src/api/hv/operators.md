@@ -72,28 +72,3 @@ let raw = bind_direct(&[a.core(), b.core()]); // → SparseSegmented
 {{#endtab}}
 {{#endtabs}}
 
-## Similarity
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-hv.overlap(a, b)    # count of matching ON bits
-hv.hamming(a, b)    # count of differing segments
-hv.equal(a, b)      # hash equality
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-hv.Overlap(a, b)         // uint32
-hv.Hamming(a, b)         // uint32
-hv.Equal(a, b)           // bool
-hv.JaccardIndex(a, b)    // float64
-hv.JaccardDistance(a, b)  // float64
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-overlap(&a.core(), &b.core())   // u32
-```
-{{#endtab}}
-{{#endtabs}}

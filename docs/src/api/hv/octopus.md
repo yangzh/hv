@@ -1,4 +1,4 @@
-# Octopus
+# Octopus 🐙
 
 A key-value composite where each value is bound with its key's Sparkle. See [Composites: Octopus](../../concepts/composites.md#octopus) for the conceptual overview.
 

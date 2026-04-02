@@ -1,143 +1,73 @@
 # Misc
 
-## HyperBinary Interface
+## Environment Variables
 
-All vector types (SparseSegmented, Sparkle, Set, Sequence, Octopus, Knot, Parcel, Cyclone, Learner) conform to a common interface. In Go this is the `HyperBinary` interface; in Rust it is the `HyperBinary` trait. The two implementations are kept at **feature parity**.
+All environment variables are read once on first access and cannot be changed at runtime. Unset variables use the documented default.
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-In Python, there is no explicit interface. All types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `KONGMING_REPR_FORMAT` | `YAML` | Controls `__repr__()` / `Repr()` output format. `YAML`: multi-line YAML dump. `PROTO`: multi-line protobuf debug string. |
+| `KONGMING_LEARNER_SAMPLING` | `fisher_yates` | Learner bundling strategy. `fisher_yates`: Fisher-Yates exact selection (default). `classic`: per-segment probabilistic sampling. |
+
+```bash
+# Example: switch repr to protobuf debug format
+export KONGMING_REPR_FORMAT=PROTO
+
+# Example: use classic sampling in Learner
+export KONGMING_LEARNER_SAMPLING=classic
+```
+
+## Display
+
+All HyperBinary types have a compact, emoji-prefixed string representation for quick visual inspection. See [HyperBinary Types](types.md#type-symbols) for type symbols and [Domain & Pod](common/domain_pod.md#display-labels) for field labels.
+
+### Python `__str__` and `__repr__`
+
+**`__str__`** (triggered by `print()`) returns the compact emoji form:
 
 ```python
-v.model()        # Model enum
-v.stable_hash()  # int
-v.core()         # SparseSegmented
-v.power(p)       # HyperBinary
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-type HyperBinary interface {
-    Model() api.Model
-    Width() uint32
-    Cardinality() uint32
-    Hint() api.HyperBinaryProto_Hint
-    StableHash() uint64
-    Core() SparseSegmented
-    Domain() Domain
-    Pod() Pod
-    Exponent() int32
-    Power(p int32) HyperBinary
-    Clone() HyperBinary
-
-    // Display: String() returns compact emoji form;
-    // Repr() returns detailed YAML/proto form.
-    // Both are part of the interface in Go.
-    fmt.Stringer
-    Repr() string
-
-    // Serialization is part of the interface in Go.
-    ToProto(ctx context.Context) (*api.HyperBinaryProto, error)
-}
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-pub trait HyperBinary: std::fmt::Display {
-    fn model(&self) -> Model;
-    fn width(&self) -> u32;
-    fn cardinality(&self) -> u32;
-    fn hint(&self) -> HyperBinaryHint;
-    fn stable_hash(&self) -> u64;
-    fn core(&self) -> SparseSegmented;
-    fn domain(&self) -> &Domain;
-    fn pod(&self) -> &Pod;
-    fn exponent(&self) -> i32;
-    fn power(&self, p: i32) -> HyperBinaryKind;
-    fn clone_hb(&self) -> HyperBinaryKind;
-
-    // Display: via the std::fmt::Display supertrait (shown above).
-    // No separate Repr(); use Debug derive or per-type formatting.
-
-    // Serialization: to_proto() / from_proto() are inherent methods
-    // on each concrete type, not part of the trait.
-}
+>>> a = hv.Sparkle.with_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
+>>> print(a)
+✨:🌐0x..c862,🫛0x..80e4
 ```
 
-In Rust, concrete types are wrapped in `HyperBinaryKind` (an enum) for dynamic dispatch instead of Go's interface boxing.
-{{#endtab}}
-{{#endtabs}}
+**`__repr__`** (triggered by evaluating a variable in the shell or notebook) returns a detailed, developer-friendly YAML representation, controlled by the `KONGMING_REPR_FORMAT` environment variable:
 
-In Python, there is no explicit interface — all types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
+```python
+>>> a
+hint: SPARKLE
+model: MODEL_64K_8BIT
+stable_hash: 12345678
+domain:
+  id: ...
+pod:
+  seed: 12345
+```
 
-## Shortcuts
+Set `KONGMING_REPR_FORMAT=PROTO` for protobuf debug output instead of the default YAML. See [Environment Variables](#environment-variables) for all supported variables.
+
+### Go / Rust Display
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-hv.d0()       # Default Domain (id=0)
-hv.p0()       # Default Pod (seed=0)
+print(sparkle)      # compact emoji form via __str__
+repr(sparkle)       # detailed YAML/proto form via __repr__
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-hv.D0()       // Default Domain
-hv.P0()       // Default Pod
+// Compact emoji form
+fmt.Println(sparkle)          // ✨:🌐0x..c862,🫛0x..80e4
+
+// Detailed YAML/proto form (controlled by KONGMING_REPR_FORMAT env)
+fmt.Println(sparkle.Repr())
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-Domain::default_domain()  // D0
-Pod::default_pod()        // P0
-```
-{{#endtab}}
-{{#endtabs}}
-
-## Hash Utilities
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-hv.hash64_from_string("hello")   # deterministic u64 hash from string
-hv.hash64_from_bytes(b"\x01\x02") # deterministic u64 hash from bytes
-hv.curr_time_as_seed()            # current time as a u64 seed
-hv.kongming_studio_seed()         # fixed studio seed constant
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-hv.Hash64FromString("hello")     // uint64
-hv.Hash64FromBytes(raw)          // uint64
-hv.Hash64FromMessage(protoMsg)   // uint64 — hash from protobuf message
-hv.CurrTimeAsSeed()              // uint64
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-hash64_from_string("hello")      // u64
-hash64_from_bytes(&raw)          // u64
-curr_time_as_seed()              // u64
-KONGMING_STUDIO_SEED             // u64
-```
-{{#endtab}}
-{{#endtabs}}
-
-## Identity Check
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-hv.is_identity(v)   # True if v is an identity vector
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-hv.IsIdentity(v)    // bool
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-v.is_identity()     // bool
+// Compact emoji form (via Display trait)
+println!("{}", sparkle);      // ✨:🌐0x..c862,🫛0x..80e4
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -180,53 +110,3 @@ let sparkle = Sparkle::from_proto(&pb)?;
 {{#endtab}}
 {{#endtabs}}
 
-## Environment Variables
-
-All environment variables are read once on first access and cannot be changed at runtime. Unset variables use the documented default.
-
-| Variable | Default | Effect |
-|----------|---------|--------|
-| `KONGMING_REPR_FORMAT` | `YAML` | Controls `__repr__()` / `Repr()` output format. `YAML`: multi-line YAML dump. `PROTO`: multi-line protobuf debug string. |
-| `KONGMING_LEARNER_SAMPLING` | `fisher_yates` | Learner bundling strategy. `fisher_yates`: Fisher-Yates exact selection (default). `classic`: per-segment probabilistic sampling. |
-
-```bash
-# Example: switch repr to protobuf debug format
-export KONGMING_REPR_FORMAT=PROTO
-
-# Example: use classic sampling in Learner
-export KONGMING_LEARNER_SAMPLING=classic
-```
-
-## Frame Analysis
-
-Functions for analyzing sets of hypervectors as geometric frames.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-hv.frame_inner_product(set_a, set_b)  # inner product between two sets
-hv.frame_cross(set_a, set_b)          # cross-overlap between sets
-hv.frame_correlation(set_a, set_b)    # normalized correlation
-hv.frame_cross_noise(set_a, set_b)    # cross-noise level
-hv.frame_coefficient(hbs, probe)      # coefficient of probe in set
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-hv.FrameInnerProduct(hc0, hc1)   // float64
-hv.FrameCross(hc0, hc1)          // float64
-hv.FrameCorrelation(hc0, hc1)    // float64
-hv.FrameCrossNoise(hc0, hc1)     // float64
-hv.FrameCoefficient(hc, probe)   // float64
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-frame_inner_product(&set_a, &set_b)   // f64
-frame_cross(&set_a, &set_b)           // f64
-frame_correlation(&set_a, &set_b)     // f64
-frame_cross_noise(&set_a, &set_b)     // f64
-frame_coefficient(&hbs, &probe)       // f64
-```
-{{#endtab}}
-{{#endtabs}}

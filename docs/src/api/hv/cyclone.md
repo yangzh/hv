@@ -1,4 +1,4 @@
-# Cyclone
+# Cyclone 🌀
 
 A periodic permutation vector where `power(v, period) == identity`. See [Composites: Cyclone](../../concepts/composites.md#cyclone).
 

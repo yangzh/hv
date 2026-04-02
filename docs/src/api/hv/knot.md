@@ -1,4 +1,4 @@
-# Knot
+# Knot 🪢
 
 The result of binding (multiplicative composition) of hypervectors. Unlike `BindDirect`, Knot tracks its member parts for serialization and debugging. See [Composites: Knot](../../concepts/composites.md#knot).
 

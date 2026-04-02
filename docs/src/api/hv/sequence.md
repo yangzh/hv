@@ -1,4 +1,4 @@
-# Sequence
+# Sequence 📿
 
 An ordered collection of hypervectors with positional encoding. See [Composites: Sequence](../../concepts/composites.md#sequence) for the conceptual overview.
 

@@ -1,4 +1,4 @@
-# Set
+# Set 🫧
 
 An unordered collection of hypervectors. See [Composites: Set](../../concepts/composites.md#set) for the conceptual overview.
 

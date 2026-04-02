@@ -1,4 +1,4 @@
-# Parcel
+# Parcel 🎁
 
 The result of bundling (additive composition) of hypervectors. Unlike `BundleDirect`, Parcel tracks its members and bundling seed for serialization and debugging. See [Composites: Parcel](../../concepts/composites.md#parcel).
 

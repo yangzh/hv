@@ -1,4 +1,4 @@
-# SparseSegmented
+# SparseSegmented 🍡
 
 The foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at a recorded offset. All other types (Sparkle, Set, Sequence, etc.) ultimately stores a `SparseSegmented` in memory and can be accessed via `.Core()`.
 

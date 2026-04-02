@@ -1,4 +1,4 @@
-# Learner
+# Learner 💫
 
 Performs online bundling for a stream of observations, implementing Hebbian-style learning. The total weight budget is fixed — what matters is the distribution of weights among observed vectors.
 

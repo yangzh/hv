@@ -1,4 +1,4 @@
-# Sparkle
+# Sparkle ✨
 
 A seeded hypervector — a [SparseSegmented](sparse_segmented.md) with an associated Domain, Pod (seed source), and exponent. Sparkle is the atomic building block for higher-level constructs: given the same (model, domain, pod), it always produces the same vector deterministically.
 

@@ -1,6 +1,6 @@
-# Model & SparseOperation
+# Models
 
-See [Concepts: Models](../../concepts/models.md) for the full overview of model configurations.
+See [Concepts: Models](../../../concepts/models.md) for the full overview.
 
 ## Model Enum
 
