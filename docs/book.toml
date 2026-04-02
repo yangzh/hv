@@ -19,6 +19,10 @@ additional-js = ["theme/tabs.js"]
 [output.html.search]
 enable = true
 
+[preprocessor.last-changed]
+command = "mdbook-last-changed"
+renderer = ["html"]
+
 [preprocessor.katex]
 renderers = ["html", "pdf"]
 

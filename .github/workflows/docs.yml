@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Install mdBook and plugins
         run: |
           mkdir -p $HOME/bin
@@ -30,6 +32,8 @@ jobs:
           curl -sSL https://github.com/lzanini/mdbook-katex/releases/download/0.10.0-alpha-binaries/mdbook-katex-v0.10.0-alpha-x86_64-unknown-linux-gnu.tar.gz \
             | tar -xz -C $HOME/bin
           curl -sSL https://github.com/RustForWeb/mdbook-plugins/releases/download/v0.3.4/mdbook-tabs-v0.3.4-x86_64-unknown-linux-gnu.tar.gz \
+            | tar -xz -C $HOME/bin
+          curl -sSL https://github.com/badboy/mdbook-last-changed/releases/download/v0.4.0/mdbook-last-changed-v0.4.0-x86_64-unknown-linux-gnu.tar.gz \
             | tar -xz -C $HOME/bin
           echo "$HOME/bin" >> $GITHUB_PATH
       - name: Install tab assets

@@ -1,6 +1,6 @@
 # Kongming HV
 
-> **[Download as PDF](kongming-hv.pdf)**
+[![PDF](https://img.shields.io/badge/PDF-download-red)](kongming-hv.pdf)
 
 Kongming is a hyperdimensional computing library implementing sparse binary hypervectors for cognitive computing applications.
 
@@ -11,20 +11,6 @@ The core implementation is in **Go** with a parallel **Rust** implementation. Bo
 Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors and manipulates them with simple algebraic operations (bind, bundle, and permutation). The key insight is that random vectors in high-dimensional spaces are nearly orthogonal, giving each concept a unique, robust and almost interference-free representation.
 
 Kongming focuses on **sparse binary** hypervectors **only**: only a small fraction of dimensions are "on" (set to 1). This enables efficient storage and fast bitwise operations while preserving the algebraic properties of HDC.
-
-## Key Abstractions
-
-| Type | Purpose |
-|------|---------|
-| **SparseSegmented** | The building block for all sparse binary hypervectors |
-| **Sparkle** | A seeded / deterministic hypervector |
-| **Set** | An unordered collection of entities |
-| **Sequence** | An ordered collection of entities |
-| **Octopus** | A key-value structure (or equivalently attribute/value pairs) |
-| **Knot** | Bound group of hypervectors |
-| **Parcel** | Bundled group of hypervectors |
-| **Cyclone** | Periodic permutation vector |
-| **Learner** | Generic online learning with incremental bundling |
 
 ## Language Support
 
