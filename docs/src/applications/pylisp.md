@@ -104,7 +104,7 @@ The `release` operation is noisy — it produces an approximate result. **Cleanu
 # In-memory (default, volatile)
 env = LispEnv()
 
-# Persistent (Fjall disk-backed)
+# Persistent (embedded disk-backed)
 env = LispEnv(path="/tmp/my_lisp_db")
 ```
 

@@ -97,17 +97,18 @@ Persistent, single-machine storage backed by an embedded key-value store. Suitab
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-storage = memory.Fjall("/path/to/store", model=hv.MODEL_64K_8BIT)
+storage = memory.Embedded(hv.MODEL_64K_8BIT, "/path/to/store")
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-substrate, err := badger.Connect(ctx, "/path/to/store", opts)
+m, err := badger.EmbeddedConnect(ctx, "/path/to/store", opts)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let substrate = FjallSubstrate::new(db, items_ks, index_ks, so, realm, ttl, span);
+use kongming::memory::embedded::{EmbeddedSubstrate, connect};
+let substrate = connect(path, realm, ttl)?;
 ```
 {{#endtab}}
 {{#endtabs}}
