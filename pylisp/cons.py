@@ -62,7 +62,8 @@ def is_atom(env: LispEnv, v: HyperBinary) -> bool:
 
 def _lookup_cell(env: LispEnv, id: hv.Sparkle) -> HyperBinary:
     """Look up a cons cell's encoded content by its id."""
-    return env.storage.get(id.domain(), id.pod())
+    chunk = env.storage.get(id.domain(), id.pod())
+    return chunk.code
 
 
 def cleanup(env: LispEnv, probe: HyperBinary) -> HyperBinary:
@@ -71,5 +72,5 @@ def cleanup(env: LispEnv, probe: HyperBinary) -> HyperBinary:
     Returns the chunk id (not code), matching Rust's ``chunk.id`` pattern.
     """
     sel = memory.nns(memory.with_code(probe))
-    chunk_id, _code = memory.first_picked_chunk(env.storage.new_view(), sel)
-    return chunk_id
+    chunk = memory.first_picked_chunk(env.storage.new_view(), sel)
+    return chunk.id

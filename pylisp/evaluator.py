@@ -189,10 +189,10 @@ def _lookup_function(env: LispEnv, head: HyperBinary) -> HyperBinary | None:
         return None
     fn_name = hv.Sparkle.from_word(env.model, env.fn_domain, name)
     try:
-        cell = env.storage.get(fn_name.domain(), fn_name.pod())
+        chunk = env.storage.get(fn_name.domain(), fn_name.pod())
     except (HvError, ValueError):
         return None
-    released = hv.release(cell, env.rhs)
+    released = hv.release(chunk.code, env.rhs)
     return cons_mod.cleanup(env, released)
 
 
