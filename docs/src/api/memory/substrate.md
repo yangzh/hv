@@ -90,9 +90,9 @@ let substrate = InMemorySubstrate::new(model, seed_high, seed_low);
 {{#endtab}}
 {{#endtabs}}
 
-### Embedded LSM, Fjall for Python/Rust, and badger for Go
+### Embedded
 
-Persistent, single-machine storage backed by an embedded LSM key-value store. Suitable for local development and moderate-scale deployments.
+Persistent, single-machine storage backed by an embedded key-value store. Suitable for local development and moderate-scale deployments.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
