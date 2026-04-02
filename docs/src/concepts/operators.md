@@ -4,12 +4,21 @@ Kongming provides three core algebraic operations on hypervectors, plus convenie
 
 ## Bind
 
-**Binding** combines two vectors into a result that is dissimilar to both inputs. It is the multiplicative operation in the HDC algebra.
+**Binding** ($\otimes$) combines two vectors into a result that is dissimilar to both inputs. It is the multiplicative operation in the HDC algebra.
 
-- Implemented as segment-wise offset addition modulo segment size
-- Associative and commutative
-- Reversible: `Bind(Bind(a, b), Inverse(b)) = a`
-- Binding with identity is a no-op
+**Mathematical properties:**
+
+$$A \otimes B = B \otimes A \quad \text{(commutative)}$$
+
+$$(A \otimes B) \otimes C = A \otimes (B \otimes C) \quad \text{(associative)}$$
+
+$$A \otimes I = A \quad \text{(where I is an identity vector)}$$
+
+$$A \otimes A^{-1} = I \quad \text{(inverse)}$$
+
+$$O(A \otimes B, A) \approx O(A \otimes B, B) \approx \text{noise} \quad \text{(dissimilarity)}$$
+
+Implementation: segment-wise offset addition modulo segment size.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -43,13 +52,25 @@ let released = release(&[bound, b]);
 {{#endtab}}
 {{#endtabs}}
 
+### Release
+
+Occasionally we use **releae**, which derived from **bind**, by binding $A$ with the inverse of $B$: the equivalent of division, as opposed of multiplication.
+
+Note: `Release(a, b) == Inverse(Release(b, a))` — it is anti-commutative.
+
 ## Bundle
 
-**Bundling** creates a superposition of vectors — the result is similar to all inputs. It is the additive operation within VSA algebra.
+**Bundling** ($\oplus$) creates a superposition of vectors — the result is similar to all inputs. It is the additive operation within VSA algebra.
 
-- Not reversible — individual members cannot be recovered without extra help
-- The result has above-random overlap with each input
-- Weights can be applied to emphasize certain members
+**Mathematical properties:**
+
+$$S = \sum_{i, \oplus} A_i$$
+
+$$O(S, A_i) \gg O_{\text{random}} \quad \text{(similarity to each member)}$$
+
+$$O(S, X) \approx O_{\text{random}} \quad \text{for } X \notin \{A_i\} \quad \text{(dissimilarity to non-members)}$$
+
+Bundling is **not reversible** — individual members cannot be recovered from the bundle without extra help (e.g., [near-neighbor search](near_neighbor_search.md)). Weights can be applied to emphasize certain members.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -72,12 +93,19 @@ let raw = bundle_direct(seed, &[a.core(), b.core()]);
 
 ## Permute (Power)
 
-**Permutation** rotates a vector's offsets, creating a new vector dissimilar to the original. Used to encode positional information (e.g., in Sequences).
+**Permutation** ($\pi$) rotates a vector's offsets, creating a new vector dissimilar to the original. Used to encode positional information (e.g., in Sequences).
 
-- `Power(1)` is the base vector
-- `Power(0)` is the identity
-- `Power(-1)` is the inverse
-- `Power(n) = Power(1)` applied $n$ times
+**Mathematical properties:**
+
+$$\pi^0(A) = I \quad \text{(identity)}$$
+
+$$\pi^1(A) = A \quad \text{(base vector)}$$
+
+$$\pi^{-1}(A) = A^{-1} \quad \text{(inverse)}$$
+
+$$\pi^n(A) = \pi^1(A) \text{ applied } n \text{ times}$$
+
+$$O(\pi^i(A), \pi^j(A)) \approx O_{\text{random}} \quad \text{for } i \neq j \quad \text{(different powers are near-orthogonal)}$$
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -99,37 +127,7 @@ let v2 = sparkle.power(3);
 {{#endtab}}
 {{#endtabs}}
 
-## Derived Operations
 
-### Release
-
-Extracts one component from a binding by binding with the inverse of the other.
-
-```go
-// Go
-recovered := hv.Release(knot, role) // = Bind(knot, Inverse(role))
-```
-
-Note: `Release(a, b) == Inverse(Release(b, a))` — it is anti-commutative.
-
-### Replace
-
-Substitutes a filler in a template without unbundling.
-
-```go
-// Go
-result := hv.ReplaceSingle(template, oldFiller, newFiller)
-result := hv.Replace(template, seed, hv.Replacement{Old: a, New: b}, ...)
-```
-
-### Template
-
-Creates a reusable structure from roles (binds each role with itself).
-
-```go
-// Go
-tmpl := hv.NewTemplate(seed, roleA, roleB)
-```
 
 ## Similarity Metrics
 

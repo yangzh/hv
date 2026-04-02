@@ -52,6 +52,31 @@ let raw = bundle_direct(seed, &[a.core(), b.core()]);
 {{#endtab}}
 {{#endtabs}}
 
+## Release
+
+Extracts one component from a binding: $A \oslash B = A \otimes B^{-1}$
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+bound = hv.bind(role, filler)
+recovered = hv.release(bound, role)  # ≈ filler
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+bound := hv.Bind(role, filler)
+recovered := hv.Release(bound, role)  // ≈ filler
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+// release = bind with inverse
+let recovered = bind_hb(&[bound, inverse(role)]);
+```
+{{#endtab}}
+{{#endtabs}}
+
 ## BindDirect
 
 Binds SparseSegmented instances directly, without wrapping in a Knot.

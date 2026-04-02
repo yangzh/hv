@@ -51,4 +51,5 @@
 
 # Applications
 
+- [Mexican Dollar](applications/mexican_dollar.md)
 - [LISP Interpreter](applications/pylisp.md)
