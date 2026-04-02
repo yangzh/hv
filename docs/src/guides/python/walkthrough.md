@@ -5,7 +5,7 @@ A deeper exploration of the Python API, covering vector creation, similarity, ra
 ## Creating Vectors
 
 ```python
-from kongming_rs_hv import hv
+from kongming import hv
 
 model = hv.MODEL_64K_8BIT
 

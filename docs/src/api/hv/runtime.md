@@ -1,4 +1,4 @@
-# Customizing Run-time Behavior
+# Customizing runtime behavior
 
 ## Environment Variables
 

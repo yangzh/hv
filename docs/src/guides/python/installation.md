@@ -17,10 +17,10 @@ pip install kongming-rs-hv
 ## Verifying Installation
 
 ```python
-import kongming_rs
-print(kongming_rs.__version__)  # e.g. should be "3.6.5", as of Apr. 2026. Yours should be newer. 
+import kongming
+print(kongming.__version__)  # e.g. should be "3.6.5", as of Apr. 2026. Yours should be newer. 
 
-from kongming_rs import hv
+from kongming import hv
 print(hv.MODEL_64K_8BIT)  # should print 1
 ```
 
@@ -29,8 +29,8 @@ print(hv.MODEL_64K_8BIT)  # should print 1
 The package exposes two main modules:
 
 ```python
-from kongming_rs import hv       # hypervector operations
-from kongming_rs import memory   # storage and selectors
+from kongming import hv       # hypervector operations
+from kongming import memory   # storage and selectors
 ```
 
 Model constants are available directly on `hv`:

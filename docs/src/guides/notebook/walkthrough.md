@@ -8,7 +8,7 @@ A step-by-step introduction to Kongming HV in a notebook, cell by cell.
 # Cell 1: Install and import
 # !pip install kongming-rs-hv pandas
 
-from kongming_rs_hv import hv
+from kongming import hv
 import pandas as pd
 
 model = hv.MODEL_64K_8BIT

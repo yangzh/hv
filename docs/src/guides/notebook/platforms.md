@@ -33,7 +33,7 @@ pip install kongming-rs-hv
 
 ```python
 # Cell 1 — no restart needed
-from kongming_rs import hv
+from kongming import hv
 ```
 
 For development workflows with frequent code changes, use autoreload:
@@ -58,7 +58,7 @@ After the first install, Colab requires a **runtime restart**:
 
 ```python
 # Cell 2 — after restart
-from kongming_rs import hv
+from kongming import hv
 model = hv.MODEL_64K_8BIT
 ```
 
@@ -85,7 +85,7 @@ Binder builds a Docker image from your repo's `requirements.txt` and launches a 
 
 ```python
 # Cell 1 — works immediately, no install
-from kongming_rs import hv
+from kongming import hv
 ```
 
 <div class="callout callout-warning">

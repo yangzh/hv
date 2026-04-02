@@ -38,7 +38,7 @@ The result will have high overlap with **Peso** — the analogical answer.
 ## Code
 
 ```python
-from kongming_rs import hv
+from kongming import hv
 
 model = hv.MODEL_64K_8BIT
 so = hv.SparseOperation(model, 42, 0)

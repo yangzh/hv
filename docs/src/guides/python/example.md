@@ -3,7 +3,7 @@
 A minimal example showing the core operations:
 
 ```python
-from kongming_rs import hv
+from kongming import hv
 
 # Create hypervectors
 a = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
