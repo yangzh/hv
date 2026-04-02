@@ -5,14 +5,6 @@
 ## The ChunkSelector Interface
 
 {{#tabs global="lang"}}
-{{#tab name="Python"}}
-In Python, selectors are opaque objects created by factory functions (`by_item_key`, `nns`, etc.) and consumed by helpers like `first_picked`. There is no explicit interface to implement.
-
-```python
-sel = memory.by_item_key("animals", "cat")
-code = memory.first_picked(view, sel)
-```
-{{#endtab}}
 {{#tab name="Go"}}
 ```go
 type ChunkSelector interface {
@@ -45,7 +37,6 @@ pub trait ChunkSelector: std::fmt::Display {
     fn to_proto(&self) -> Result<ChunkSelectorProto, HvError>;
 }
 ```
-{{#endtab}}
 {{#endtabs}}
 
 ## Working with Results

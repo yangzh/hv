@@ -5,15 +5,6 @@
 ## The ChunkProducer Interface
 
 {{#tabs global="lang"}}
-{{#tab name="Python"}}
-In Python, producers are opaque objects created by factory functions (`terminal`, `from_set_members`, etc.) and consumed by `mem_set`.
-
-```python
-producer = memory.terminal("fruits", "apple")
-with storage.new_mutable_view() as view:
-    memory.mem_set(view, producer)
-```
-{{#endtab}}
 {{#tab name="Go"}}
 ```go
 type ChunkProducer interface {
@@ -45,7 +36,6 @@ pub trait ChunkProducer: std::fmt::Display {
     fn to_proto(&self) -> Result<ChunkProducerProto, HvError>;
 }
 ```
-{{#endtab}}
 {{#endtabs}}
 
 Note: some producers only update existing chunks (e.g., `ClusterUpdater`) without creating new ones. In those cases, `Produce` returns the updated chunk rather than a newly created one.
@@ -225,33 +215,6 @@ chunk, err := memory.ClusterUpdater(
 {{#tab name="Rust"}}
 ```rust
 let chunk = cluster_updater(learner_sel, observed_sel, 1, args).produce(&mut *view, index.as_deref())?;
-```
-{{#endtab}}
-{{#endtabs}}
-
-### SemanticUpdater
-
-Similar to ClusterUpdater but bundles the observed chunk's *code* (not identity) into the Learner.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-with storage.new_mutable_view() as view:
-    memory.mem_set(view, memory.semantic_updater(
-        learner=memory.by_item_key("learners", "my_learner"),
-        observed=memory.by_item_key("fruits", "apple"),
-    ))
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.SemanticUpdater(
-    learnerSel, observedSel, 1).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = semantic_updater(learner_sel, observed_sel, 1, args).produce(&mut *view, index.as_deref())?;
 ```
 {{#endtab}}
 {{#endtabs}}
