@@ -80,37 +80,4 @@ model.from_segment_offset(seg, offset) // u32
 {{#endtab}}
 {{#endtabs}}
 
-## SparseOperation
-
-A Model wrapped with a seeded PCG-DXSM random number generator. Primary way to generate random vectors deterministically.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-so = hv.SparseOperation(model, seed_high, seed_low)
-so.model()        # Model
-so.uint64()       # next random u64
-so.width_bits()   # log2(width) for this model
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-so := hv.NewSparseOperation(model, seedHigh, seedLow)
-so.Model()        // api.Model
-so.Width()        // uint32
-so.Cardinality()  // uint32
-so.Sparsity()     // float64
-so.Uint64()       // uint64 — next random number
-so.Seed()         // Seed128
-so.RNG()          // *rand.Rand
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let mut so = SparseOp::new(model, seed_high, seed_low);
-so.model()        // Model
-so.uint64()       // u64 — next random number
-so.uint32()       // u32
-```
-{{#endtab}}
-{{#endtabs}}
+See also: [SparseOperation](sparse_operation.md) — Model + seeded RNG for deterministic vector generation.

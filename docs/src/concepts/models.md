@@ -14,7 +14,7 @@ A **Model** defines the sparsity configuration for all hypervectors in a system.
 | `MODEL_256M_14BIT` | 268,435,456 | 14 | 16,384 | 16,384 |
 | `MODEL_4G_16BIT` | 4,294,967,296 | 16 | 65,536 | 65,536 |
 
-## Key Functions
+## Model properties
 
 All model functions take a Model enum value and return the derived property:
 
@@ -35,31 +35,3 @@ All model functions take a Model enum value and return the derived property:
 Larger models provide more orthogonal space (lower collision probability) at the cost of more memory per vector.
 
 Also note that the storage per hypervector estimation only applies to **SparseSegmented** (and a few other types) where we want to store the raw offsets. **Sparkle**, for example, only stores the random seeds (128 bit for now) so that the offsets can be computed on-the-fly during serialization time. Composite types (such as **Set**, **Sequence**) typically contain reference to member **Sparkle** instances, and typically cost much less storage than a **SparseSegmented** instance.
-
-## SparseOperation
-
-A **SparseOperation** wraps a Model with a seeded random number generator (PCG-DXSM). It is the primary way to create random vectors deterministically.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-so = hv.SparseOperation(model, seed_high, seed_low)
-random_u64 = so.uint64()
-sparkle = hv.Sparkle.random("domain", so)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-so := hv.NewSparseOperation(model, seedHigh, seedLow)
-randomU64 := so.Uint64()
-sparkle := hv.NewRandomSparkle(domain, so)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let mut so = SparseOp::new(model, seed_high, seed_low);
-let random_u64 = so.uint64();
-let sparkle = Sparkle::random(&domain, &mut so);
-```
-{{#endtab}}
-{{#endtabs}}
