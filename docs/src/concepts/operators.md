@@ -54,9 +54,15 @@ let released = release(&[bound, b]);
 
 ### Release
 
-Occasionally we use **releae**, which derived from **bind**, by binding $A$ with the inverse of $B$: the equivalent of division, as opposed of multiplication.
+Occasionally we use **releae**, which derived from **bind**, as the equivalent of division, as opposed of multiplication.
 
-Note: `Release(a, b) == Inverse(Release(b, a))` — it is anti-commutative.
+$$ A \oslash B = A \otimes B^{-1} $$
+
+
+
+Note that release is anti-commutative:
+$$ (A \oslash B)^{-1} = B \oslash A $$
+
 
 ## Bundle
 
@@ -90,51 +96,3 @@ let raw = bundle_direct(seed, &[a.core(), b.core()]);
 ```
 {{#endtab}}
 {{#endtabs}}
-
-## Permute (Power)
-
-**Permutation** ($\pi$) rotates a vector's offsets, creating a new vector dissimilar to the original. Used to encode positional information (e.g., in Sequences).
-
-**Mathematical properties:**
-
-$$\pi^0(A) = I \quad \text{(identity)}$$
-
-$$\pi^1(A) = A \quad \text{(base vector)}$$
-
-$$\pi^{-1}(A) = A^{-1} \quad \text{(inverse)}$$
-
-$$\pi^n(A) = \pi^1(A) \text{ applied } n \text{ times}$$
-
-$$O(\pi^i(A), \pi^j(A)) \approx O_{\text{random}} \quad \text{for } i \neq j \quad \text{(different powers are near-orthogonal)}$$
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-v2 = sparkle.power(3)
-inv = sparkle.power(-1)  # inverse
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-v2 := sparkle.Power(3).(hv.Sparkle)
-inv := hv.Inverse(sparkle)  // shorthand for Power(-1)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let v2 = sparkle.power(3);
-```
-{{#endtab}}
-{{#endtabs}}
-
-
-
-## Similarity Metrics
-
-| Function | Description |
-|----------|-------------|
-| `Overlap` / `overlap` | Count of matching ON bits (inner product) |
-| `Equal` | True if stable hashes match |
-| `Hamming` | Count of differing segments |
-| `JaccardIndex` | $\frac{\text{overlap}}{2k - \text{overlap}}$ |
-| `JaccardDistance` | $1 - \text{JaccardIndex}$ |

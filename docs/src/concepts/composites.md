@@ -145,30 +145,6 @@ p := hv.NewWeightedParcel(domain, pod, []float64{0.7, 0.3}, memberA, memberB)
 {{#endtab}}
 {{#endtabs}}
 
-## Cyclone
-
-A **periodic** permutation vector where `power(v, period) == identity`. Useful for encoding cyclic structures (e.g., days of the week, hours).
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-c = hv.Cyclone(model, domain, pod, 7)  # period=7
-# c.power(7) ≈ identity
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-c := hv.NewCyclone(model, domain, pod, 7) // period=7
-// c.Power(7) == identity
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let c = Cyclone::new(model, domain, pod, 7);
-```
-{{#endtab}}
-{{#endtabs}}
-
 ## Summary
 
 | Type | Composition | Order? | Use Case |
@@ -178,4 +154,3 @@ let c = Cyclone::new(model, domain, pod, 7);
 | **Octopus** | Key-bind + bundle | Partial (by key) | Key-value records |
 | **Knot** | Bind (multiply) | No | Reversible associations |
 | **Parcel** | Bundle (add) | No | superpositions, weighted or unweighted |
-| **Cyclone** | Periodic permutation | N/A | Cyclic encodings |
