@@ -2,13 +2,13 @@
 
 **Near Neighbor Search (NNS)** generally retrieves chunks from the storage substrate in the increasing order of Hamming distance (from a query).
 
-As we mentioned [earlier](hypervectors.md), this is equivalent to a strictly descreasing order of overlap (between query and candidate). If overlap encodes the semantic relevance, this translates to a list of semantically similar candidates. It leverages the [Associative Index](#associative-index) for efficient recovery of candidates.
+As we mentioned [earlier](hypervectors.md#similarity-and-distance-measure), this is equivalent to a strictly descreasing order of overlap (between query and candidate). If overlap encodes the semantic relevance, this translates to a list of semantically similar candidates. It leverages the [Associative Index](#associative-index) for efficient recovery of candidates.
 
 ## Attractors
 
-Each attractor conceptually provides the center of attraction for candidates: the NNS accepts one or more attractors.
+Each attractor conceptually provides "the center of attraction" for candidates: the NNS accepts one or more attractors.
 
-| Attractor | Query | Finds |
+| Attractor | Query | Attracts |
 |-----------|-------|-------|
 | **SetMembersAttractor** | Releases SET_MARKER from a Set | All members of the Set |
 | **SequenceMemberAttractor** | Releases with SEQUENCE_MARKER + positional marker | Sequence member at a specific position |
@@ -44,7 +44,7 @@ The attractor binds the target with the relationship (feature $\otimes$ source$^
 
 ## Performance
 
-This NNS module has a constant time complexity, with help from [Associative Index](associative_index.md): the efficient random-access to underlying index is critical.
+This NNS module has a constant time complexity, with help from [Associative Index](associative_index.md). The secret sauce is the efficient random-access to underlying index.
 
 ## Accuracy
 
@@ -52,8 +52,4 @@ Unlike approximate nearest neighbor methods (LSH, HNSW, etc.), this NNS module c
 
 ## Associative Index
 
-The **Associative Index** is a semantic index that enables fast similarity-based lookup over stored hypervectors. It is the mechanism that turns a key-value substrate into an associative memory — one where retrieval is by *content similarity*, not by exact content or key match.
-
-### Relationship to Near Neighbor Search
-
-The Associative Index is the backbone of [Near Neighbor Search](near_neighbor_search.md). The NNS selector uses attractors to generate query vectors, probes the index for candidates, and returns results ranked by relevance.
+The **Associative Index** is a semantic index that enables fast similarity-based lookup over stored hypervectors. Conceptually it turns a key-value substrate (item memory) into an associative memory — one where retrieval is by *content similarity*, not by exact content or key match.
