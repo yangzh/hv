@@ -2,7 +2,7 @@
 
 **Near Neighbor Search (NNS)** generally retrieves chunks from the storage substrate in the increasing order of Hamming distance (from a query).
 
-As we mentioned [earlier](hypervectors.md), this is equivalent to a strictly descreasing order of overlap (between query and candidate). If overlap encodes the semantic relevance, this translates to a list of semantically similar candidates. It leverages the [Associative Index](associative_index.md) for efficient recovery of candidates.
+As we mentioned [earlier](hypervectors.md), this is equivalent to a strictly descreasing order of overlap (between query and candidate). If overlap encodes the semantic relevance, this translates to a list of semantically similar candidates. It leverages the [Associative Index](#associative-index) for efficient recovery of candidates.
 
 ## Attractors
 
@@ -49,3 +49,11 @@ This NNS module has a constant time complexity, with help from [Associative Inde
 ## Accuracy
 
 Unlike approximate nearest neighbor methods (LSH, HNSW, etc.), this NNS module can computes **exact** overlap counts via the associative index. There is no approximation error and no index-specific parameters to tune.
+
+## Associative Index
+
+The **Associative Index** is a semantic index that enables fast similarity-based lookup over stored hypervectors. It is the mechanism that turns a key-value substrate into an associative memory — one where retrieval is by *content similarity*, not by exact content or key match.
+
+### Relationship to Near Neighbor Search
+
+The Associative Index is the backbone of [Near Neighbor Search](near_neighbor_search.md). The NNS selector uses attractors to generate query vectors, probes the index for candidates, and returns results ranked by relevance.

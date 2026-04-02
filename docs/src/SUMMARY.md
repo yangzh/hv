@@ -5,11 +5,9 @@
 # Concepts
 
 - [Hypervectors](concepts/hypervectors.md)
-    - [Models](concepts/models.md)
 - [Operators](concepts/operators.md)
 - [Composites](concepts/composites.md)
 - [Near-neighbor search](concepts/near_neighbor_search.md)
-    - [Associative index](concepts/associative_index.md)
 
 # API Reference
 
