@@ -2,11 +2,11 @@
 
 ## What is Hyperdimensional Computing?
 
-Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors and manipulates them with simple algebraic operations. The key insight is that random vectors in high-dimensional spaces are **nearly orthogonal** — giving each concept a unique, robust representation that tolerates potential interference from other entities.
+Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors and manipulates them with simple algebraic operations. The key insight is that random vectors in high-dimensional spaces are **nearly orthogonal** — giving each concept a unique, robust representation that tolerates potential interference from other entities. In that sense, the traditional notion of curse of dimensionality becomes the bless of dimensionality.
 
 ## Sparse Binary Representation
 
-Kongming uses **sparse binary** hypervectors. Each vector has a fixed, large number of dimensions (e.g., 65,536 or 16 million), but only a small fraction of them are "on" (set to 1). This sparsity is controlled by the [Model](models.md) configuration.
+Kongming uses **sparse binary** hypervectors. Each vector has a fixed, large number of dimensions (e.g., 65,536 or 16 million), but only a very small fraction of them are "on" (set to 1). This sparsity is controlled by the [Model](models.md) configuration.
 
 We don't linger at generic **sparse binary** hypervectors. Instead, the base type we are focusing is **SparseSegmented**: the vector is divided into equal-sized *segments*, and exactly one bit is "on" per segment. 
 
@@ -46,6 +46,6 @@ Given the model setup, this is typically 1 or 2.
 
 Semantically-related vectors have significantly higher overlap. A vector's overlap with itself equals its cardinality $M$.
 
-The commonly-used distance measure (dis-similar measure) for binary vectors is Hamming Distance, equivalent to a bitwise XOR operation. As we discussed (and proved) in the paper, the **overlap** and **Hamming distance** between **sparse binary** hypervectors  are two sides of the same coin, with the following equation:
+The commonly-used distance measure (dis-similar measure) for binary vectors is Hamming Distance, equivalent to a bitwise XOR operation. As we discussed (and proved) in [the paper](https://arxiv.org/abs/2310.18316), the **overlap** and **Hamming distance** between **sparse binary** hypervectors  are two sides of the same coin, with the following equation:
 
 $$2 \times O(A, B) + H(A, B) = 2M$$
