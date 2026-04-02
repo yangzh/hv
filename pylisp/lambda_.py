@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from .env import LispEnv
 
 
-
 def evlamb(env: LispEnv, lambda_expr: HyperBinary, args: list[HyperBinary]) -> HyperBinary:
     """Apply a lambda expression to arguments (curried, one at a time)."""
     current = lambda_expr
@@ -23,6 +22,7 @@ def evlamb(env: LispEnv, lambda_expr: HyperBinary, args: list[HyperBinary]) -> H
     if _is_lambda(env, current):
         return current
     from .evaluator import ev
+
     return ev(env, current)
 
 

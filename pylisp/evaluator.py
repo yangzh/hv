@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from kongming_rs import hv, HvError, REASON_NOT_FOUND
+from kongming_rs import HvError, hv
 
 from . import cons as cons_mod
 from . import lambda_
@@ -12,7 +12,6 @@ from .types import HyperBinary
 
 if TYPE_CHECKING:
     from .env import LispEnv
-
 
 
 def _eq(a: HyperBinary, b: HyperBinary) -> bool:
@@ -161,9 +160,7 @@ def _eval_define(env: LispEnv, args: HyperBinary) -> HyperBinary:
 
     name_str = env.name_of(name) or "?"
     fn_name = hv.Sparkle.from_word(env.model, env.fn_domain, name_str)
-    cell = cons_mod.cons_parcel(env, 
-        hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), 
-        name, lambda_expr)
+    cell = cons_mod.cons_parcel(env, hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), name, lambda_expr)
     env.storage.store_chunk(fn_name, code=cell)
 
     return env.nil

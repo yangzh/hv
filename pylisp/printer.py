@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from .env import LispEnv
 
 
-
 def display(env: LispEnv, v: HyperBinary) -> str:
     """Convert a hypervector back to a readable S-expression string."""
     if cons_mod.is_atom(env, v):

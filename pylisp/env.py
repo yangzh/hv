@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from kongming_rs import hv, memory, HvError, REASON_NOT_FOUND
+from kongming_rs import hv, memory
 from kongming_rs.api.v1.hv_pb2 import (
     MODEL_64K_8BIT,
     DomainPrefix,
@@ -84,18 +84,18 @@ class LispEnv:
 
         # Register reserved symbols and builtins.
         for name, sparkle in [
-            ("T", self.t), 
-            ("F", self.f), 
+            ("T", self.t),
+            ("F", self.f),
             ("NIL", self.nil),
-            ("CAR", self.sym_car), 
-            ("CDR", self.sym_cdr), 
+            ("CAR", self.sym_car),
+            ("CDR", self.sym_cdr),
             ("CONS", self.sym_cons),
-            ("EQ", self.sym_eq), 
-            ("ATOM", self.sym_atom), 
+            ("EQ", self.sym_eq),
+            ("ATOM", self.sym_atom),
             ("QUOTE", self.sym_quote),
-            ("DEFINE", self.sym_define), 
+            ("DEFINE", self.sym_define),
             ("COND", self.sym_cond),
-            ("LAMBDA", self.sym_lambda), 
+            ("LAMBDA", self.sym_lambda),
             ("LABEL", self.sym_label),
         ]:
             self.register_symbol(name, sparkle)
@@ -123,17 +123,18 @@ class LispEnv:
 
     def eval(self, expr_str: str) -> str:
         """Parse and evaluate (single step), return display string."""
-        from . import reader, evaluator, printer
-        return printer.display(self, 
-            evaluator.ev(self, reader.parse(self, expr_str)))
+        from . import evaluator, printer, reader
+
+        return printer.display(self, evaluator.ev(self, reader.parse(self, expr_str)))
 
     def eval_full(self, expr_str: str) -> str:
         """Parse and evaluate until stable, return display string."""
-        from . import reader, evaluator, printer
-        return printer.display(self,
-            evaluator.ev_until_done(self, reader.parse(self, expr_str)))
+        from . import evaluator, printer, reader
+
+        return printer.display(self, evaluator.ev_until_done(self, reader.parse(self, expr_str)))
 
     def parse_display(self, expr_str: str) -> str:
         """Parse and display without evaluating."""
-        from . import reader, printer
+        from . import printer, reader
+
         return printer.display(self, reader.parse(self, expr_str))

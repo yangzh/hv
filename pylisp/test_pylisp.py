@@ -6,11 +6,10 @@ Mirrors rust/kongming-lisp/tests/integration.rs for feature parity.
 import tempfile
 
 import pytest
-
 from kongming_rs.pylisp import LispEnv
 
-
 # ── Parse / display ──────────────────────────────────────────────────
+
 
 def test_cons_car_cdr_roundtrip():
     env = LispEnv()
@@ -18,6 +17,7 @@ def test_cons_car_cdr_roundtrip():
 
 
 # ── McCarthy's 7 primitives ──────────────────────────────────────────
+
 
 def test_quote():
     env = LispEnv()
@@ -66,6 +66,7 @@ def test_cond():
 
 # ── Lambda / Define / Label ──────────────────────────────────────────
 
+
 def test_lambda_identity():
     env = LispEnv()
     assert env.eval_full("((LAMBDA (X) X) (QUOTE A))") == "A"
@@ -85,16 +86,17 @@ def test_define_and_call():
 def test_define_last():
     env = LispEnv()
     env.eval(
-        "(DEFINE LAST (LAMBDA (L) ((LABEL REC (LAMBDA (X) "
-        "(COND ((ATOM (CDR X)) (CAR X)) (T (REC (CDR X)))))) L)))"
+        "(DEFINE LAST (LAMBDA (L) ((LABEL REC (LAMBDA (X) (COND ((ATOM (CDR X)) (CAR X)) (T (REC (CDR X)))))) L)))"
     )
     assert env.eval_full("(LAST (QUOTE (A B C)))") == "C"
 
 
 # ── Fjall backend ────────────────────────────────────────────────────
 
+
 def test_fjall_basic_roundtrip():
     import os
+
     with tempfile.TemporaryDirectory() as d:
         env = LispEnv(path=os.path.join(d, "lisp.db"))
         assert env.eval("(CAR (QUOTE (A B C)))") == "A"
@@ -103,6 +105,7 @@ def test_fjall_basic_roundtrip():
 
 def test_fjall_define_and_call():
     import os
+
     with tempfile.TemporaryDirectory() as d:
         env = LispEnv(path=os.path.join(d, "lisp.db"))
         env.eval("(DEFINE SECOND (LAMBDA (L) (CAR (CDR L))))")
