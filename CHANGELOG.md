@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.6.5 (2026-04-02)
+
+- Re-export __version__ from native module in __init__.py
 ## v3.6.4 (2026-04-02)
 
 - Fix release: sed both pyproject.toml and Cargo.toml for version sync
@@ -169,12 +172,4 @@ Only the latest 10 releases are shown.
 - remove `IsValid` / `is_valid` from `SparseSegmented` and `Chunk`
 - simplify notebook install cells (try/except + `%pip`)
 - add weekly GitHub release cleanup (keep latest 10)
-
-## v3.3.0 (2026-03-17)
-
-- expose InMemory and Fjall storage backends to Python
-- expose NNS, attractors, and all ChunkSelector/ChunkProducer equivalents to Python
-- add `Unmasked()` to Set and Sequence composites
-- add Fjall persistent storage + `export()` to Python
-- refactor notebooks to use `from kongming_rs import api, hv, memory` style
 
