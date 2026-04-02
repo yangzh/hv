@@ -2,7 +2,10 @@
 
 **ChunkProducers** are write builders that create and persist chunks in the substrate. Each producer encapsulates the logic for constructing a specific type of chunk.
 
-Note: some producers only update existing chunks (e.g., `ClusterUpdater`) without creating new ones. In those cases, `Produce` returns the updated chunk rather than a newly created one.
+<div class="callout callout-note">
+<div class="callout-title">Note</div>
+Some producers only update existing chunks (e.g., <code>ClusterUpdater</code>) without creating new ones. In those cases, <code>Produce</code> returns the updated chunk rather than a newly created one.
+</div>
 
 ## Producer Options
 

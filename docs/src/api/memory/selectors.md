@@ -310,6 +310,7 @@ for _, c := range chunks {
 {{#endtab}}
 {{#endtabs}}
 
-## Note on Python Selector Consumption
-
-In Python, selectors passed to combinators (`range_sel`, `nns`, `joiner`, etc.) are **consumed** — they cannot be reused after being passed. This mirrors Rust's move semantics. Attempting to reuse a consumed selector raises `ValueError`.
+<div class="callout callout-warning">
+<div class="callout-title">Python Selector Consumption</div>
+Selectors passed to combinators (<code>range_sel</code>, <code>nns</code>, <code>joiner</code>, etc.) are <strong>consumed</strong> — they cannot be reused after being passed. This mirrors Rust's move semantics. Attempting to reuse a consumed selector raises <code>ValueError</code>.
+</div>

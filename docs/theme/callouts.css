@@ -1,0 +1,57 @@
+/* Callout boxes: note, warning, tip */
+.callout {
+    padding: 0.8em 1em 0.8em 3em;
+    margin: 1em 0;
+    border-left: 4px solid;
+    border-radius: 4px;
+    position: relative;
+    font-size: 0.95em;
+}
+.callout::before {
+    position: absolute;
+    left: 0.7em;
+    top: 0.75em;
+    font-size: 1.2em;
+}
+.callout-title {
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+
+/* Note (blue) */
+.callout-note {
+    background: #e8f0fe;
+    border-color: #4285f4;
+}
+.callout-note::before {
+    content: "\2139\FE0F"; /* ℹ️ */
+}
+
+/* Warning (orange) */
+.callout-warning {
+    background: #fef7e0;
+    border-color: #f9ab00;
+}
+.callout-warning::before {
+    content: "\26A0\FE0F"; /* ⚠️ */
+}
+
+/* Tip (green) */
+.callout-tip {
+    background: #e6f4ea;
+    border-color: #34a853;
+}
+.callout-tip::before {
+    content: "\1F4A1"; /* 💡 */
+}
+
+/* Dark theme adjustments */
+.ayu .callout-note, .coal .callout-note, .navy .callout-note {
+    background: #1a2744;
+}
+.ayu .callout-warning, .coal .callout-warning, .navy .callout-warning {
+    background: #332b1a;
+}
+.ayu .callout-tip, .coal .callout-tip, .navy .callout-tip {
+    background: #1a3324;
+}

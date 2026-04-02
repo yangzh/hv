@@ -88,7 +88,10 @@ Binder builds a Docker image from your repo's `requirements.txt` and launches a 
 from kongming_rs import hv
 ```
 
-**Limitation**: You cannot install additional packages not in `requirements.txt` (the environment is read-only).
+<div class="callout callout-warning">
+<div class="callout-title">Limitation</div>
+You cannot install additional packages not in <code>requirements.txt</code> (the environment is read-only).
+</div>
 
 ## Choosing a Platform
 

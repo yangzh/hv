@@ -76,7 +76,10 @@ $$O(S, A_i) \gg O_{\text{random}} \quad \text{(similarity to each member)}$$
 
 $$O(S, X) \approx O_{\text{random}} \quad \text{for } X \notin \{A_i\} \quad \text{(dissimilarity to non-members)}$$
 
-Bundling is **not reversible** — individual members cannot be recovered from the bundle without extra help (e.g., [near-neighbor search](near_neighbor_search.md)). Weights can be applied to emphasize certain members.
+<div class="callout callout-warning">
+<div class="callout-title">Not Reversible</div>
+Individual members cannot be recovered from the bundle without extra help (e.g., <a href="near_neighbor_search.html">near-neighbor search</a>). Weights can be applied to emphasize certain members.
+</div>
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}

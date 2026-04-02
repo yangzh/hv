@@ -13,7 +13,7 @@ edit-url-template = "https://github.com/yangzh/hv/edit/main/docs/src/{path}"
 site-url = "/hv/"
 default-theme = "light"
 preferred-dark-theme = "ayu"
-additional-css = ["theme/tabs.css", "theme/last-changed.css"]
+additional-css = ["theme/tabs.css", "theme/last-changed.css", "theme/callouts.css"]
 additional-js = ["theme/tabs.js"]
 
 [output.html.search]
@@ -27,6 +27,10 @@ renderer = ["html"]
 renderers = ["html", "pdf"]
 
 [preprocessor.tabs]
+
+# TODO: re-enable when mdbook-linkcheck supports mdbook 0.5+
+# [output.linkcheck]
+# warning-policy = "warn"
 
 [output.pdf]
 title = "Kongming HV Documentation"
