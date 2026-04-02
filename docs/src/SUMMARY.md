@@ -34,6 +34,7 @@
         - [Knot 🪢](api/hv/knot.md)
         - [Parcel 🎁](api/hv/parcel.md)
         - [Cyclone 🌀](api/hv/cyclone.md)
+    - [Customizing Run-time Behavior](api/hv/runtime.md)
     - [Misc](api/hv/misc.md)
 - [Memory](api/memory/overview.md)
     - [Chunk](api/memory/chunk.md)

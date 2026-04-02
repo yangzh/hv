@@ -1,22 +1,5 @@
 # Misc
 
-## Environment Variables
-
-All environment variables are read once on first access and cannot be changed at runtime. Unset variables use the documented default.
-
-| Variable | Default | Effect |
-|----------|---------|--------|
-| `KONGMING_REPR_FORMAT` | `YAML` | Controls `__repr__()` / `Repr()` output format. `YAML`: multi-line YAML dump. `PROTO`: multi-line protobuf debug string. |
-| `KONGMING_LEARNER_SAMPLING` | `fisher_yates` | Learner bundling strategy. `fisher_yates`: Fisher-Yates exact selection (default). `classic`: per-segment probabilistic sampling. |
-
-```bash
-# Example: switch repr to protobuf debug format
-export KONGMING_REPR_FORMAT=PROTO
-
-# Example: use classic sampling in Learner
-export KONGMING_LEARNER_SAMPLING=classic
-```
-
 ## Display
 
 All HyperBinary types have a compact, emoji-prefixed string representation for quick visual inspection. See [HyperBinary Types](types.md#type-symbols) for type symbols and [Domain & Pod](common/domain_pod.md#display-labels) for field labels.
@@ -44,7 +27,7 @@ pod:
   seed: 12345
 ```
 
-Set `KONGMING_REPR_FORMAT=PROTO` for protobuf debug output instead of the default YAML. See [Environment Variables](#environment-variables) for all supported variables.
+Set `KONGMING_REPR_FORMAT=PROTO` for protobuf debug output instead of the default YAML. See [Environment Variables](runtime.md#environment-variables) for all supported variables.
 
 ### Go / Rust Display
 
