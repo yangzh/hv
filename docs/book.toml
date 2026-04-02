@@ -13,7 +13,7 @@ edit-url-template = "https://github.com/yangzh/hv/edit/main/docs/src/{path}"
 site-url = "/hv/"
 default-theme = "light"
 preferred-dark-theme = "ayu"
-additional-css = ["theme/tabs.css"]
+additional-css = ["theme/tabs.css", "theme/last-changed.css"]
 additional-js = ["theme/tabs.js"]
 
 [output.html.search]

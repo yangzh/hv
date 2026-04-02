@@ -3,16 +3,6 @@
 All vector types conform to a common interface. In Go this is the `HyperBinary` interface; in Rust it is the `HyperBinary` trait. The two implementations are kept at **feature parity**.
 
 {{#tabs global="lang"}}
-{{#tab name="Python"}}
-In Python, there is no explicit interface. All types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
-
-```python
-v.model()        # Model enum
-v.stable_hash()  # int
-v.core()         # SparseSegmented
-v.power(p)       # HyperBinary
-```
-{{#endtab}}
 {{#tab name="Go"}}
 ```go
 type HyperBinary interface {
@@ -64,24 +54,17 @@ pub trait HyperBinary: std::fmt::Display {
 
 In Rust, concrete types are wrapped in `HyperBinaryKind` (an enum) for dynamic dispatch instead of Go's interface boxing.
 {{#endtab}}
+{{#tab name="Python"}}
+In Python, there is no explicit interface. All types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
+
+```python
+v.model()        # Model enum
+v.stable_hash()  # int
+v.core()         # SparseSegmented
+v.power(p)       # HyperBinary
+```
+{{#endtab}}
 {{#endtabs}}
-
-## Type Symbols
-
-| Emoji | Type |
-|-------|------|
-| ✨ | Sparkle |
-| 🍡 | SparseSegmented |
-| 💫 | Learner |
-| 🫧 | Set |
-| 📿 | Sequence |
-| 🐙 | Octopus |
-| 🪢 | Knot |
-| 🎁 | Parcel |
-| 🌀 | Cyclone |
-| 🎯 | Dart |
-
-See [Display & Emoji](display.md) for the full field label reference.
 
 ## Concrete Types
 
