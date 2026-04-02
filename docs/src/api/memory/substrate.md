@@ -36,11 +36,11 @@ view.Get(ctx, key, func(ctx context.Context, val []byte) error {
 })
 
 // Mutable
-mview := substrate.NewMutableView(nil)
-defer mview.Discard()
+mv := substrate.NewMutableView(nil)
+defer mv.Discard()
 
-mview.Set(ctx, memory.Cell{Key: key, Value: val})
-mview.Commit()
+mv.Set(ctx, memory.Cell{Key: key, Value: val})
+mv.Commit()
 ```
 {{#endtab}}
 {{#tab name="Rust"}}

@@ -84,7 +84,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.NewTerminal(
-    domain, pod, memory.PNote("an apple")).Produce(ctx, view)
+    domain, pod, memory.PNote("an apple")).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -108,7 +108,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.NewLearner(
-    domain, pod, memory.PNote("a learner")).Produce(ctx, view)
+    domain, pod, memory.PNote("a learner")).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -133,7 +133,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.FromSetMembers(
-    domain, pod, members, memory.PNote("fruit set")).Produce(ctx, view)
+    domain, pod, members, memory.PNote("fruit set")).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -161,7 +161,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.FromSequenceMembers(
-    domain, pod, members, 0, memory.PNote("greeting")).Produce(ctx, view)
+    domain, pod, members, 0, memory.PNote("greeting")).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -191,7 +191,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.FromKeyValues(
-    domain, pod, keys, values, memory.PNote("object")).Produce(ctx, view)
+    domain, pod, keys, values, memory.PNote("object")).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -219,7 +219,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.ClusterUpdater(
-    learnerSel, observedSel, 1).Produce(ctx, view)
+    learnerSel, observedSel, 1).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -246,7 +246,7 @@ with storage.new_mutable_view() as view:
 {{#tab name="Go"}}
 ```go
 chunk, err := memory.SemanticUpdater(
-    learnerSel, observedSel, 1).Produce(ctx, view)
+    learnerSel, observedSel, 1).Produce(ctx, mv)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
