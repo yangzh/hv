@@ -3,6 +3,14 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.6.6 (2026-04-02)
+
+- Add kongming as top-level Python import path
+- Add Embedded aliases: hide badger/fjall implementation names
+- Remove gopy: delete Go→Python bridge, old workflow, and build targets
+- Remove unused SparseSegmented.Offsets() from Go
+- Apply linter formatting: rustfmt, ruff, gofmt
+- Add pre-commit hooks: ruff, gofmt, go vet, rustfmt, buf lint
 ## v3.6.5 (2026-04-02)
 
 - Re-export __version__ from native module in __init__.py
@@ -155,21 +163,3 @@ Only the latest 10 releases are shown.
 - Add CI workflow to sync pylisp to public hv repo
 - Add DomainPrefix.LISP (λ) to proto and Rust hash labels
 - Add pure-Python LISP interpreter (kongming.pylisp)
-## v3.4.0 (2026-03-23)
-
-- version api protos as `kongming.api.v1` (Kubernetes-style path versioning)
-- upgrade prost 0.13→0.14, tonic 0.12→0.14; unpin buf plugins
-- remove protobuf `<6.0` upper bound; rely on `_pb2.py` plugin pin for Colab compat
-- add `DomainPrefix.LISP` (λ) for LISP interpreter domains
-- add `write_chunk(hv, code=...)` — separate id and code per chunk
-- expose `HvError` and `REASON_NOT_FOUND` from `kongming_rs`
-- add pure-Python LISP interpreter (`kongming_rs.pylisp`)
-- add spaCy NLP engine support alongside stanza
-- add `KONGMING_REPR_FORMAT` env flag (YAML/PROTO) for `Repr()` / `__repr__`
-- add `KONGMING_LEARNER_SAMPLING` env flag (classic/fisher_yates)
-- expose `UniformSet`, `WeightedSet`, and Frame analysis functions to Python
-- change Sequence emoji from ⛓️ to 📿
-- remove `IsValid` / `is_valid` from `SparseSegmented` and `Chunk`
-- simplify notebook install cells (try/except + `%pip`)
-- add weekly GitHub release cleanup (keep latest 10)
-
