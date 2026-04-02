@@ -26,27 +26,40 @@ After the type prefix, fields are separated by commas:
 | Emoji | Field | Meaning | Format |
 |-------|-------|---------|--------|
 | 🔗 | Domain (named) | Semantic namespace | `🔗animals` or `🔗PREFIX.name` |
-| 🌐 | Domain (id) | Numeric domain ID | `🌐0x..c862` (lower 16 bits hex) |
-| 🫛 | Pod (seed) | Numeric seed | `🫛0x..80e4` (lower 16 bits hex) |
-| 🌱 | Pod (word) | Word-seeded pod | `🌱cat` |
+| 🌐 | Domain (id) | Numeric domain ID | `🌐0x..c862` (lower 16 bits hex of the domain id), for compactness |
+| 🫛 | Pod (seed) | Numeric seed | `🫛0x..80e4` (lower 16 bits hex of the seed), for compactness |
+| 🌱 | Pod (named) | Word-seeded pod | `🌱cat` |
 | 🍀 | Pod (prewired) | Prewired constant | `🍀SET_MARKER` |
 | 💪 | Exponent | Non-trivial exponent | `💪3` or `💪-1` |
 
-The `0x..` prefix means only the lower 16 bits of the 64-bit value are shown, for compactness.
-
 **Identity vectors** display as `IDENT` (e.g., `✨IDENT`).
 
-## Python `__repr__`
+## Python `__str__` and `__repr__`
 
-All HyperBinary types implement `__repr__` in Python. When a variable is evaluated in an interactive shell or notebook cell, the repr is displayed automatically:
+Python's two display hooks serve different purposes:
+
+**`__str__`** (triggered by `print()`) returns the compact emoji form:
 
 ```python
 >>> a = hv.Sparkle.with_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
->>> a
+>>> print(a)
 ✨:🌐0x..c862,🫛0x..80e4
 ```
 
-This is useful for quick inspection without explicitly calling `print()` or serialization functions.
+**`__repr__`** (triggered by evaluating a variable in the shell or notebook) returns a detailed, developer-friendly representation. The default format is **YAML**, controlled by the `KONGMING_REPR_FORMAT` environment variable:
+
+```python
+>>> a
+hint: SPARKLE
+model: MODEL_64K_8BIT
+stable_hash: 12345678
+domain:
+  id: ...
+pod:
+  seed: 12345
+```
+
+Set `KONGMING_REPR_FORMAT=PROTO` for protobuf debug output instead of the default YAML. See [Environment Variables](misc.md#environment-variables) for all supported variables.
 
 ## Go / Rust Equivalents
 
@@ -54,6 +67,8 @@ This is useful for quick inspection without explicitly calling `print()` or seri
 {{#tab name="Go"}}
 ```go
 // Compact emoji form (used by fmt.Println, etc.)
+//
+// Or equivalently, fmt.Println(sparkle.String())
 fmt.Println(sparkle)          // ✨:🌐0x..c862,🫛0x..80e4
 
 // Detailed YAML/proto form (controlled by KONGMING_REPR_FORMAT env)
