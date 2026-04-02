@@ -2,146 +2,6 @@
 
 **ChunkSelectors** are composable query builders for reading chunks from the substrate. Each selector defines how to find and return matching chunks.
 
-## The ChunkSelector Interface
-
-{{#tabs global="lang"}}
-{{#tab name="Go"}}
-```go
-type ChunkSelector interface {
-    fmt.Stringer
-
-    // Select scans the view and calls eachOp for each matching chunk.
-    // Returns nil if no matches (callback is simply not called).
-    // Wrap with NotFoundLabeler to get ErrNotFound instead.
-    Select(ctx context.Context, view SubstrateView, eachOp OnSelectedChunk) error
-
-    // ToProto serializes this selector for storage or wire transport.
-    ToProto(ctx context.Context) (*api.ChunkSelectorProto, error)
-}
-
-// Callback signature for each matched chunk.
-type OnSelectedChunk func(ctx context.Context, chunk Chunk, extra *api.SelectorExtra) error
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-pub trait ChunkSelector: std::fmt::Display {
-    /// Scan the view and forward each matching chunk to `each`.
-    fn select(
-        &self,
-        view: &dyn SubstrateView,
-        each: &mut dyn FnMut(&Chunk, Option<&SelectorExtra>) -> Result<(), HvError>,
-    ) -> Result<(), HvError>;
-
-    /// Convert to protobuf representation.
-    fn to_proto(&self) -> Result<ChunkSelectorProto, HvError>;
-}
-```
-{{#endtabs}}
-
-## Working with Results
-
-### FirstPicked — get the first match
-
-Returns the first chunk matching the selector. Returns an error if nothing is found.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-# Returns the code (HyperBinary) of the first match
-code = memory.first_picked(view, selector)
-
-# Returns the full Chunk object (with .id, .code, .note, .extra)
-chunk = memory.first_picked_chunk(view, selector)
-print(chunk.id, chunk.code, chunk.note)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, extra, err := memory.FirstPicked(ctx, view, selector)
-// chunk is a Chunk; extra contains idx and weight (from NNS)
-// err is ErrNotFound if no match
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let (chunk, extra) = first_picked(&*view, &selector)?;
-// Returns HvError::NotFound if no match
-```
-{{#endtab}}
-{{#endtabs}}
-
-### Iterator — iterate all matches
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-Not available as iterator in Python. Use `mem_get()` for batch reads.
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-for chunk, extra := range memory.SelectorIter(ctx, view, selector) {
-    fmt.Println(chunk.ID, chunk.Code, extra)
-}
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunks = select_all(&*view, &selector)?;
-for chunk in &chunks {
-    println!("{} {:?}", chunk.id, chunk.code);
-}
-```
-{{#endtab}}
-{{#endtabs}}
-
-### mem_get — high-level batch read
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-results = storage.mem_get(selector)
-for hv in results:
-    print(hv)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunks, err := m.Get(ctx, selector)
-for _, c := range chunks {
-    fmt.Println(c)
-}
-```
-{{#endtab}}
-{{#endtabs}}
-
-### Raw Select — callback-based
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-Not directly exposed in Python. Use `first_picked()` or `mem_get()` instead.
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-selector.Select(ctx, view, func(ctx context.Context, chunk memory.Chunk, extra *api.SelectorExtra) error {
-    fmt.Println(chunk.ID, chunk.Code)
-    return nil // return non-nil error to stop iteration
-})
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-selector.select(&*view, &mut |chunk, extra| {
-    println!("{}", chunk.id);
-    Ok(()) // return Err to stop iteration
-})?;
-```
-{{#endtab}}
-{{#endtabs}}
-
-## Note on Python Selector Consumption
-
-In Python, selectors passed to combinators (`range_sel`, `nns`, `joiner`, etc.) are **consumed** — they cannot be reused after being passed. This mirrors Rust's move semantics. Attempting to reuse a consumed selector raises `ValueError`.
-
 ## Concrete Selectors
 
 ### ByItemKey
@@ -374,3 +234,82 @@ memory.AnalogicalReasoner(
 ```
 {{#endtab}}
 {{#endtabs}}
+
+## Working with Results
+
+### FirstPicked — get the first match
+
+Returns the first chunk matching the selector. Returns an error if nothing is found.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# Returns the code (HyperBinary) of the first match
+code = memory.first_picked(view, selector)
+
+# Returns the full Chunk object (with .id, .code, .note, .extra)
+chunk = memory.first_picked_chunk(view, selector)
+print(chunk.id, chunk.code, chunk.note)
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+chunk, extra, err := memory.FirstPicked(ctx, view, selector)
+// chunk is a Chunk; extra contains idx and weight (from NNS)
+// err is ErrNotFound if no match
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let (chunk, extra) = first_picked(&*view, &selector)?;
+// Returns HvError::NotFound if no match
+```
+{{#endtab}}
+{{#endtabs}}
+
+### Iterator — iterate all matches
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+Not available as iterator in Python. Use `mem_get()` for batch reads.
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+for chunk, extra := range memory.SelectorIter(ctx, view, selector) {
+    fmt.Println(chunk.ID, chunk.Code, extra)
+}
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let chunks = select_all(&*view, &selector)?;
+for chunk in &chunks {
+    println!("{} {:?}", chunk.id, chunk.code);
+}
+```
+{{#endtab}}
+{{#endtabs}}
+
+### mem_get — high-level batch read
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+results = storage.mem_get(selector)
+for hv in results:
+    print(hv)
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+chunks, err := m.Get(ctx, selector)
+for _, c := range chunks {
+    fmt.Println(c)
+}
+```
+{{#endtab}}
+{{#endtabs}}
+
+## Note on Python Selector Consumption
+
+In Python, selectors passed to combinators (`range_sel`, `nns`, `joiner`, etc.) are **consumed** — they cannot be reused after being passed. This mirrors Rust's move semantics. Attempting to reuse a consumed selector raises `ValueError`.

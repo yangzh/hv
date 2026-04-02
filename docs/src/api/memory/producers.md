@@ -2,42 +2,6 @@
 
 **ChunkProducers** are write builders that create and persist chunks in the substrate. Each producer encapsulates the logic for constructing a specific type of chunk.
 
-## The ChunkProducer Interface
-
-{{#tabs global="lang"}}
-{{#tab name="Go"}}
-```go
-type ChunkProducer interface {
-    fmt.Stringer
-
-    // Produce generates a Chunk and writes it into the view.
-    // Returns the produced Chunk, or nil for update-only producers.
-    // The view decides when/how to commit the written results.
-    Produce(ctx context.Context, view SubstrateMutableView) (Chunk, error)
-
-    // ToProto serializes this producer for storage or wire transport.
-    ToProto(ctx context.Context) (*api.ChunkProducerProto, error)
-}
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-pub trait ChunkProducer: std::fmt::Display {
-    /// Produce a chunk and write it into the view.
-    /// `index` is passed separately to avoid borrow conflicts
-    /// with the mutable view.
-    fn produce(
-        &self,
-        view: &mut dyn SubstrateMutableView,
-        index: Option<&dyn AssociativeIndex>,
-    ) -> Result<Chunk, HvError>;
-
-    /// Convert to protobuf representation.
-    fn to_proto(&self) -> Result<ChunkProducerProto, HvError>;
-}
-```
-{{#endtabs}}
-
 Note: some producers only update existing chunks (e.g., `ClusterUpdater`) without creating new ones. In those cases, `Produce` returns the updated chunk rather than a newly created one.
 
 ## Producer Options
