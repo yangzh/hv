@@ -26,13 +26,13 @@
     - [HyperBinary Types](api/hv/types.md)
         - [SparseSegmented 🍡](api/hv/sparse_segmented.md)
         - [Sparkle ✨](api/hv/sparkle.md)
+        - [Learner 💫](api/hv/learner.md)
         - [Set 🫧](api/hv/set.md)
         - [Sequence 📿](api/hv/sequence.md)
         - [Octopus 🐙](api/hv/octopus.md)
         - [Knot 🪢](api/hv/knot.md)
         - [Parcel 🎁](api/hv/parcel.md)
         - [Cyclone 🌀](api/hv/cyclone.md)
-        - [Learner 💫](api/hv/learner.md)
     - [Misc](api/hv/misc.md)
 - [Memory](api/memory/overview.md)
     - [Chunk](api/memory/chunk.md)
@@ -44,6 +44,9 @@
 
 - [Python Quick Start](guides/python/quick-start.md)
 - [Notebook Quick Start](guides/notebook/quick-start.md)
+    - [Notebook Platforms](guides/notebook/platforms.md)
+    - [Interactive Notebooks](guides/notebook/notebooks.md)
+    - [Walkthrough](guides/notebook/walkthrough.md)
 
 # Applications
 

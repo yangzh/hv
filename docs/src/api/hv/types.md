@@ -89,10 +89,10 @@ See [Display & Emoji](display.md) for the full field label reference.
 |------|-------------|
 | [SparseSegmented 🍡](sparse_segmented.md) | Foundational vector — packed per-segment offsets |
 | [Sparkle ✨](sparkle.md) | Seeded, deterministic hypervector |
+| [Learner 💫](learner.md) | Online Hebbian learning |
 | [Set 🫧](set.md) | Unordered collection |
 | [Sequence 📿](sequence.md) | Ordered collection with positional encoding |
 | [Octopus 🐙](octopus.md) | Key-value composite |
 | [Knot 🪢](knot.md) | Bound (multiplied) group |
 | [Parcel 🎁](parcel.md) | Bundled (added) group |
 | [Cyclone 🌀](cyclone.md) | Periodic permutation vector |
-| [Learner 💫](learner.md) | Online Hebbian learning |
