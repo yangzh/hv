@@ -11,7 +11,7 @@ Kongming provides three core algebraic operations on hypervectors, plus convenie
 - Reversible: `Bind(Bind(a, b), Inverse(b)) = a`
 - Binding with identity is a no-op
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 bound = hv.bind(a, b)
@@ -51,7 +51,12 @@ let released = release(&[bound, b]);
 - The result has above-random overlap with each input
 - Weights can be applied to emphasize certain members
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+p = hv.bundle(hv.Seed128(10, 1), a, b, c)
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 p := hv.Bundle(seed, a, b, c)                 // → Parcel
@@ -74,7 +79,7 @@ let raw = bundle_direct(seed, &[a.core(), b.core()]);
 - `Power(-1)` is the inverse
 - `Power(n) = Power(1)` applied $n$ times
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 v2 = sparkle.power(3)

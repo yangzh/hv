@@ -1,10 +1,10 @@
 # Model & SparseOperation
 
-See [Concepts: Models](../concepts/models.md) for the full overview of model configurations.
+See [Concepts: Models](../../concepts/models.md) for the full overview of model configurations.
 
 ## Model Enum
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 model = hv.MODEL_64K_8BIT
@@ -36,7 +36,7 @@ let model = Model::Model4g16bit;
 
 ## Model Functions
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.width(model)           # total dimensions
@@ -84,7 +84,7 @@ model.from_segment_offset(seg, offset) // u32
 
 A Model wrapped with a seeded PCG-DXSM random number generator. Primary way to generate random vectors deterministically.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 so = hv.SparseOperation(model, seed_high, seed_low)

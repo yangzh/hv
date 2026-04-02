@@ -1,10 +1,16 @@
 # Knot
 
-The result of binding (multiplicative composition) of hypervectors. Unlike `BindDirect`, Knot tracks its member parts for serialization and debugging. See [Composites: Knot](../concepts/composites.md#knot).
+The result of binding (multiplicative composition) of hypervectors. Unlike `BindDirect`, Knot tracks its member parts for serialization and debugging. See [Composites: Knot](../../concepts/composites.md#knot).
 
 ## Constructor
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# Not directly constructed in Python. Use hv.bind() instead.
+k = hv.bind(a, b)
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 k := hv.NewKnot(domain, pod, partA, partB)
@@ -22,7 +28,15 @@ let k = Knot::new(domain, pod, parts);
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+k.model()       # Model
+k.power(p)      # HyperBinary
+k.core()        # SparseSegmented
+k.stable_hash() # int
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 k.Model()       // api.Model

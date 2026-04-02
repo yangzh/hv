@@ -16,7 +16,7 @@ The offsets are bit-packed according to the model's sparsity bits — they do **
 
 ## Constructors
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 # From raw offsets, typically discouraged...
@@ -60,7 +60,7 @@ let ss = SparseSegmented::from_random(model, seed_high, seed_low);
 
 ### Model Properties
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 ss.model()        # Model enum
@@ -92,7 +92,7 @@ ss.is_identity()  // bool
 
 ### Similarity
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.overlap(a, b)   # Count of matching ON bits
@@ -117,7 +117,7 @@ a.hamming(&b)   // u32
 
 Returns the $p$-th power of the vector. `Power(0)` returns identity, `Power(-1)` returns the inverse.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 ss2 = ss.power(3)
@@ -140,7 +140,10 @@ let inv = ss.power(-1);
 
 ### Bit Access
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+Not directly exposed in Python.
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 // Check if a specific global index is ON

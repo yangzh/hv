@@ -2,7 +2,7 @@
 
 A LISP interpreter built entirely on hyperdimensional computing. Every data structure — atoms, cons cells, lists, closures — is a sparse binary hypervector. Every operation is VSA algebra: bind, bundle, release, and near-neighbor search.
 
-Inspired by [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889), originally developed by Peter Norvig [here](https://norvig.com/lispy.html).
+Inspired by [Hey, Pentti, We Did it!: A fully Vector-Symbolic Lisp](https://arxiv.org/abs/2510.17889), with history tracing back to [Peter Norvig's post](https://norvig.com/lispy.html).
 
 ## Two Implementations
 

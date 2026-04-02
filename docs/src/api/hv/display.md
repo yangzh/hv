@@ -63,7 +63,13 @@ Set `KONGMING_REPR_FORMAT=PROTO` for protobuf debug output instead of the defaul
 
 ## Go / Rust Equivalents
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+print(sparkle)      # compact emoji form via __str__
+repr(sparkle)       # detailed YAML/proto form via __repr__
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 // Compact emoji form (used by fmt.Println, etc.)

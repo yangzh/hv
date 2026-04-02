@@ -4,7 +4,17 @@
 
 All vector types (SparseSegmented, Sparkle, Set, Sequence, Octopus, Knot, Parcel, Cyclone, Learner) conform to a common interface. In Go this is the `HyperBinary` interface; in Rust it is the `HyperBinary` trait. The two implementations are kept at **feature parity**.
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+In Python, there is no explicit interface. All types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
+
+```python
+v.model()        # Model enum
+v.stable_hash()  # int
+v.core()         # SparseSegmented
+v.power(p)       # HyperBinary
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 type HyperBinary interface {
@@ -62,7 +72,7 @@ In Python, there is no explicit interface — all types expose the same methods 
 
 ## Shortcuts
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.d0()       # Default Domain (id=0)
@@ -85,7 +95,7 @@ Pod::default_pod()        // P0
 
 ## Hash Utilities
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.hash64_from_string("hello")   # deterministic u64 hash from string
@@ -114,7 +124,7 @@ KONGMING_STUDIO_SEED             // u64
 
 ## Identity Check
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.is_identity(v)   # True if v is an identity vector
@@ -134,7 +144,7 @@ v.is_identity()     // bool
 
 ## Serialization
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 # HyperBinary → protobuf bytes
@@ -191,7 +201,7 @@ export KONGMING_LEARNER_SAMPLING=classic
 
 Functions for analyzing sets of hypervectors as geometric frames.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.frame_inner_product(set_a, set_b)  # inner product between two sets

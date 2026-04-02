@@ -1,10 +1,10 @@
 # Sequence
 
-An ordered collection of hypervectors with positional encoding. See [Composites: Sequence](../concepts/composites.md#sequence) for the conceptual overview.
+An ordered collection of hypervectors with positional encoding. See [Composites: Sequence](../../concepts/composites.md#sequence) for the conceptual overview.
 
 ## Constructor
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 seq = hv.Sequence(domain, pod, 0, [first, second, third])
@@ -24,7 +24,10 @@ let seq = Sequence::new(domain, pod, 0, members);
 
 ## Manipulation
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+Not directly exposed in Python.
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 // Prepend a member (start decreases by 1)
@@ -48,7 +51,15 @@ let seq4 = seq.reset(5);
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+seq.model()       # Model
+seq.power(p)      # HyperBinary
+seq.core()        # SparseSegmented
+seq.stable_hash() # int
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 seq.Start()       // int32 — starting index

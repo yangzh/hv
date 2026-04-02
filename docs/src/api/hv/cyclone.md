@@ -1,12 +1,12 @@
 # Cyclone
 
-A periodic permutation vector where `power(v, period) == identity`. See [Composites: Cyclone](../concepts/composites.md#cyclone).
+A periodic permutation vector where `power(v, period) == identity`. See [Composites: Cyclone](../../concepts/composites.md#cyclone).
 
 Constraint: `segment_size(model)` must be divisible by `period`.
 
 ## Constructor
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 c = hv.Cyclone(model, domain, pod, 16)  # period=7
@@ -26,7 +26,15 @@ let c = Cyclone::new(model, domain, pod, 16)?;
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+c.period()      # int
+c.power(p)      # HyperBinary
+c.model()       # Model
+c.core()        # SparseSegmented
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 c.Period()      // uint32

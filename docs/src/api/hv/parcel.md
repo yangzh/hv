@@ -1,10 +1,15 @@
 # Parcel
 
-The result of bundling (additive composition) of hypervectors. Unlike `BundleDirect`, Parcel tracks its members and bundling seed for serialization and debugging. See [Composites: Parcel](../concepts/composites.md#parcel).
+The result of bundling (additive composition) of hypervectors. Unlike `BundleDirect`, Parcel tracks its members and bundling seed for serialization and debugging. See [Composites: Parcel](../../concepts/composites.md#parcel).
 
 ## Constructors
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+p = hv.bundle(hv.Seed128(10, 1), a, b, c)
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 // Uniform weights
@@ -36,7 +41,15 @@ let p = Parcel::with_parts(domain, pod, hbs);
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+p.model()       # Model
+p.power(p_)     # HyperBinary
+p.core()        # SparseSegmented
+p.stable_hash() # int
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 p.Model()       // api.Model

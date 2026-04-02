@@ -16,7 +16,7 @@ This mark is tuned for the domain, so that it WILL be shared among all sets with
 
 Use when: you need to represent "these things together" without order.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 s = hv.Set(domain, pod, [member_a, member_b, member_c])
@@ -46,7 +46,7 @@ $S_{marker}$ is a special marker to distinguish a sequence from its individual m
 
 Use when: order matters (e.g., words in a sentence, events in time).
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 seq = hv.Sequence(domain, pod, 0, [first, second, third])
@@ -73,7 +73,7 @@ $$S = \sum_{i,\oplus} K_i \otimes V_i$$
 
 Use when: you need to represent structured records with named attributes.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 oct = hv.Octopus(domain, pod, ["color", "shape"], [red, circle])
@@ -101,7 +101,7 @@ Binding is reversible: given a Knot of A and B, you can recover A by releasing B
 
 Use when: you need a reversible association between concepts.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```Python
 # Not exported
@@ -130,7 +130,12 @@ Unlike direct bundling, Parcel tracks its members for serialization and introspe
 
 Use when: you need a superposition of concepts with optional weights.
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+p = hv.bundle(hv.Seed128(10, 1), member_a, member_b)
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 p := hv.Bundle(seed, memberA, memberB)
@@ -144,7 +149,7 @@ p := hv.NewWeightedParcel(domain, pod, []float64{0.7, 0.3}, memberA, memberB)
 
 A **periodic** permutation vector where `power(v, period) == identity`. Useful for encoding cyclic structures (e.g., days of the week, hours).
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 c = hv.Cyclone(model, domain, pod, 7)  # period=7

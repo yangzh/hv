@@ -40,7 +40,7 @@ Also note that the storage per hypervector estimation only applies to **SparseSe
 
 A **SparseOperation** wraps a Model with a seeded random number generator (PCG-DXSM). It is the primary way to create random vectors deterministically.
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 so = hv.SparseOperation(model, seed_high, seed_low)

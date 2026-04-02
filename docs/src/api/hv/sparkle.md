@@ -4,7 +4,7 @@ A seeded hypervector — a [SparseSegmented](sparse_segmented.md) with an associ
 
 ## Constructors
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 # From a word string
@@ -66,7 +66,7 @@ let s = Sparkle::identity(model, domain, pod);
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 s.model()         # Model enum

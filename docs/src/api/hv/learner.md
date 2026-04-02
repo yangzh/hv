@@ -4,7 +4,7 @@ Performs online bundling for a stream of observations, implementing Hebbian-styl
 
 ## Constructors
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 learner = hv.Learner(model, "domain", seed)
@@ -45,7 +45,7 @@ let mut learner = Learner::full(model, domain, pod, age, buffer);
 
 ## Feeding Observations
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 learner.bundle(observation)                 # single observation
@@ -70,7 +70,7 @@ learner.bundle_set(&hbs)?;                  // entire HyperBinarySet
 
 ## Inspection
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 learner.age()             # number of observations seen

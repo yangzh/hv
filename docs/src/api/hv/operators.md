@@ -1,10 +1,10 @@
 # Operators
 
-See [Concepts: Operators](../concepts/operators.md) for the full overview.
+See [Concepts: Operators](../../concepts/operators.md) for the full overview.
 
 ## Bind
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 bound = hv.bind(a, b)
@@ -32,7 +32,12 @@ let raw = bind_direct(&[a.core(), b.core()]); // → SparseSegmented
 
 ## Bundle
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+p = hv.bundle(hv.Seed128(10, 1), a, b, c)
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 p := hv.Bundle(seed, a, b, c)                    // → Parcel
@@ -51,7 +56,10 @@ let raw = bundle_direct(seed, &[a.core(), b.core()]);
 
 Binds SparseSegmented instances directly, without wrapping in a Knot.
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+Not directly exposed in Python.
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 raw := hv.BindDirect(a.Core(), b.Core())  // → SparseSegmented
@@ -66,7 +74,7 @@ let raw = bind_direct(&[a.core(), b.core()]); // → SparseSegmented
 
 ## Similarity
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 hv.overlap(a, b)    # count of matching ON bits

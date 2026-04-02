@@ -1,10 +1,10 @@
 # Set
 
-An unordered collection of hypervectors. See [Composites: Set](../concepts/composites.md#set) for the conceptual overview.
+An unordered collection of hypervectors. See [Composites: Set](../../concepts/composites.md#set) for the conceptual overview.
 
 ## Constructor
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 s = hv.Set(domain, pod, [member_a, member_b, member_c])
@@ -24,7 +24,15 @@ let s = Set::new(domain, pod, members);
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+s.model()         # Model
+s.stable_hash()   # int
+s.power(p)        # HyperBinary
+s.core()          # SparseSegmented
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 s.Model()         // api.Model

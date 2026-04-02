@@ -1,10 +1,10 @@
 # Octopus
 
-A key-value composite where each value is bound with its key's Sparkle. See [Composites: Octopus](../concepts/composites.md#octopus) for the conceptual overview.
+A key-value composite where each value is bound with its key's Sparkle. See [Composites: Octopus](../../concepts/composites.md#octopus) for the conceptual overview.
 
 ## Constructor
 
-{{#tabs}}
+{{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 oct = hv.Octopus(domain, pod, ["color", "shape"], [red, circle])
@@ -24,7 +24,15 @@ let oct = Octopus::new(domain, pod, keys, values);
 
 ## Key Methods
 
-{{#tabs}}
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+oct.model()              # Model
+oct.power(p)             # HyperBinary
+oct.core()               # SparseSegmented
+oct.stable_hash()        # int
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 oct.ValueByKey("color")  // HyperBinary — lookup by key
