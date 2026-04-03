@@ -11,7 +11,7 @@ The total storage / processing budget is fixed — what matters is the distribut
 ```python
 learner = hv.Learner(model, hv.Seed128(0, 42))
 
-# From SparseOperation
+# a randomly-initialized learner.
 learner = hv.Learner.random(so)
 ```
 {{#endtab}}
@@ -19,7 +19,7 @@ learner = hv.Learner.random(so)
 ```go
 learner := hv.NewLearner(model, hv.NewSeed128(0, 42))
 
-// From SparseOperation
+// a randomly-initialized learner.
 learner := hv.NewRandomLearner(so)
 ```
 {{#endtab}}
@@ -27,7 +27,7 @@ learner := hv.NewRandomLearner(so)
 ```rust
 let mut learner = Learner::new(model, Seed128::new(0, 42));
 
-// From SparseOperation
+// a randomly-initialized learner.
 let mut learner = Learner::random(&mut so);
 ```
 {{#endtab}}

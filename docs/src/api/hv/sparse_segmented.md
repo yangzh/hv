@@ -60,101 +60,35 @@ let ss = SparseSegmented::from_random(&mut so);
 
 ## Key Methods
 
-### Model Properties
-
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-ss.model()        # Model enum
-ss.width()        # Total dimensions
-ss.cardinality()  # Number of ON bits (= segments)
-ss.stable_hash()  # Deterministic hash
 ss.is_identity()  # True if identity vector
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-ss.Model()        // api.Model
-ss.Width()        // uint32
-ss.Cardinality()  // uint32
-ss.StableHash()   // uint64
-ss.IsIdentity()   // bool
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-ss.model()        // Model
-ss.width()        // u32
-ss.cardinality()  // u32
-ss.stable_hash()  // u64
-ss.is_identity()  // bool
-```
-{{#endtab}}
-{{#endtabs}}
 
-### Similarity
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-hv.overlap(a, b)   # Count of matching ON bits
-hv.hamming(a, b)   # Count of differing segments
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-a.Overlap(b)   // uint32
-a.Hamming(b)   // uint32
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-a.overlap(&b)   // u32
-a.hamming(&b)   // u32
-```
-{{#endtab}}
-{{#endtabs}}
-
-### Power
-
-Returns the $p$-th power of the vector. `Power(0)` returns identity, `Power(-1)` returns the inverse.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
 ss2 = ss.power(3)
 inv = ss.power(-1)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-ss2 := ss.Power(3).(hv.SparseSegmented)
-inv := ss.Power(-1).(hv.SparseSegmented)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let ss2 = ss.power(3);
-let inv = ss.power(-1);
-```
-{{#endtab}}
-{{#endtabs}}
 
-### Bit Access
+# Similarity
+hv.overlap(a, b)   # Count of matching ON bits
+hv.hamming(a, b)   # Count of differing segments
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
 ss.offsets()   # returns all offsets
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-// Check if a specific global index is ON
-ss.On(idx)         // bool
+ss.IsIdentity()   // bool
 
-// Get the offset within a segment
-ss.Offset(seg)     // uint32
+ss2 := ss.Power(3).(hv.SparseSegmented)
+inv := ss.Power(-1).(hv.SparseSegmented)
+
+// Similarity
+a.Overlap(b)   // uint32
+a.Hamming(b)   // uint32
+
+// offset access.
+ss.On(idx)         // Check if a specific global index is ON
+ss.Offset(seg)     // Get the offset within a segment
 
 // Iterate over all (segment, offset) pairs
 for seg, offset := range ss.OffsetIter() {
@@ -164,8 +98,19 @@ for seg, offset := range ss.OffsetIter() {
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
+ss.is_identity()  // bool
+
+let ss2 = ss.power(3);
+let inv = ss.power(-1);
+
+// Similarity
+a.overlap(&b)   // u32
+a.hamming(&b)   // u32
+
+// offset access.
 ss.on(idx)          // bool
 ss.offset(seg)      // u32
+
 for (seg, offset) in ss.offset_iter() {
     // ...
 }

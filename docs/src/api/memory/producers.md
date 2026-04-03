@@ -54,8 +54,13 @@ Creates a Set from stored members.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    members = memory.by_item_domain("fruits")
-    memory.mem_set(view, memory.from_set_members("sets", "fruit_set", members))
+    memory.mem_set(
+        view, 
+        memory.from_set_members(
+            "sets",
+            "fruit_set", 
+            memory.by_item_domain("fruits"),
+        ))
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -68,11 +73,17 @@ Creates a Sequence from stored members with positional encoding.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    members = memory.joiner(
-        memory.by_item_key("words", "hello"),
-        memory.by_item_key("words", "world"),
+    memory.mem_set(
+        view, 
+        memory.from_sequence_members(
+            "seqs",
+            "greeting", 
+            memory.joiner(
+                memory.by_item_key("words", "hello"),
+                memory.by_item_key("words", "world"),
+            ),
+            start=0),
     )
-    memory.mem_set(view, memory.from_sequence_members("seqs", "greeting", members, start=0))
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -85,13 +96,17 @@ Creates an Octopus (key-value composite) from keys and value selectors.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    values = memory.joiner(
-        memory.by_item_key("colors", "red"),
-        memory.by_item_key("shapes", "circle"),
-    )
-    memory.mem_set(view, memory.from_key_values(
-        "records", "obj1", keys=["color", "shape"], values=values,
-    ))
+    memory.mem_set(
+        view, 
+        memory.from_key_values(
+            "records",
+            "obj1", 
+            keys=["color", "shape"], 
+            values=memory.joiner(
+                memory.by_item_key("colors", "red"),
+                memory.by_item_key("shapes", "circle"),
+            ),
+        ))
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -104,11 +119,12 @@ Feeds an observed chunk into an existing Learner, updating its accumulated code 
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(view, memory.cluster_updater(
-        learner=memory.by_item_key("learners", "my_learner"),
-        observed=memory.by_item_key("fruits", "apple"),
-        multiple=1,
-    ))
+    memory.mem_set(view, 
+        memory.cluster_updater(
+            learner=memory.by_item_key("learners", "my_learner"),
+            observed=memory.by_item_key("fruits", "apple"),
+            multiple=1,
+        ))
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -1,29 +1,11 @@
 # Sparkle ✨
 
 
-Sparkles are the atomic building block for higher-level constructs: essentially seeded hypervectors — [SparseSegmented](sparse_segmented.md) annotated with domain (logical grouping) and pod. 
+Sparkles are the atomic building block for higher-level constructs: essentially [SparseSegmented](sparse_segmented.md) annotated with domain and pod. 
 
 Domain is a logical namespace that groups related Sparkle instances. Pod acts as the secondary identifier for a Sparkle instance.
 
-Sparkle is **deterministic**: the same (domain, pod) pair always produces the same offsets. As a consequence, the (model, pod) pair uniquely identifies a Sparkle.
-
-During pretty-printing of Sparkle instances, you may notice special emoji for domain / pods.
-
-<div class="callout callout-tip">
-<div class="callout-title">Display labels</div>
-
-| Emoji | Variant | Example |
-|-------|---------|---------|
-| 🔗 | Named | `🔗animals`, `🔗PREFIX.name` |
-| 🌐 | Numeric ID | `🌐0x..c862` |
-| 🌱 | Word-seeded | `🌱cat` |
-| 🫛 | Numeric seed | `🫛0x..80e4` |
-| 🍀 | Prewired | `🍀SET_MARKER` |
-| 💪 | Exponent / Power | `💪3`, `💪-1` |
-
-**Identity vectors** display as `IDENT` (e.g., `✨IDENT`).
-
-</div>
+Sparkle is **deterministic**: the same (domain, pod) pair always produces the same offsets. For this reason, the (model, pod) pair uniquely identifies a Sparkle.
 
 ## Sparkle Constructors
 
@@ -102,9 +84,6 @@ s.Exponent()      // int32
 
 s.Power(p)        // HyperBinary (cast to Sparkle)
 s.Core()          // SparseSegmented
-
-s.Domain()        // Domain
-s.Pod()           // Pod
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -115,14 +94,43 @@ s.exponent()      // i32
 
 s.power(p)        // Sparkle
 s.core()          // SparseSegmented
-
-s.domain()        // &Domain
-s.pod()           // &Pod
 ```
 {{#endtab}}
 {{#endtabs}}
 
+## Pretty-printing
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```Python
+# Pretty-printing, or s.__str__()
+print(s)
+
+# More detailed information, or s.__repr__()
+s
+```
+{{#endtab}}
+{{#endtabs}}
+
+During pretty-printing of Sparkle instances, you may notice special emoji for domain / pods.
+
+<div class="callout callout-tip">
+<div class="callout-title">emojis for domain / pod</div>
+
+| Emoji | Variant | Example |
+|-------|---------|---------|
+| 🔗 | Named | `🔗animals`, `🔗PREFIX.name` |
+| 🌐 | Numeric ID | `🌐0x..c862` |
+| 🌱 | Word-seeded | `🌱cat` |
+| 🫛 | Numeric seed | `🫛0x..80e4` |
+| 🍀 | Prewired | `🍀SET_MARKER` |
+| 💪 | Exponent / Power | `💪3`, `💪-1` |
+
+**Identity vectors** display as `IDENT` (e.g., `✨IDENT`).
+
+</div>
+
 ## Notes
 - The underlying offsets are generated lazily from a seeded PRNG. Only the seeds are stored, which is a significant saving; offsets are recomputed during serialization.
-- `Power(0)` returns the identity sparkle. `Power(-1)` returns the inverse.
+- `Power(0)` alwsys returns the identity sparkle. `Power(-1)` returns the inverse.
 - Serialization / deserialization is designed to work across language / system boundaries.

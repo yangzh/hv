@@ -36,8 +36,3 @@ for hv in results:
 ```
 {{#endtab}}
 {{#endtabs}}
-
-<div class="callout callout-warning">
-<div class="callout-title">Python Selector Consumption</div>
-Selectors passed to combinators (<code>range_sel</code>, <code>nns</code>, <code>joiner</code>, etc.) are <strong>consumed</strong> — they cannot be reused after being passed. This mirrors Rust's move semantics. Attempting to reuse a consumed selector raises <code>ValueError</code>.
-</div>
