@@ -27,27 +27,17 @@ let oct = Octopus::new(Seed128::new(0, 42), keys, values);
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-oct.model()              # Model
-oct.power(p)             # HyperBinary
-oct.core()               # SparseSegmented
-oct.stable_hash()        # int
+oct.value_by_key("color") // returns the value, or raises ValueError
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 oct.ValueByKey("color")  // HyperBinary — lookup by key
-oct.Model()              // api.Model
-oct.Power(p)             // HyperBinary
-oct.Core()               // SparseSegmented
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 oct.value_by_key("color")  // Option<&HyperBinaryKind>
-oct.keys()                 // &[String]
-oct.values()               // &[HyperBinaryKind]
-oct.power(p)               // Octopus
-oct.core()                 // SparseSegmented
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -20,37 +20,7 @@ $$O(A \otimes B, A) \approx O(A \otimes B, B) \approx \text{noise} \quad \text{(
 
 Implementation: segment-wise offset addition modulo segment size.
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-bound = hv.bind(a, b)
-recovered = hv.bind(bound, hv.inverse(b))
-hv.equal(recovered, a)
-
-## Or equivalently..
-released = hv.release(bound, b)
-hv.equal(released, a)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-bound := hv.Bind(a, b)
-recovered := hv.Bind(bound, hv.Inverse(bound))
-
-// Or equivalently...
-released = hv.Release(bound, b)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let bound = bind(&[a, b]);
-let recovered = bind(&[bound, inverse(b)]);
-
-// Or equivalently...
-let released = release(&[bound, b]);
-```
-{{#endtab}}
-{{#endtabs}}
+Code snippets are available [here](../api/hv/operators.md#bind).
 
 ### Release
 
@@ -58,11 +28,10 @@ Occasionally we use **releae**, which derived from **bind**, as the equivalent o
 
 $$ A \oslash B = A \otimes B^{-1} $$
 
-
-
 Note that release is anti-commutative:
 $$ (A \oslash B)^{-1} = B \oslash A $$
 
+Code snippets are availale [here](../api/hv/operators.md#release)
 
 ## Bundle
 
@@ -81,21 +50,4 @@ $$O(S, X) \approx O_{\text{random}} \quad \text{for } X \notin \{A_i\} \quad \te
 Individual members cannot be recovered from the bundle without extra help (e.g., <a href="near_neighbor_search.html">near-neighbor search</a>). Weights can be applied to emphasize certain members.
 </div>
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-p = hv.bundle(hv.Seed128(10, 1), a, b, c)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-p := hv.Bundle(seed, a, b, c)                 // → Parcel
-raw := hv.BundleDirect(seed, a.Core(), b.Core()) // → SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let raw = bundle_direct(seed, &[a.core(), b.core()]);
-```
-{{#endtab}}
-{{#endtabs}}
+Code snippets are available [here](../api/hv/operators.md#bundle)

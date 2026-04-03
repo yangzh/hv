@@ -1,6 +1,6 @@
 # SparseSegmented 🍡
 
-The foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at a recorded offset. All other types (Sparkle, Set, Sequence, etc.) ultimately stores a `SparseSegmented` in memory and can be accessed via `.Core()`.
+The foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at the recorded offset location. All other types (Sparkle, Set, Sequence, etc.) ultimately contains a `SparseSegmented`.
 
 ## Structure
 
@@ -12,18 +12,18 @@ The foundational vector type — a sparse binary hypervector where each segment 
 
 The offsets are bit-packed according to the model's sparsity bits — they do **not** align to byte boundaries. This trades a small CPU cost for compact, uniform storage that works both in memory and on disk.
 
-**Identity vector**: when `offsets` is nil/None, the vector is the identity (all offsets = 0). Binding with identity is a no-op, and identity requires zero storage for offsets.
+**Identity vector**: when `offsets` is blank, the vector is the identity vector where all offsets are 0. Binding with identity is a no-op, and identity requires zero storage for offsets.
 
 ## Constructors
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# From raw offsets, typically discouraged...
-ss = hv.SparseSegmented(model, offsets_bytes)
-
 # Identity
 ss = hv.SparseSegmented.identity(model)
+
+# From raw offsets, typically discouraged...
+ss = hv.SparseSegmented(model, offsets_bytes)
 
 # Random
 so = hv.SparseOperation(model, seed_high, seed_low)
@@ -32,26 +32,28 @@ ss = hv.SparseSegmented.random(so)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-// From raw offsets (takes ownership of slice)
-ss := hv.NewSparseSegmented(model, offsets)
-
 // Identity
 ss := hv.NewSparseSegmentedIdentity(model)
 
+// From raw offsets (takes ownership of slice)
+ss := hv.NewSparseSegmented(model, offsets)
+
 // Random
+so := hv.NewSparseOperation(model, seedHigh, seedLow)
 ss := hv.NewRandomSparseSegmented(so)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-// From raw offsets (takes ownership)
-let ss = SparseSegmented::new(model, Some(offsets));
-
 // Identity
 let ss = SparseSegmented::identity(model);
 
+// From raw offsets (takes ownership)
+let ss = SparseSegmented::new(model, Some(offsets));
+
 // Random
-let ss = SparseSegmented::from_random(model, seed_high, seed_low);
+let mut so = SparseOperation::new(Model::Model1m10bit, seedHigh, seedLow);
+let ss = SparseSegmented::from_random(&mut so);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -113,7 +115,7 @@ a.hamming(&b)   // u32
 {{#endtab}}
 {{#endtabs}}
 
-### Power (Permutation)
+### Power
 
 Returns the $p$-th power of the vector. `Power(0)` returns identity, `Power(-1)` returns the inverse.
 
@@ -142,7 +144,9 @@ let inv = ss.power(-1);
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
-Not directly exposed in Python.
+```python
+ss.offsets()   # returns all offsets
+```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go

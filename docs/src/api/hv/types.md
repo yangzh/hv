@@ -3,6 +3,22 @@
 All vector types conform to a common interface. In Go this is the `HyperBinary` interface; in Rust it is the `HyperBinary` trait. The two implementations are kept at **feature parity**.
 
 {{#tabs global="lang"}}
+{{#tab name="Python"}}
+Python doesn't have the concept of interface/trait, but all `HyperBinary` derived types share a common set of methods.
+
+```python
+v.model()        # Model enum
+v.width()
+v.cardinality()
+v.hint()
+v.stable_hash()  # int
+v.seed128()
+v.exponent()
+
+v.core()         # SparseSegmented
+v.power(p)       # HyperBinary
+```
+{{#endtab}}
 {{#tab name="Go"}}
 ```go
 type HyperBinary interface {
@@ -11,20 +27,11 @@ type HyperBinary interface {
     Cardinality() uint32
     Hint() api.HyperBinaryProto_Hint
     StableHash() uint64
-    Core() SparseSegmented
     Seed128() Seed128
     Exponent() int32
+
+    Core() SparseSegmented
     Power(p int32) HyperBinary
-    Clone() HyperBinary
-
-    // Display: String() returns compact emoji form;
-    // Repr() returns detailed YAML/proto form.
-    // Both are part of the interface in Go.
-    fmt.Stringer
-    Repr() string
-
-    // Serialization is part of the interface in Go.
-    ToProto(ctx context.Context) (*api.HyperBinaryProto, error)
 }
 ```
 {{#endtab}}
@@ -36,31 +43,15 @@ pub trait HyperBinary: std::fmt::Display {
     fn cardinality(&self) -> u32;
     fn hint(&self) -> HyperBinaryHint;
     fn stable_hash(&self) -> u64;
-    fn core(&self) -> SparseSegmented;
     fn seed128(&self) -> &Seed128;
     fn exponent(&self) -> i32;
+
+    fn core(&self) -> SparseSegmented;
     fn power(&self, p: i32) -> HyperBinaryKind;
-    fn clone_hb(&self) -> HyperBinaryKind;
-
-    // Display: via the std::fmt::Display supertrait (shown above).
-    // No separate Repr(); use Debug derive or per-type formatting.
-
-    // Serialization: to_proto() / from_proto() are inherent methods
-    // on each concrete type, not part of the trait.
 }
 ```
 
 In Rust, concrete types are wrapped in `HyperBinaryKind` (an enum) for dynamic dispatch instead of Go's interface boxing.
-{{#endtab}}
-{{#tab name="Python"}}
-In Python, there is no explicit interface. All types expose the same methods (`model()`, `stable_hash()`, `core()`, `power()`, etc.) by convention.
-
-```python
-v.model()        # Model enum
-v.stable_hash()  # int
-v.core()         # SparseSegmented
-v.power(p)       # HyperBinary
-```
 {{#endtab}}
 {{#endtabs}}
 

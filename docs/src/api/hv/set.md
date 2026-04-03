@@ -21,34 +21,3 @@ let s = Set::new(Seed128::new(0, 42), members);
 ```
 {{#endtab}}
 {{#endtabs}}
-
-## Key Methods
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-s.model()         # Model
-s.stable_hash()   # int
-s.power(p)        # HyperBinary
-s.core()          # SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-s.Model()         // api.Model
-s.Seed128()       // Seed128
-s.StableHash()    // uint64
-s.Power(p)        // HyperBinary
-s.Core()          // SparseSegmented
-s.Clone()         // HyperBinary
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-s.model()         // Model
-s.members()       // &UniformSet
-s.power(p)        // Set
-s.core()          // SparseSegmented
-```
-{{#endtab}}
-{{#endtabs}}

@@ -23,32 +23,3 @@ let c = Cyclone::new(model, Seed128::new(0, 42), 16)?;
 ```
 {{#endtab}}
 {{#endtabs}}
-
-## Key Methods
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-c.period()      # int
-c.power(p)      # HyperBinary
-c.model()       # Model
-c.core()        # SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-c.Period()      // uint32
-c.Power(p)      // HyperBinary — wraps around at period
-c.Model()       // api.Model
-c.Core()        // SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-c.period()      // u32
-c.power(p)      // Cyclone
-c.model()       // Model
-c.core()        // SparseSegmented
-```
-{{#endtab}}
-{{#endtabs}}

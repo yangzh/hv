@@ -6,7 +6,7 @@ Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors
 
 ## Sparse Binary Representation
 
-Kongming uses **sparse binary** hypervectors. Each vector has a fixed, large number of dimensions (e.g., 65,536 or 16 million), but only a very small fraction of them are "on" (set to 1). This sparsity is controlled by the [Model](models.md) configuration.
+Kongming uses **sparse binary** hypervectors. Each vector has a fixed, large number of dimensions (e.g., 65,536 or 16 million), but only a very small fraction of them are "on" (set to 1). This sparsity is controlled by the [Model](../api/hv/common/models.md) configuration.
 
 We don't linger at generic **sparse binary** hypervectors. Instead, the base type we are focusing is **SparseSegmented**: the vector is divided into equal-sized *segments*, and exactly one bit is "on" per segment. 
 
@@ -24,9 +24,9 @@ Every hypervector in kongming carries:
 | Property | Description |
 |----------|-------------|
 | **Model** | Sparsity configuration — determines vector's cardinality and width |
-| **Seed128** | A 128-bit seed embedding a Domain (semantic namespace) and Pod (identifier within a domain). Composites carry a Seed128; only Sparkle exposes Domain and Pod individually |
+| **Seed128** | A 128-bit seed for probablistic operations |
 | **Exponent** | Exponent applied to the base vector. Particularly, exponent of 0 implies an identity vector |
-| **StableHash** | Deterministic hash for equality checks and indexing, consistent across serializations, even across different implementations and storage systems |
+| **StableHash** | Deterministic hash for equality and integrity checks |
 
 ## Identity and Inverses
 
@@ -83,4 +83,4 @@ All model functions take a Model enum value and return the derived property:
 
 Larger models provide more orthogonal space (lower collision probability) at the cost of more memory per vector.
 
-Also note that the storage per hypervector estimation only applies to **SparseSegmented** (and a few other types) where we want to store the raw offsets. **Sparkle**, for example, only stores the random seeds (128 bit for now) so that the offsets can be computed on-the-fly during serialization time. Composite types (such as **Set**, **Sequence**) typically contain reference to member **Sparkle** instances, and typically cost much less storage than a **SparseSegmented** instance.
+Also note that the storage per hypervector estimation only applies to **SparseSegmented** (and a few other types) where raw offsets are neede. **Sparkle**, for example, only stores the random seeds so that the offsets can be recovered on-the-fly at serialization time. Composite types (such as **Set**, **Sequence**) typically contain reference to member **Sparkle** instances, and typically cost much less storage than a **SparseSegmented** instance.

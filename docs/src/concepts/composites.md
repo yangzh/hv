@@ -16,23 +16,7 @@ This mark is tuned for the domain, so that it WILL be shared among all sets with
 
 Use when: you need to represent "these things together" without order.
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-s = hv.Set(hv.Seed128(0, 42), [member_a, member_b, member_c])
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-s := hv.NewSet(hv.NewSeed128(0, 42), memberA, memberB, memberC)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let s = Set::new(Seed128::new(0, 42), &members);
-```
-{{#endtab}}
-{{#endtabs}}
+Jump to API reference for Set [here](../api/hv/set.md).
 
 ## Sequence
 
@@ -46,24 +30,7 @@ $S_{marker}$ is a special marker to distinguish a sequence from its individual m
 
 Use when: order matters (e.g., words in a sentence, events in time).
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-seq = hv.Sequence(hv.Seed128(0, 42), [first, second, third])
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-seq := hv.NewSequence(hv.NewSeed128(0, 42), 0, first, second, third)
-// start=0 means positions are 0, 1, 2
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let seq = Sequence::new(Seed128::new(0, 42), 0, &members);
-```
-{{#endtab}}
-{{#endtabs}}
+Jump to API reference for Sequence [here](../api/hv/sequence.md).
 
 ## Octopus
 
@@ -73,23 +40,7 @@ $$S = \sum_{i,\oplus} K_i \otimes V_i$$
 
 Use when: you need to represent structured records with named attributes.
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-oct = hv.Octopus(hv.Seed128(0, 42), ["color", "shape"], red, circle)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-oct := hv.NewOctopus(hv.NewSeed128(0, 42), []string{"color", "shape"}, red, circle)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let oct = Octopus::new(Seed128::new(0, 42), &["color", "shape"], &values);
-```
-{{#endtab}}
-{{#endtabs}}
+Jump to API reference for Octopus [here](../api/hv/octopus.md).
 
 ## Knot
 
@@ -101,24 +52,7 @@ Binding is reversible: given a Knot of A and B, you can recover A by releasing B
 
 Use when: you need a reversible association between concepts.
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```Python
-# Not exported
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-k := hv.Bind(role, filler)
-recovered := hv.Release(k, role) // ≈ filler
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let k = bind_hb(&[role, filler]);
-```
-{{#endtab}}
-{{#endtabs}}
+Jump to API reference for Knot [here](../api/hv/knot.md).
 
 ## Parcel
 
@@ -130,20 +64,7 @@ Unlike direct bundling, Parcel tracks its members for serialization and introspe
 
 Use when: you need a superposition of concepts with optional weights.
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-p = hv.bundle(hv.Seed128(10, 1), member_a, member_b)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-p := hv.Bundle(hv.NewSeed128(0, 42), memberA, memberB)
-// or with weights:
-p := hv.NewWeightedParcel(hv.NewSeed128(0, 42), []float64{0.7, 0.3}, memberA, memberB)
-```
-{{#endtab}}
-{{#endtabs}}
+Jump to API reference for Parcel [here](../api/hv/parcel.md).
 
 ## Summary
 

@@ -5,23 +5,27 @@
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-hv.overlap(a, b)    # count of matching ON bits
-hv.hamming(a, b)    # count of differing segments
-hv.equal(a, b)      # hash equality
+hv.overlap(a, b)    # Overlap
+
+hv.hamming(a, b)    # Hamming distance
+
+hv.equal(a, b)      # Equality check
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-hv.Overlap(a, b)         // uint32
-hv.Hamming(a, b)         // uint32
-hv.Equal(a, b)           // bool
-hv.JaccardIndex(a, b)    // float64
-hv.JaccardDistance(a, b)  // float64
+hv.Overlap(a, b)         // Overlap
+
+hv.Hamming(a, b)         // Hamming distance
+
+hv.Equal(a, b)           // Equality check
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-overlap(&a.core(), &b.core())   // u32
+overlap(&a.core(), &b.core())   // Overlap
+
+hamming(&a.core(), &b.core())   // Hamming distance
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -31,17 +35,21 @@ overlap(&a.core(), &b.core())   // u32
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
+v=hv.Sparkle.identity(model)
+
 hv.is_identity(v)   # True if v is an identity vector
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-hv.IsIdentity(v)    // bool
+v := hv.NewSparkleIdentity(model)
+
+hv.IsIdentity(v)    // True if v is an identity vector
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-v.is_identity()     // bool
+v.is_identity()     // True if v is an identity vector
 ```
 {{#endtab}}
 {{#endtabs}}

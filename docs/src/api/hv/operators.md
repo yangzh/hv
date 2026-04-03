@@ -8,24 +8,22 @@ See [Concepts: Operators](../../concepts/operators.md) for the full overview.
 {{#tab name="Python"}}
 ```python
 bound = hv.bind(a, b)
-released = hv.release(bound, b)  # ≈ a
-inv = hv.inverse(a)              # a.power(-1)
-eq = hv.equal(a, b)              # hash equality
+released = hv.release(bound, b)  # this will recover `a`
+hv.equal(a, b)                   # hash equality
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-k := hv.Bind(a, b)                       // → Knot
-raw := hv.BindDirect(a.Core(), b.Core())  // → SparseSegmented
-recovered := hv.Release(k, b)            // → Knot ≈ a
-inv := hv.Inverse(a)                     // Power(-1)
+bound := hv.Bind(a, b)                       
+recovered := hv.Release(bound, b)        // this will recover `a`
 eq := hv.Equal(a, b)                     // bool
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let k = bind_hb(&[a, b]);                // → Knot
-let raw = bind_direct(&[a.core(), b.core()]); // → SparseSegmented
+let bound = operators::bind_hb(vec![a.clone(), b.clone()]); // Knot
+let recovered = operators::release(&bound, &b);             // this will recover `a`
+let eq = hyper_binary::equal(&a, &b);                              
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -40,14 +38,12 @@ p = hv.bundle(hv.Seed128(10, 1), a, b, c)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.Bundle(seed, a, b, c)                    // → Parcel
-raw := hv.BundleDirect(seed, a.Core(), b.Core())  // → SparseSegmented
-p := hv.BundleSet(seed, hbs)                     // → Parcel from set
+p := hv.Bundle(hv.NewSeed128(10, 1), a, b, c)                    // → Parcel
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let raw = bundle_direct(seed, &[a.core(), b.core()]);
+let p = operators::bundle(Seed128::new(10, 1), vec![a, b]);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -71,29 +67,8 @@ recovered := hv.Release(bound, role)  // ≈ filler
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-// release = bind with inverse
-let recovered = bind_hb(&[bound, inverse(role)]);
+let bound = bind(&[role, filler]);
+let recovered = release(&[bound, role]);
 ```
 {{#endtab}}
 {{#endtabs}}
-
-## BindDirect
-
-Binds SparseSegmented instances directly, without wrapping in a Knot.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-Not directly exposed in Python.
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-raw := hv.BindDirect(a.Core(), b.Core())  // → SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let raw = bind_direct(&[a.core(), b.core()]); // → SparseSegmented
-```
-{{#endtab}}
-{{#endtabs}}
-

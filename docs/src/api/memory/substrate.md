@@ -23,39 +23,6 @@ with storage.new_mutable_view() as view:
     # commits automatically
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-// Read-only
-view := substrate.NewView(nil)
-defer view.Discard()
-
-exists := view.KeyExists(ctx, key)
-view.Get(ctx, key, func(ctx context.Context, val []byte) error {
-    // process value
-    return nil
-})
-
-// Mutable
-mv := substrate.NewMutableView(nil)
-defer mv.Discard()
-
-mv.Set(ctx, memory.Cell{Key: key, Value: val})
-mv.Commit()
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-// Read-only
-let view = substrate.new_view(None);
-let exists = view.key_exists(&key);
-let val = view.get(&key)?;
-
-// Mutable
-let mut mview = substrate.new_mutable_view(None);
-mview.set(Cell { key, value, expiration: 0 })?;
-mview.commit()?;
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Storage Backends
@@ -77,17 +44,6 @@ Volatile, in-process storage. All data lost on exit. Best for testing and epheme
 storage = memory.InMemory(hv.MODEL_64K_8BIT, "my_store")
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-m, err := badger.InMemorySubstrate(ctx, memory.KongmingMemoryOpt(
-    so, memory.OptName("my_store"), memory.OptIndexTTL(30)))
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let substrate = InMemorySubstrate::new(model, seed_high, seed_low);
-```
-{{#endtab}}
 {{#endtabs}}
 
 ### Embedded
@@ -98,17 +54,6 @@ Persistent, single-machine storage backed by an embedded key-value store. Suitab
 {{#tab name="Python"}}
 ```python
 storage = memory.Embedded(hv.MODEL_64K_8BIT, "/path/to/store")
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-m, err := badger.EmbeddedConnect(ctx, "/path/to/store", opts)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-use kongming::memory::embedded::{EmbeddedSubstrate, connect};
-let substrate = connect(path, realm, ttl)?;
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -123,20 +68,4 @@ Distributed storage via Cassandra-compatible ScyllaDB. For high-scale, multi-nod
 # Not exposed yet...
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-substrate, err := scylla.Connect(ctx, hosts, opts)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let substrate = ScyllaSubstrate::new(session, runtime, so, realm, ttl, span);
-```
-{{#endtab}}
 {{#endtabs}}
-
-## Associative Index
-
-Each substrate optionally maintains an [Associative Index](../../concepts/associative_index.md) for [near-neighbor search](../../concepts/near_neighbor_search.md). Index entries carry a TTL and expire automatically, modeling memory decay.
-
-The index is populated automatically when chunks are written via producers that opt into semantic indexing.

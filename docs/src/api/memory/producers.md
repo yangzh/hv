@@ -16,13 +16,6 @@ memory.terminal("d", "p", note="annotation")
 memory.from_set_members("d", "p", members, semantic_indexing=True)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-memory.PNote("annotation")           // Set note
-memory.PExtra(protoMsg)              // Set extra payload
-memory.PSemanticIndexing(true)       // Enable associative index impression
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Concrete Producers
@@ -38,17 +31,6 @@ with storage.new_mutable_view() as view:
     memory.mem_set(view, memory.terminal("fruits", "apple", note="an apple"))
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.NewTerminal(
-    domain, pod, memory.PNote("an apple")).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = new_terminal(domain, pod, args).produce(&mut *view, index.as_deref())?;
-```
-{{#endtab}}
 {{#endtabs}}
 
 ### NewLearner
@@ -60,17 +42,6 @@ Creates a fresh Learner chunk for online learning.
 ```python
 with storage.new_mutable_view() as view:
     memory.mem_set(view, memory.new_learner("learners", "my_learner", note="a learner"))
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.NewLearner(
-    domain, pod, memory.PNote("a learner")).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = new_learner(domain, pod, args).produce(&mut *view, index.as_deref())?;
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -85,17 +56,6 @@ Creates a Set from stored members.
 with storage.new_mutable_view() as view:
     members = memory.by_item_domain("fruits")
     memory.mem_set(view, memory.from_set_members("sets", "fruit_set", members))
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.FromSetMembers(
-    domain, pod, members, memory.PNote("fruit set")).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = from_set_members(domain, pod, members, args).produce(&mut *view, index.as_deref())?;
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -113,17 +73,6 @@ with storage.new_mutable_view() as view:
         memory.by_item_key("words", "world"),
     )
     memory.mem_set(view, memory.from_sequence_members("seqs", "greeting", members, start=0))
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.FromSequenceMembers(
-    domain, pod, members, 0, memory.PNote("greeting")).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = from_sequence_members(domain, pod, members, 0, args).produce(&mut *view, index.as_deref())?;
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -145,17 +94,6 @@ with storage.new_mutable_view() as view:
     ))
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.FromKeyValues(
-    domain, pod, keys, values, memory.PNote("object")).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = from_key_values(domain, pod, keys, values, args).produce(&mut *view, index.as_deref())?;
-```
-{{#endtab}}
 {{#endtabs}}
 
 ### ClusterUpdater
@@ -171,17 +109,6 @@ with storage.new_mutable_view() as view:
         observed=memory.by_item_key("fruits", "apple"),
         multiple=1,
     ))
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-chunk, err := memory.ClusterUpdater(
-    learnerSel, observedSel, 1).Produce(ctx, mv)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let chunk = cluster_updater(learner_sel, observed_sel, 1, args).produce(&mut *view, index.as_deref())?;
 ```
 {{#endtab}}
 {{#endtabs}}

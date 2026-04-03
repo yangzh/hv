@@ -26,31 +26,3 @@ let k = Knot::new(Seed128::new(0, 42), parts);
 {{#endtab}}
 {{#endtabs}}
 
-## Key Methods
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-k.model()       # Model
-k.power(p)      # HyperBinary
-k.core()        # SparseSegmented
-k.stable_hash() # int
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-k.Model()       // api.Model
-k.Power(p)      // HyperBinary
-k.Core()        // SparseSegmented
-k.Clone()       // HyperBinary
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-k.model()       // Model
-k.parts()       // &[HyperBinaryKind]
-k.power(p)      // Knot
-k.core()        // SparseSegmented
-```
-{{#endtab}}
-{{#endtabs}}

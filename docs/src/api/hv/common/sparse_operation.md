@@ -1,25 +1,23 @@
 # SparseOperation
 
-A SparseOperation instance wraps a Model, and a random number generator. It can be used to create random vectors deterministically.
-
-The current random number generator expects 2 64-bit seeds (total 128bit): the same (model, seed_high, seed_low) triple always produces the same sequence of random numbers, enabling reproducible vector generation across runs and languages.
+A SparseOperation instance wraps a Model, a random number generator, and potentially other information related to the sparse operation in general.
 
 ## Constructor
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-so = hv.SparseOperation(model, seed_high, seed_low)
+so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-so := hv.NewSparseOperation(model, seedHigh, seedLow)
+so := hv.NewSparseOperation(api.Model_MODEL_1M_10BIT, 0, 42)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut so = SparseOp::new(model, seed_high, seed_low);
+let mut so = SparseOp::new(Model::Model1m10bit, 0, 42);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -30,9 +28,13 @@ let mut so = SparseOp::new(model, seed_high, seed_low);
 {{#tab name="Python"}}
 ```python
 so.model()        # Model enum
+
 so.width()        # width for this model
+
 so.cardinality()  # cardinality for this model
+
 so.sparsity()     # sparsity for this model
+
 so.uint64()       # next random number
 
 ```
@@ -40,18 +42,26 @@ so.uint64()       # next random number
 {{#tab name="Go"}}
 ```go
 so.Model()        // api.Model
+
 so.Width()        // width for this model
+
 so.Cardinality()  // cardinality for this model
+
 so.Sparsity()     // sparsity for this model
+
 so.Uint64()       // next random number
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 so.model()        // Model
+
 so.width()        // width for this model
+
 so.cardinality()  // cardinality for this model
+
 so.sparsity()     // sparsity for this model
+
 so.uint64()       // next random number
 ```
 {{#endtab}}
@@ -62,19 +72,19 @@ so.uint64()       // next random number
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-so = hv.SparseOperation(model, seed_high, seed_low)
-sparkle = hv.Sparkle.random("domain", so)
+so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
+sparkle = hv.Sparkle.random(hv.Domain("domain"), so)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-so := hv.NewSparseOperation(model, seedHigh, seedLow)
+so := hv.NewSparseOperation(api.Model_MODEL_1M_10BIT, 0, 42)
 sparkle := hv.NewRandomSparkle(domain, so)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut so = SparseOp::new(model, seed_high, seed_low);
+let mut so = SparseOp::new(Model::Model1m10bit, 0, 42);
 let sparkle = Sparkle::random(&domain, &mut so);
 ```
 {{#endtab}}
