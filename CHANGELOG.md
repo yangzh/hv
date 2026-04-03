@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.3 (2026-04-03)
+
+- tweaks to make Python API match Go/Rust.
 ## v3.7.2 (2026-04-03)
 
 - Python composites take Seed128; add Seed128.High/Low accessors
@@ -144,8 +147,3 @@ Only the latest 10 releases are shown.
 ## v3.6.3 (2026-03-25)
 
 - Fix: ship kongming.api.annotations_pb2 and top-level buf in wheel
-## v3.6.2 (2026-03-25)
-
-- Fix: include top-level buf package in wheel; bump to 3.6.2
-- Fix changelog filter: only exclude pure version bump commits
-- Opt into Node.js 24 for all workflows; remove unused deep_clone
