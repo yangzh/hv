@@ -2,7 +2,7 @@
 
 ## Display
 
-All HyperBinary types have a compact, emoji-prefixed string representation for quick visual inspection. See [HyperBinary Types](types.md#type-symbols) for type symbols and [Domain & Pod](common/domain_pod.md#display-labels) for field labels.
+All HyperBinary types have a compact, emoji-prefixed string representation for quick visual inspection. See [HyperBinary Types](types.md#type-symbols) for type symbols and [Sparkle](sparkle.md#display-labels) for field labels.
 
 ### Python `__str__` and `__repr__`
 

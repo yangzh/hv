@@ -7,17 +7,17 @@ A key-value composite where each value is bound with its key's Sparkle. See [Com
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-oct = hv.Octopus(domain, pod, ["color", "shape"], [red, circle])
+oct = hv.Octopus(hv.Seed128(0, 42), ["color", "shape"], red, circle)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-oct := hv.NewOctopus(seed, []string{"color", "shape"}, red, circle)
+oct := hv.NewOctopus(hv.NewSeed128(0, 42), []string{"color", "shape"}, red, circle)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let oct = Octopus::new(seed, keys, values);
+let oct = Octopus::new(Seed128::new(0, 42), keys, values);
 ```
 {{#endtab}}
 {{#endtabs}}

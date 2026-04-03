@@ -61,7 +61,7 @@ s_inv = s.power(-1)
 ## Online Learning with Learner
 
 ```python
-learner = hv.Learner(model, "animals", 42)
+learner = hv.Learner(model, hv.Seed128(0, 42))
 
 # Feed observations one at a time
 learner.bundle(cat)

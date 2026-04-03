@@ -7,17 +7,17 @@ An unordered collection of hypervectors. See [Composites: Set](../../concepts/co
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-s = hv.Set(domain, pod, [member_a, member_b, member_c])
+s = hv.Set(hv.Seed128(0, 42), [member_a, member_b, member_c])
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-s := hv.NewSet(seed, memberA, memberB, memberC)
+s := hv.NewSet(hv.NewSeed128(0, 42), memberA, memberB, memberC)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let s = Set::new(seed, members);
+let s = Set::new(Seed128::new(0, 42), members);
 ```
 {{#endtab}}
 {{#endtabs}}

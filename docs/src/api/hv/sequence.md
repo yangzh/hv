@@ -7,17 +7,17 @@ An ordered collection of hypervectors with positional encoding. See [Composites:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-seq = hv.Sequence(domain, pod, 0, [first, second, third])
+seq = hv.Sequence(hv.Seed128(0, 42), [first, second, third])
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-seq := hv.NewSequence(seed, 0, first, second, third)
+seq := hv.NewSequence(hv.NewSeed128(0, 42), 0, first, second, third)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let seq = Sequence::new(seed, 0, members);
+let seq = Sequence::new(Seed128::new(0, 42), 0, members);
 ```
 {{#endtab}}
 {{#endtabs}}

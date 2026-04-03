@@ -13,7 +13,7 @@ k = hv.bind(a, b)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-k := hv.NewKnot(seed, partA, partB)
+k := hv.NewKnot(hv.NewSeed128(0, 42), partA, partB)
 
 // More commonly via the Bind operator:
 k := hv.Bind(a, b)
@@ -21,7 +21,7 @@ k := hv.Bind(a, b)
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let k = Knot::new(seed, parts);
+let k = Knot::new(Seed128::new(0, 42), parts);
 ```
 {{#endtab}}
 {{#endtabs}}

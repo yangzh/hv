@@ -7,7 +7,7 @@ Performs online bundling for a stream of observations, implementing Hebbian-styl
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-learner = hv.Learner(model, "domain", seed)
+learner = hv.Learner(model, seed)
 
 # From SparseOperation
 learner = hv.Learner.random(so)
@@ -15,24 +15,24 @@ learner = hv.Learner.random(so)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-learner := hv.NewLearner(model, seed)
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42))
 
 // From SparseOperation
 learner := hv.NewRandomLearner(so)
 
 // Full restore (with age, pcg, buffer)
-learner := hv.NewLearnerFull(model, seed, age, pcg, buffer)
+learner := hv.NewLearnerFull(model, hv.NewSeed128(0, 42), age, pcg, buffer)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut learner = Learner::new(model, seed);
+let mut learner = Learner::new(model, Seed128::new(0, 42));
 
 // From SparseOperation
 let mut learner = Learner::random(&mut so);
 
 // Full restore
-let mut learner = Learner::full(model, seed, age, buffer);
+let mut learner = Learner::full(model, Seed128::new(0, 42), age, buffer);
 ```
 {{#endtab}}
 {{#endtabs}}

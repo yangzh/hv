@@ -13,28 +13,28 @@ p = hv.bundle(hv.Seed128(10, 1), a, b, c)
 {{#tab name="Go"}}
 ```go
 // Uniform weights
-p := hv.NewParcel(seed, partA, partB, partC)
+p := hv.NewParcel(hv.NewSeed128(0, 42), partA, partB, partC)
 
 // From a HyperBinarySet
-p := hv.NewParcelWithParts(seed, hbs)
+p := hv.NewParcelWithParts(hv.NewSeed128(0, 42), hbs)
 
 // Via the Bundle operator
-p := hv.Bundle(seed, a, b, c)
+p := hv.Bundle(hv.NewSeed128(0, 42), a, b, c)
 
 // Weighted
-p := hv.NewWeightedParcel(seed, []float64{0.7, 0.3}, a, b)
+p := hv.NewWeightedParcel(hv.NewSeed128(0, 42), []float64{0.7, 0.3}, a, b)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 // Uniform weights
-let p = Parcel::new(seed, parts);
+let p = Parcel::new(Seed128::new(0, 42), parts);
 
 // Weighted
-let p = Parcel::weighted(seed, weights, parts);
+let p = Parcel::weighted(Seed128::new(0, 42), weights, parts);
 
 // From a HyperBinarySet
-let p = Parcel::with_parts(seed, hbs);
+let p = Parcel::with_parts(Seed128::new(0, 42), hbs);
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -60,7 +60,7 @@ The diagonal is 256 (cardinality = perfect self-overlap). Off-diagonal values ar
 
 ```python
 # Cell 4: Create a learner and feed it observations
-learner = hv.Learner(model, "animals", so.uint64())
+learner = hv.Learner(model, hv.Seed128(0, so.uint64()))
 
 # "cat" seen 3 times, "dog" once, "bird" once
 for _ in range(3):
@@ -115,7 +115,7 @@ blue = hv.Sparkle.with_word(model, "color", "blue")
 cat = vectors["cat"]
 
 # Bind role with filler, then bundle the pairs
-learner2 = hv.Learner(model, "record", so.uint64())
+learner2 = hv.Learner(model, hv.Seed128(0, so.uint64()))
 learner2.bundle(hv.Sparkle.bind(color_role, red))
 learner2.bundle(hv.Sparkle.bind(animal_role, cat))
 

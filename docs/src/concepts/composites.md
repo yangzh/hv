@@ -19,17 +19,17 @@ Use when: you need to represent "these things together" without order.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-s = hv.Set(domain, pod, [member_a, member_b, member_c])
+s = hv.Set(hv.Seed128(0, 42), [member_a, member_b, member_c])
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-s := hv.NewSet(seed, memberA, memberB, memberC)
+s := hv.NewSet(hv.NewSeed128(0, 42), memberA, memberB, memberC)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let s = Set::new(seed, &members);
+let s = Set::new(Seed128::new(0, 42), &members);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -49,18 +49,18 @@ Use when: order matters (e.g., words in a sentence, events in time).
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-seq = hv.Sequence(domain, pod, 0, [first, second, third])
+seq = hv.Sequence(hv.Seed128(0, 42), [first, second, third])
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-seq := hv.NewSequence(seed, 0, first, second, third)
+seq := hv.NewSequence(hv.NewSeed128(0, 42), 0, first, second, third)
 // start=0 means positions are 0, 1, 2
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let seq = Sequence::new(seed, 0, &members);
+let seq = Sequence::new(Seed128::new(0, 42), 0, &members);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -76,17 +76,17 @@ Use when: you need to represent structured records with named attributes.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-oct = hv.Octopus(domain, pod, ["color", "shape"], [red, circle])
+oct = hv.Octopus(hv.Seed128(0, 42), ["color", "shape"], red, circle)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-oct := hv.NewOctopus(seed, []string{"color", "shape"}, red, circle)
+oct := hv.NewOctopus(hv.NewSeed128(0, 42), []string{"color", "shape"}, red, circle)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let oct = Octopus::new(seed, &["color", "shape"], &values);
+let oct = Octopus::new(Seed128::new(0, 42), &["color", "shape"], &values);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -138,9 +138,9 @@ p = hv.bundle(hv.Seed128(10, 1), member_a, member_b)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.Bundle(seed, memberA, memberB)
+p := hv.Bundle(hv.NewSeed128(0, 42), memberA, memberB)
 // or with weights:
-p := hv.NewWeightedParcel(seed, []float64{0.7, 0.3}, memberA, memberB)
+p := hv.NewWeightedParcel(hv.NewSeed128(0, 42), []float64{0.7, 0.3}, memberA, memberB)
 ```
 {{#endtab}}
 {{#endtabs}}
