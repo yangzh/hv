@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.7 (2026-04-03)
+
+- Python: Seed128 constructor accepts Domain/int/str for each arg
 ## v3.7.6 (2026-04-03)
 
 - Python: improve Chunk __repr__ and __str__
@@ -51,41 +54,3 @@ Only the latest 10 releases are shown.
 ## v3.6.5 (2026-04-02)
 
 - Re-export __version__ from native module in __init__.py
-## v3.6.4 (2026-04-02)
-
-- Fix release: sed both pyproject.toml and Cargo.toml for version sync
-- CI: auto-sync Cargo.toml version from release tag
-- Expose __version__ on kongming_rs Python module
-- Add InMemorySubstrate convenience function for badger
-- Re-export Model constants into hv Python module
-- Cleanup: remove SparseOperation.WidthBits, scope maskLower16Bit locally
-- Remove Exp type; use plain int32/i32 for exponent across Go/Rust/Python
-- Rename SparsityOffset → SparsityBits, WidthOffset → WidthBits across Go/Rust/Python
-- Hierarchical HMM modelling: part 4
-- hierarchical HMM modelling: Part 3.
-- Rename FirstFromEach to Joiner across Go, Rust, proto, and Python
-- Remove unused Unmasked() from Set and Sequence
-- misc.
-- Fix cleanup-releases: deduplicate tags and tolerate deletion failures
-- misc.
-- Fix ResetSequence: use D0() for STEP sparkle, not sequence domain
-- Simplify Set/Sequence constructors; rename ResetSequence
-- Rename NewNaturalSequence → NewSequenceWithStart; use UniformSet in compose
-- Remove PORTING.md; superseded by src/kongming/memory/parity.md
-- Port parse_tree.go to Rust (kongming::nlp::parse_tree)
-- Fjall: read-your-own-writes for get/key_exists before commit
-- Replace ViewSession.expiration with ttl_secs across Go/Rust/Python
-- Upgrade Arrow Go: apache/arrow/go/v18 → apache/arrow-go/v18 v18.5.2
-- Re-add index_ttl_secs; wire through to AssociativeIndex.TTL()
-- Remove expiration from AssociativeIndex.Impress; compute from TTL()
-- Remove deprecated Redis backend and rueidis dependency
-- Fix SparseSegmented emoji: 🫀 → 🍡 to match proto label
-- Update parity.md: fix AssociativeIndex methods, remove deprecated backends
-- Remove index_ttl_secs from proto and all backends
-- Fjall TTL envelope; remove index_ttl_secs from views/substrates; strict tests
-- Fix expiration unit: Cell.Expiration is microseconds, not seconds
-- Upgrade fjall v2 → v3.1, preparing for TTL support
-- Add ViewSession proto; pass to NewView/NewMutableView for view-level expiration
-- Upgrade GitHub Actions to Node.js 24 native versions
-- Add PyChunk class; all memory reads return Chunk with id/code/note/extra
-- Always upgrade kongming-rs-hv in notebook install cells
