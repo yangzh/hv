@@ -12,12 +12,12 @@ s = hv.Set(domain, pod, [member_a, member_b, member_c])
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-s := hv.NewSet(domain, pod, memberA, memberB, memberC)
+s := hv.NewSet(seed, memberA, memberB, memberC)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let s = Set::new(domain, pod, members);
+let s = Set::new(seed, members);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -36,8 +36,7 @@ s.core()          # SparseSegmented
 {{#tab name="Go"}}
 ```go
 s.Model()         // api.Model
-s.Domain()        // Domain
-s.Pod()           // Pod
+s.Seed128()       // Seed128
 s.StableHash()    // uint64
 s.Power(p)        // HyperBinary
 s.Core()          // SparseSegmented

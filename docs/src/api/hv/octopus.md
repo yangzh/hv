@@ -12,12 +12,12 @@ oct = hv.Octopus(domain, pod, ["color", "shape"], [red, circle])
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-oct := hv.NewOctopus(domain, pod, []string{"color", "shape"}, red, circle)
+oct := hv.NewOctopus(seed, []string{"color", "shape"}, red, circle)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let oct = Octopus::new(domain, pod, keys, values);
+let oct = Octopus::new(seed, keys, values);
 ```
 {{#endtab}}
 {{#endtabs}}

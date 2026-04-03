@@ -12,12 +12,12 @@ seq = hv.Sequence(domain, pod, 0, [first, second, third])
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-seq := hv.NewSequence(domain, pod, 0, first, second, third)
+seq := hv.NewSequence(seed, 0, first, second, third)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let seq = Sequence::new(domain, pod, 0, members);
+let seq = Sequence::new(seed, 0, members);
 ```
 {{#endtab}}
 {{#endtabs}}

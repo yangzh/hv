@@ -12,8 +12,7 @@ type HyperBinary interface {
     Hint() api.HyperBinaryProto_Hint
     StableHash() uint64
     Core() SparseSegmented
-    Domain() Domain
-    Pod() Pod
+    Seed128() Seed128
     Exponent() int32
     Power(p int32) HyperBinary
     Clone() HyperBinary
@@ -38,8 +37,7 @@ pub trait HyperBinary: std::fmt::Display {
     fn hint(&self) -> HyperBinaryHint;
     fn stable_hash(&self) -> u64;
     fn core(&self) -> SparseSegmented;
-    fn domain(&self) -> &Domain;
-    fn pod(&self) -> &Pod;
+    fn seed128(&self) -> &Seed128;
     fn exponent(&self) -> i32;
     fn power(&self, p: i32) -> HyperBinaryKind;
     fn clone_hb(&self) -> HyperBinaryKind;

@@ -13,7 +13,7 @@ k = hv.bind(a, b)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-k := hv.NewKnot(domain, pod, partA, partB)
+k := hv.NewKnot(seed, partA, partB)
 
 // More commonly via the Bind operator:
 k := hv.Bind(a, b)
@@ -21,7 +21,7 @@ k := hv.Bind(a, b)
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let k = Knot::new(domain, pod, parts);
+let k = Knot::new(seed, parts);
 ```
 {{#endtab}}
 {{#endtabs}}

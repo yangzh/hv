@@ -9,17 +9,17 @@ Constraint: `segment_size(model)` must be divisible by `period`.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-c = hv.Cyclone(model, domain, pod, 16)  # period=7
+c = hv.Cyclone(model, domain, pod, 16)  # period=16
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-c, err := hv.NewCyclone(model, domain, pod, 16)
+c, err := hv.NewCyclone(model, seed, 16)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let c = Cyclone::new(model, domain, pod, 16)?;
+let c = Cyclone::new(model, seed, 16)?;
 ```
 {{#endtab}}
 {{#endtabs}}

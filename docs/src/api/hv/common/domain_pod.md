@@ -1,4 +1,63 @@
-# Domain & Pod
+# Seed128
+
+A `Seed128` is a 128-bit seed that embeds a [Domain](#domain) and a [Pod](#pod). It is the primary parameter for all composite constructors (Set, Sequence, Octopus, Knot, Parcel, Cyclone, Learner) and for the Learner.
+
+The `HyperBinary` trait exposes `Seed128()` (Go) / `seed128()` (Rust). Only [Sparkle](../sparkle.md) retains separate `Domain()` / `Pod()` accessors.
+
+## Constructors
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+seed = hv.Seed128(high, low)       # from two u64 values (domain id, pod seed)
+seed = hv.Seed128.zero()           # zero seed
+
+seed.high()                        # u64 (domain id)
+seed.low()                         # u64 (pod seed)
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+seed := hv.NewSeed128(domain, pod)    // from Domain + Pod
+seed := hv.Seed128Zero()              // zero seed
+seed := hv.NewRandomSeed128(so)       // random from SparseOperation
+
+seed.Domain   // Domain
+seed.Pod      // Pod
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let seed = Seed128::new(domain, pod);  // from Domain + Pod
+let seed = Seed128::zero();            // zero seed
+
+seed.domain   // Domain (pub field)
+seed.pod      // Pod (pub field)
+```
+{{#endtab}}
+{{#endtabs}}
+
+## Usage
+
+All composite constructors take a `Seed128`:
+
+```python
+# Python — composites accept (domain, pod, ...) and wrap internally
+s = hv.Set(domain, pod, a, b, c)
+seq = hv.Sequence(domain, pod, a, b, c)
+```
+
+```go
+// Go — composites take Seed128 directly
+s := hv.NewSet(hv.NewSeed128(domain, pod), a, b, c)
+seq := hv.NewSequence(hv.NewSeed128(domain, pod), 0, a, b, c)
+```
+
+```rust
+// Rust — composites take Seed128 directly
+let s = Set::new(Seed128::new(domain, pod), vec![a, b, c]);
+let seq = Sequence::new(Seed128::new(domain, pod), 0, vec![a, b, c]);
+```
 
 ## Domain
 
@@ -10,6 +69,7 @@ A logical namespace that groups related hypervectors. Different domains produce 
 d = hv.Domain("animals")            # from name (hashed to 64-bit id)
 d = hv.Domain.from_name("animals")  # same as above
 d = hv.Domain.from_id(12345)        # from numeric id
+d = hv.Domain.with_prefix(hv.DOMAIN_PREFIX_NLP, "sentiment")  # prefixed
 d = hv.d0()                         # default domain (id=0)
 
 d.id()       # uint64
@@ -81,18 +141,3 @@ p.word()      // &str
 ```
 {{#endtab}}
 {{#endtabs}}
-
-## Display Labels
-
-In the compact emoji representation, Domain and Pod are shown with these labels:
-
-| Emoji | Field | Meaning | Format |
-|-------|-------|---------|--------|
-| 🔗 | Domain (named) | Semantic namespace | `🔗animals` or `🔗PREFIX.name` |
-| 🌐 | Domain (id) | Numeric domain ID | `🌐0x..c862` (lower 16 bits hex) |
-| 🫛 | Pod (seed) | Numeric seed | `🫛0x..80e4` (lower 16 bits hex) |
-| 🌱 | Pod (named) | Word-seeded pod | `🌱cat` |
-| 🍀 | Pod (prewired) | Prewired constant | `🍀SET_MARKER` |
-| 💪 | Exponent | Non-trivial exponent | `💪3` or `💪-1` |
-
-**Identity vectors** display as `IDENT` (e.g., `✨IDENT`).

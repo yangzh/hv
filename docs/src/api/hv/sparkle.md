@@ -17,7 +17,7 @@ s = hv.Sparkle.with_seed(model, "animals", 42)
 s = hv.Sparkle.with_prewired(model, "animals", hv.PREWIRED_SET_MARKER)
 
 # Identity vector
-s = hv.Sparkle.identity(model, "animals", pod)
+s = hv.Sparkle.identity(model)
 
 # Random (from SparseOperation)
 s = hv.Sparkle.random("animals", so)
@@ -34,11 +34,8 @@ s := hv.NewSparkleWithSeed(model, domain, 42)
 // From a prewired enum
 s := hv.NewSparkleWithPrewired(model, domain, api.Prewired_SET_MARKER)
 
-// From domain and pod
-s := hv.NewSparkleFromDomainPod(model, domain, pod)
-
 // Identity vector
-s := hv.NewSparkleIdentity(model, domain, pod)
+s := hv.NewSparkleIdentity(model)
 
 // Random (from SparseOperation)
 s := hv.NewRandomSparkle(domain, so)
@@ -55,11 +52,8 @@ let s = Sparkle::with_seed(model, domain, 42);
 // From a prewired enum
 let s = Sparkle::with_prewired(model, domain, Prewired::SetMarker);
 
-// From domain and pod
-let s = Sparkle::from_domain_pod(model, domain, pod);
-
 // Identity vector
-let s = Sparkle::identity(model, domain, pod);
+let s = Sparkle::identity(model);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -100,6 +94,46 @@ s.core()          // SparseSegmented
 ```
 {{#endtab}}
 {{#endtabs}}
+
+## Domain & Pod Accessors
+
+Sparkle is the **only** HyperBinary type that exposes `Domain()` and `Pod()` directly. All other types expose `Seed128()` / `seed128()` which wraps both.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+s.domain()        # Domain
+s.pod()           # Pod
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+s.Domain()        // Domain
+s.Pod()           // Pod
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+s.domain()        // &Domain
+s.pod()           // &Pod
+```
+{{#endtab}}
+{{#endtabs}}
+
+## Display Labels
+
+In the compact emoji representation, Domain and Pod are shown with these labels:
+
+| Emoji | Field | Meaning | Format |
+|-------|-------|---------|--------|
+| 🔗 | Domain (named) | Semantic namespace | `🔗animals` or `🔗PREFIX.name` |
+| 🌐 | Domain (id) | Numeric domain ID | `🌐0x..c862` (lower 16 bits hex) |
+| 🫛 | Pod (seed) | Numeric seed | `🫛0x..80e4` (lower 16 bits hex) |
+| 🌱 | Pod (named) | Word-seeded pod | `🌱cat` |
+| 🍀 | Pod (prewired) | Prewired constant | `🍀SET_MARKER` |
+| 💪 | Exponent | Non-trivial exponent | `💪3` or `💪-1` |
+
+**Identity vectors** display as `IDENT` (e.g., `✨IDENT`).
 
 ## Notes
 

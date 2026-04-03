@@ -24,8 +24,7 @@ Every hypervector in kongming carries:
 | Property | Description |
 |----------|-------------|
 | **Model** | Sparsity configuration — determines vector's cardinality and width |
-| **Domain** | Semantic namespace (e.g., "language", "color"), for grouping |
-| **Pod** | An identifier for a random vector within a Domain |
+| **Seed128** | A 128-bit seed embedding a Domain (semantic namespace) and Pod (identifier within a domain). Composites carry a Seed128; only Sparkle exposes Domain and Pod individually |
 | **Exponent** | Exponent applied to the base vector. Particularly, exponent of 0 implies an identity vector |
 | **StableHash** | Deterministic hash for equality checks and indexing, consistent across serializations, even across different implementations and storage systems |
 

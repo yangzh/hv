@@ -24,12 +24,12 @@ s = hv.Set(domain, pod, [member_a, member_b, member_c])
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-s := hv.NewSet(domain, pod, memberA, memberB, memberC)
+s := hv.NewSet(seed, memberA, memberB, memberC)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let s = Set::new(domain, pod, &members);
+let s = Set::new(seed, &members);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -54,13 +54,13 @@ seq = hv.Sequence(domain, pod, 0, [first, second, third])
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-seq := hv.NewSequence(domain, pod, 0, first, second, third)
+seq := hv.NewSequence(seed, 0, first, second, third)
 // start=0 means positions are 0, 1, 2
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let seq = Sequence::new(domain, pod, 0, &members);
+let seq = Sequence::new(seed, 0, &members);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -81,12 +81,12 @@ oct = hv.Octopus(domain, pod, ["color", "shape"], [red, circle])
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-oct := hv.NewOctopus(domain, pod, []string{"color", "shape"}, red, circle)
+oct := hv.NewOctopus(seed, []string{"color", "shape"}, red, circle)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let oct = Octopus::new(domain, pod, &["color", "shape"], &values);
+let oct = Octopus::new(seed, &["color", "shape"], &values);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -140,7 +140,7 @@ p = hv.bundle(hv.Seed128(10, 1), member_a, member_b)
 ```go
 p := hv.Bundle(seed, memberA, memberB)
 // or with weights:
-p := hv.NewWeightedParcel(domain, pod, []float64{0.7, 0.3}, memberA, memberB)
+p := hv.NewWeightedParcel(seed, []float64{0.7, 0.3}, memberA, memberB)
 ```
 {{#endtab}}
 {{#endtabs}}

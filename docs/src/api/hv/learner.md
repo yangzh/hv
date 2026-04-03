@@ -15,30 +15,24 @@ learner = hv.Learner.random(so)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-learner := hv.NewLearner(model, domain, pod)
-
-// From Seed128
-learner := hv.NewLearnerWithSeed(model, seed128)
+learner := hv.NewLearner(model, seed)
 
 // From SparseOperation
 learner := hv.NewRandomLearner(so)
 
 // Full restore (with age, pcg, buffer)
-learner := hv.NewLearnerFull(model, domain, pod, age, pcg, buffer)
+learner := hv.NewLearnerFull(model, seed, age, pcg, buffer)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut learner = Learner::new(model, domain, pod);
-
-// From seed
-let mut learner = Learner::with_seed(model, seed_high, seed_low);
+let mut learner = Learner::new(model, seed);
 
 // From SparseOperation
 let mut learner = Learner::random(&mut so);
 
 // Full restore
-let mut learner = Learner::full(model, domain, pod, age, buffer);
+let mut learner = Learner::full(model, seed, age, buffer);
 ```
 {{#endtab}}
 {{#endtabs}}
