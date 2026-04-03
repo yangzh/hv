@@ -3,6 +3,10 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.4 (2026-04-03)
+
+- Go: stop embedding SparseSegmented in core; prevent method promotion leak
+- Python: remove leaked SparseSegmented methods from HyperBinary types; add bind_direct
 ## v3.7.3 (2026-04-03)
 
 - tweaks to make Python API match Go/Rust.
@@ -144,6 +148,3 @@ Only the latest 10 releases are shown.
 - Upgrade GitHub Actions to Node.js 24 native versions
 - Add PyChunk class; all memory reads return Chunk with id/code/note/extra
 - Always upgrade kongming-rs-hv in notebook install cells
-## v3.6.3 (2026-03-25)
-
-- Fix: ship kongming.api.annotations_pb2 and top-level buf in wheel
