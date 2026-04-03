@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.2 (2026-04-03)
+
+- Python composites take Seed128; add Seed128.High/Low accessors
 ## v3.7.1 (2026-04-03)
 
 - Rename Seed128 constructors: new(high,low) for raw IDs, from_dp(d,p) for Domain+Pod
@@ -146,9 +149,3 @@ Only the latest 10 releases are shown.
 - Fix: include top-level buf package in wheel; bump to 3.6.2
 - Fix changelog filter: only exclude pure version bump commits
 - Opt into Node.js 24 for all workflows; remove unused deep_clone
-## v3.6.1 (2026-03-25)
-
-- Fix: include pylisp module in wheel (resolve symlink before build)
-- Opt into Node.js 24 for all GitHub Actions workflows
-- Remove unused `HvCore::deep_clone()` method
-
