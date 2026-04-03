@@ -6,12 +6,15 @@ A seeded hypervector — a [SparseSegmented](sparse_segmented.md) with an associ
 
 A logical namespace that groups related Sparkle instances. Sparkle is the **only** HyperBinary type that exposes `Domain()` / `Pod()` directly — all other types expose [Seed128](common/seed128.md).
 
-> **Tip:** Domain display labels in the compact emoji representation:
->
-> | Emoji | Variant | Example |
-> |-------|---------|---------|
-> | 🔗 | Named | `🔗animals`, `🔗PREFIX.name` |
-> | 🌐 | Numeric ID | `🌐0x..c862` |
+<div class="callout callout-tip">
+<div class="callout-title">Display labels</div>
+
+| Emoji | Variant | Example |
+|-------|---------|---------|
+| 🔗 | Named | `🔗animals`, `🔗PREFIX.name` |
+| 🌐 | Numeric ID | `🌐0x..c862` |
+
+</div>
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -60,16 +63,19 @@ s.domain()   // access the Domain of a Sparkle
 
 A slot within a Domain, acting as the secondary identifier for a Sparkle instance. The (Domain, Pod) pair uniquely identifies a Sparkle.
 
-> **Tip:** Pod and exponent display labels:
->
-> | Emoji | Variant | Example |
-> |-------|---------|---------|
-> | 🌱 | Word-seeded | `🌱cat` |
-> | 🫛 | Numeric seed | `🫛0x..80e4` |
-> | 🍀 | Prewired | `🍀SET_MARKER` |
-> | 💪 | Exponent | `💪3`, `💪-1` |
->
-> **Identity vectors** display as `IDENT` (e.g., `✨IDENT`).
+<div class="callout callout-tip">
+<div class="callout-title">Display labels</div>
+
+| Emoji | Variant | Example |
+|-------|---------|---------|
+| 🌱 | Word-seeded | `🌱cat` |
+| 🫛 | Numeric seed | `🫛0x..80e4` |
+| 🍀 | Prewired | `🍀SET_MARKER` |
+| 💪 | Exponent | `💪3`, `💪-1` |
+
+**Identity vectors** display as `IDENT` (e.g., `✨IDENT`).
+
+</div>
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
