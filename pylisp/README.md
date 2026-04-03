@@ -17,7 +17,7 @@ The LISP interpreter ships in two forms, both feature-identical:
 | **Source** | Included in `kongming-rs-hv`, also open-sourced here  | Compiled into `kongming-rs-hv` |
 | **Readable** | Yes — ~500 lines of annotated Python | No — compiled Rust binary |
 | **Performance** | Slower (Python overhead per operation) | Faster (native code) |
-| **Import** | `from pylisp import LispEnv` | `from kongming_rs.lisp import LispEnv` |
+| **Import** | `from pylisp import LispEnv` | `from kongming.lisp import LispEnv` |
 | **Dependencies** | `kongming-rs-hv` (for hypervector primitives) | Included in `kongming-rs-hv` |
 | **Use case** | Learning, debugging, extending | Production, notebooks |
 
@@ -42,7 +42,7 @@ env.eval("(CONS (QUOTE A) (QUOTE B))")  # => "(A . B)"
 
 ```python
 # Rust (same API, same results)
-from kongming_rs.lisp import LispEnv
+from kongming.lisp import LispEnv
 
 env = LispEnv()
 env.eval("(CAR (QUOTE (A B C)))")       # => "A"
@@ -135,7 +135,7 @@ pylisp/
 # In-memory (default, volatile)
 env = LispEnv()
 
-# Persistent (Fjall disk-backed)
+# Persistent (Embedded disk-backed, formerly Fjall)
 env = LispEnv(path="/tmp/my_lisp_db")
 ```
 

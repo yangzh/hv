@@ -3,6 +3,10 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.1 (2026-04-03)
+
+- Rename Seed128 constructors: new(high,low) for raw IDs, from_dp(d,p) for Domain+Pod
+- Add Python API reference; update CLAUDE.md and pylisp README
 ## v3.7.0 (2026-04-03)
 
 - Export DomainPrefix and Hint enums to Python; fix notebooks
@@ -148,15 +152,3 @@ Only the latest 10 releases are shown.
 - Opt into Node.js 24 for all GitHub Actions workflows
 - Remove unused `HvCore::deep_clone()` method
 
-## v3.6.0 (2026-03-25)
-
-- Add notebook sync to release workflow; add lisp.ipynb with dual interpreter demo
-- Make Fisher-Yates default sampling; remove proto constant re-exports from hv
-- misc.
-- Remove proto Session from Memory/Substrate interfaces; use Go context
-- Remove dead Session types from ChunkSelector/ChunkProducer protos
-- Change UniformSet/WeightedSet emojis; remove BundleSeed from proto
-- Change UniformSet emoji to ⚖️, WeightedSet to 🎚️
-- Change Parcel emoji from 🧺 to 🎁; use literal emoji in profile.rs
-- Cleanup pylisp: use register_symbol, inline init, cosmetic fixes
-- Combine pylisp sync and changelog into release workflow
