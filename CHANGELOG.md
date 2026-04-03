@@ -3,6 +3,15 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.0 (2026-04-03)
+
+- Export DomainPrefix and Hint enums to Python; fix notebooks
+- Simplify SparkleIdentity: remove Domain/Pod params, use defaults
+- Rust/Python: Seed128 embeds Domain+Pod; composites take Seed128
+- Rename NewSeed128 to take (Domain, Pod); remove FromDomainPod
+- Refactor: Seed128 embeds Domain+Pod; composites take Seed128
+- Revert ruff formatting on proto-generated _pb2.py files
+- Exclude _pb2.py files from ruff format via extend-exclude
 ## v3.6.6 (2026-04-02)
 
 - Add kongming as top-level Python import path
@@ -151,15 +160,3 @@ Only the latest 10 releases are shown.
 - Change Parcel emoji from 🧺 to 🎁; use literal emoji in profile.rs
 - Cleanup pylisp: use register_symbol, inline init, cosmetic fixes
 - Combine pylisp sync and changelog into release workflow
-## v3.5.0 (2026-03-24)
-
-- Refactor pylisp: remove LispSubstrate, add store_chunk/first_picked_chunk APIs
-- add more references.
-- Add README.md to pylisp package (syncs to hv repo)
-- Changelog automation: add release dates, keep latest 10 entries
-- Auto-update hv CHANGELOG.md on release
-- Include source commit messages in pylisp sync commits
-- Clean up pylisp: remove ~ prefix, use DomainPrefix.LISP, fix import order, expose HvError properly, remove inline type hints
-- Add CI workflow to sync pylisp to public hv repo
-- Add DomainPrefix.LISP (λ) to proto and Rust hash labels
-- Add pure-Python LISP interpreter (kongming.pylisp)

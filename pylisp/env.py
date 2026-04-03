@@ -53,7 +53,8 @@ class LispEnv:
         self._rng = hv.SparseOperation(model, _RNG_SEED_HIGH, hv.curr_time_as_seed())
 
         if path is not None:
-            self.storage = memory.Fjall(model, path)
+            import os
+            self.storage = memory.Embedded(model, os.path.join(path, "lisp.db"))
         else:
             self.storage = memory.InMemory(model)
 
