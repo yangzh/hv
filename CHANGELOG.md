@@ -3,6 +3,13 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.8 (2026-04-04)
+
+- Python: Chunk repr/str shows "(id)" when code equals id; cleanup
+- Python: accept Domain/int/str and Pod/int/str everywhere; remove Seed128.from_dp
+- Python: Sparkle constructors accept Domain/int/str for all args
+- Python: SparseOperation accepts flexible seed args; refactor shared helpers
+- Update notebooks for Seed128/xoshiro256++ API changes
 ## v3.7.7 (2026-04-03)
 
 - Python: Seed128 constructor accepts Domain/int/str for each arg
@@ -51,6 +58,3 @@ Only the latest 10 releases are shown.
 - Remove unused SparseSegmented.Offsets() from Go
 - Apply linter formatting: rustfmt, ruff, gofmt
 - Add pre-commit hooks: ruff, gofmt, go vet, rustfmt, buf lint
-## v3.6.5 (2026-04-02)
-
-- Re-export __version__ from native module in __init__.py
