@@ -26,7 +26,7 @@ eq := hv.Equal(a, b)                     // bool
 let bound = operators::bind_hb(vec![a.clone(), b.clone()]); // Knot
 let recovered = operators::release(&bound, &b);             // this will recover `a`
 
-let eq = hyper_binary::equal(&a, &b);                              
+let eq = hyper_binary::equal(&a, &b);                       // bool
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -50,8 +50,8 @@ recovered := hv.Release(bound, role)  // ≈ filler
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let bound = bind(&[role, filler]);
-let recovered = release(&[bound, role]);
+let bound = operators::bind_hb(vec![role.clone(), filler.clone()]);
+let recovered = operators::release(&bound, &role);
 ```
 {{#endtab}}
 {{#endtabs}}

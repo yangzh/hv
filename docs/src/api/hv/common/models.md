@@ -1,6 +1,6 @@
 # Models
 
-See [Concepts: Models](../../../concepts/models.md) for the full overview.
+See [Concepts: Hypervectors](../../../concepts/hypervectors.md#model-properties) for the full overview.
 
 ## Model Enum
 

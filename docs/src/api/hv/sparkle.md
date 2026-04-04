@@ -59,6 +59,9 @@ let s = Sparkle::with_prewired(model, domain, Prewired::SetMarker);
 
 // Identity vector
 let s = Sparkle::identity(model);
+
+// Random (from SparseOperation)
+let s = Sparkle::from_random(domain, &mut so);
 ```
 {{#endtab}}
 {{#endtabs}}

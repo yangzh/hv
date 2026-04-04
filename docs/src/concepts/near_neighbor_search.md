@@ -6,8 +6,8 @@ As we mentioned [earlier](hypervectors.md#similarity-and-distance-measure), this
 
 The **Associative Index** is a semantic index that enables fast similarity-based lookup over stored hypervectors. Conceptually it turns a key-value substrate (item memory) into an associative memory — one where retrieval is by *content similarity*, not by exact content or key match.
 
-Unlike approximate nearest neighbor methods (LSH, HNSW, etc.), the NNS module can computes **exact** overlap counts via the associative index. There is no approximation error and no index-specific parameters to tune.
-
 This NNS module has a constant time complexity, with help from associative index. The secret sauce is the efficient random-access to underlying index.
 
-Jump to API reference for Near-Neighbor Search [here](../api/memory/selectors/near_neighbor.md).
+Unlike approximate nearest neighbor methods (LSH, HNSW, etc.), the NNS module can computes **exact** overlap counts via the associative index. There is no approximation error and no index-specific parameters to tune.
+
+Jump to the API reference for [Near-Neighbor Search](../api/memory/selectors/near_neighbor.md).

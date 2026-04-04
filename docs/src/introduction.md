@@ -4,7 +4,9 @@
 
 Kongming is a hyperdimensional computing library implementing sparse binary hypervectors for cognitive computing applications.
 
-The core implementation is in **Go** with a parallel **Rust** implementation. Both strive to expose abstractions and features in parity and maintain wire-compatible protobuf serialization.
+The core implementation is in **Go** with a parallel **Rust** implementation. Both strive to maintain minimal abstractions, wire-identical protobuf serialization and features in parity.
+
+Python, on the other side, tries to present ergonomic API, while directing user requests with underlying Rust engine.
 
 See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and the sparse binary representation.
 
@@ -29,11 +31,11 @@ See [Notebook Platforms](guides/notebook/platforms.md) for all available noteboo
 
 ## Language Support
 
-This documentation covers implementations in the following languages. API reference pages include both languages side by side.
+This documentation covers implementations in the following languages. API reference pages include code snippets in multiple languages (if available) side by side.
 
-- **Python**: bindings via the Rust implementation (public `kongming-rs-hv` on PyPI)
-- **Go**: canonical implementation (proprietary package `github.com/kongming/core/kongming/hv`)
-- **Rust**: parallel implementation, kept in feature parity (proprietary `kongming` crate)
+- **Python**: bindings to the underlying Rust implementation (public `kongming-rs-hv` on PyPI)
+- **Go**: canonical / reference implementation (proprietary package `github.com/kongming/core/kongming/hv`)
+- **Rust**: parallel implementation, carefully maintained in feature parity (proprietary `kongming` crate)
 
 ## Reference
 

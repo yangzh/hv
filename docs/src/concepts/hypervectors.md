@@ -2,20 +2,24 @@
 
 ## What is Hyperdimensional Computing?
 
-Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors and manipulates them with simple algebraic operations. The key insight is that random vectors in high-dimensional spaces are **nearly orthogonal** — giving each concept a unique, robust representation that tolerates potential interference from other entities. In that sense, the traditional notion of curse of dimensionality becomes the bless of dimensionality.
+Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors and manipulates them with simple algebraic operations. Motivated readers should perform their own background research on this topic.
+
+The key insight is that random vectors in high-dimensional spaces are **nearly orthogonal** — giving each concept a unique, robust representation that tolerates potential interference from other entities. 
+
+In that sense, the traditional notion of curse of dimensionality becomes the bless of dimensionality.
 
 ## Sparse Binary Representation
 
 Kongming uses **sparse binary** hypervectors. Each vector has a fixed, large number of dimensions (e.g., 65,536 or 16 million), but only a very small fraction of them are "on" (set to 1). This sparsity is controlled by the [Model](../api/hv/common/models.md) configuration.
 
-We don't linger at generic **sparse binary** hypervectors. Instead, the base type we are focusing is **SparseSegmented**: the vector is divided into equal-sized *segments*, and exactly one bit is "on" per segment. 
+We don't linger at generic sparse binary hypervectors. Instead, the base type we are focusing is **SparseSegmented**: each such vector is divided into equal-sized *segments*, and exactly one ON bit is "on" per segment. 
 
 Conceptually you can image this as a list of phasers, where the offset of ON bit (within a host segment) represents the discretized phase.
 
 Implementation-wise, this unique constraint enables:
 
 - **Compact storage**: only the offset of ON bit within its host segment needs to be stored
-- **Efficient operations**: each phaser can be operated locally, independent of other phasers, even from the same **sparse binary** hypervector
+- **Efficient operations**: Unlike neural nets, where weights are recorded in float numbers, binary operations can be performed very efficiently with modern CPUs.
 
 ## Core Properties
 
@@ -24,9 +28,9 @@ Every hypervector in kongming carries:
 | Property | Description |
 |----------|-------------|
 | **Model** | Sparsity configuration — determines vector's cardinality and width |
-| **Seed128** | A 128-bit seed for probablistic operations |
-| **Exponent** | Exponent applied to the base vector. Particularly, exponent of 0 implies an identity vector |
 | **StableHash** | Deterministic hash for equality and integrity checks |
+| **Exponent** | Exponent applied to the base vector. Particularly, exponent of 0 implies an identity vector |
+| **Seed128** | A 128-bit seed for probablistic operations |
 
 ## Identity and Inverses
 
@@ -53,8 +57,6 @@ $$2 \times O(A, B) + H(A, B) = 2M$$
 
 A **Model** defines the sparsity configuration for all hypervectors in a system. It determines the total number of dimensions (width), how those dimensions are divided into segments, and therefore the storage and compute characteristics.
 
-**NOTE**: for simplicity, We will use functions names from Python. However, the counterparts from Go / Rust can be found by consulting their respective references.
-
 | Model | Width | Sparsity Bits | Segment Size | Cardinality (ON bits) |
 |-------|-------|---------------|-------------|----------------------|
 | `MODEL_64K_8BIT` | 65,536 | 8 | 256 | 256 |
@@ -67,6 +69,13 @@ A **Model** defines the sparsity configuration for all hypervectors in a system.
 
 All model functions take a Model enum value and return the derived property:
 
+<div class="callout callout-note">
+<div class="callout-title">Note</div>
+
+For simplicity, we use function names from Python. The counterparts from Go / Rust can be found by consulting their respective references.
+
+</div>
+
 | Function | Description |
 |----------|-------------|
 | `width` | Total dimension count (`2^width_bits`) |
@@ -77,9 +86,9 @@ All model functions take a Model enum value and return the derived property:
 ### How to Choose a Model
 
 - **`MODEL_64K_8BIT`**: Fast prototyping, tiny memory footprint. Good for tests and small-scale experiments.
-- **`MODEL_1M_10BIT`**: General-purpose, small memory footprint. 
-- **`MODEL_16M_12BIT`**: General-purpose, Balances performance and storage.
-- **`MODEL_256M_14BIT` / `MODEL_4G_16BIT`**: Very high capacity. Used when the concept space is extremely large.
+- **`MODEL_1M_10BIT`**: General-purpose, balances performance and storage.
+- **`MODEL_16M_12BIT`**: General-purpose, for the adventurous.
+- **`MODEL_256M_14BIT` / `MODEL_4G_16BIT`**: Very high capacity, not there yet.
 
 Larger models provide more orthogonal space (lower collision probability) at the cost of more memory per vector.
 

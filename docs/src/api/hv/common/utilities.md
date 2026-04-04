@@ -26,6 +26,8 @@ hv.Equal(a, b)           // Equality check
 overlap(&a.core(), &b.core())   // Overlap
 
 hamming(&a.core(), &b.core())   // Hamming distance
+
+hyper_binary::equal(&a, &b)     // bool
 ```
 {{#endtab}}
 {{#endtabs}}

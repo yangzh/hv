@@ -20,7 +20,7 @@ $$O(A \otimes B, A) \approx O(A \otimes B, B) \approx \text{noise} \quad \text{(
 
 Implementation: segment-wise offset addition modulo segment size.
 
-Code snippets are available [here](../api/hv/operators.md#bind).
+Check out [code snippets](../api/hv/operators.md#bind) from the API reference.
 
 ### Release
 
@@ -31,7 +31,7 @@ $$ A \oslash B = A \otimes B^{-1} $$
 Note that release is anti-commutative:
 $$ (A \oslash B)^{-1} = B \oslash A $$
 
-Code snippets are availale [here](../api/hv/operators.md#release)
+Check out [code snippets](../api/hv/operators.md#release) from the API reference.
 
 ## Bundle
 
@@ -50,4 +50,4 @@ $$O(S, X) \approx O_{\text{random}} \quad \text{for } X \notin \{A_i\} \quad \te
 Individual members cannot be recovered from the bundle without extra help (e.g., <a href="near_neighbor_search.html">near-neighbor search</a>). Weights can be applied to emphasize certain members.
 </div>
 
-Code snippets are available [here](../api/hv/operators.md#bundle)
+Check out [code snippets](../api/hv/operators.md#bundle) from the API reference.

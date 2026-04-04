@@ -27,7 +27,7 @@ let oct = Octopus::new(Seed128::new(0, 42), keys, values);
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-oct.value_by_key("color") // returns the value, or raises ValueError
+oct.value_by_key("color") # returns the value, or raises ValueError
 ```
 {{#endtab}}
 {{#tab name="Go"}}

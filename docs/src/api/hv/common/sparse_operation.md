@@ -8,6 +8,7 @@ A SparseOperation instance wraps a Model, a random number generator, and potenti
 {{#tab name="Python"}}
 ```python
 so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
+so1 = hv.SparseOperation(hv.MODEL_1M_10BIT, "domain", "pod")
 ```
 {{#endtab}}
 {{#tab name="Go"}}

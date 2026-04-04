@@ -16,7 +16,7 @@ This mark is tuned for the domain, so that it WILL be shared among all sets with
 
 Use when: you need to represent "these things together" without order.
 
-Jump to API reference for Set [here](../api/hv/set.md).
+Check out [code snippets](../api/hv/set.md) from the API reference.
 
 ## Sequence
 
@@ -30,7 +30,7 @@ $S_{marker}$ is a special marker to distinguish a sequence from its individual m
 
 Use when: order matters (e.g., words in a sentence, events in time).
 
-Jump to API reference for Sequence [here](../api/hv/sequence.md).
+Check out [code snippets](../api/hv/sequence.md) from the API reference.
 
 ## Octopus
 
@@ -40,7 +40,7 @@ $$S = \sum_{i,\oplus} K_i \otimes V_i$$
 
 Use when: you need to represent structured records with named attributes.
 
-Jump to API reference for Octopus [here](../api/hv/octopus.md).
+Check out [code snippets](../api/hv/octopus.md) from the API reference.
 
 ## Knot
 
@@ -52,7 +52,7 @@ Binding is reversible: given a Knot of A and B, you can recover A by releasing B
 
 Use when: you need a reversible association between concepts.
 
-Jump to API reference for Knot [here](../api/hv/knot.md).
+Check out [code snippets](../api/hv/knot.md) from the API reference.
 
 ## Parcel
 
@@ -64,7 +64,7 @@ Unlike direct bundling, Parcel tracks its members for serialization and introspe
 
 Use when: you need a superposition of concepts with optional weights.
 
-Jump to API reference for Parcel [here](../api/hv/parcel.md).
+Check out [code snippets](../api/hv/parcel.md) from the API reference.
 
 ## Summary
 

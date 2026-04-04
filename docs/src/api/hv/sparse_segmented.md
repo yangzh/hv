@@ -6,7 +6,7 @@ The foundational vector type — a sparse binary hypervector where each segment 
 
 | Field | Description |
 |-------|-------------|
-| `model` | Sparsity configuration ([Model](model.md)) |
+| `model` | Sparsity configuration ([Model](common/models.md)) |
 | `offsets` | Packed bit array of per-segment ON offsets. `nil`/`None` = identity vector |
 | `hash` | Lazy-computed stable hash for equality checks |
 
