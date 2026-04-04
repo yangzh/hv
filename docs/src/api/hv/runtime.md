@@ -43,3 +43,14 @@ export KONGMING_REPR_FORMAT=PROTO
 # Example: use classic sampling in Learner
 export KONGMING_LEARNER_SAMPLING=CLASSIC
 ```
+
+## Querying the Current Environment
+
+Use `global_env()` to inspect all active settings at runtime. The output format follows the active `KONGMING_REPR_FORMAT`:
+
+```python
+>>> print(hv.global_env())
+rng: xoshiro256++
+learner_sampling: fisher_yates
+repr_format: yaml
+```
