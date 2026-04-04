@@ -10,6 +10,13 @@ Only the latest 10 releases are shown.
 - Python: Sparkle constructors accept Domain/int/str for all args
 - Python: SparseOperation accepts flexible seed args; refactor shared helpers
 - Update notebooks for Seed128/xoshiro256++ API changes
+## v3.7.8 (2026-04-04)
+
+- Python: Chunk repr/str shows "(id)" when code equals id; cleanup
+- Python: accept Domain/int/str and Pod/int/str everywhere; remove Seed128.from_dp
+- Python: Sparkle constructors accept Domain/int/str for all args
+- Python: SparseOperation accepts flexible seed args; refactor shared helpers
+- Update notebooks for Seed128/xoshiro256++ API changes
 ## v3.7.7 (2026-04-03)
 
 - Python: Seed128 constructor accepts Domain/int/str for each arg
@@ -50,11 +57,3 @@ Only the latest 10 releases are shown.
 - Refactor: Seed128 embeds Domain+Pod; composites take Seed128
 - Revert ruff formatting on proto-generated _pb2.py files
 - Exclude _pb2.py files from ruff format via extend-exclude
-## v3.6.6 (2026-04-02)
-
-- Add kongming as top-level Python import path
-- Add Embedded aliases: hide badger/fjall implementation names
-- Remove gopy: delete Go→Python bridge, old workflow, and build targets
-- Remove unused SparseSegmented.Offsets() from Go
-- Apply linter formatting: rustfmt, ruff, gofmt
-- Add pre-commit hooks: ruff, gofmt, go vet, rustfmt, buf lint
