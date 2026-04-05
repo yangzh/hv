@@ -50,4 +50,7 @@ Use `global_env()` to inspect all active settings at runtime. Returns a `GlobalE
 
 ```python
 >>> hv.global_env()
+rng_hint: XOSHIRO256PP
+learner_sampling: FISHER_YATES
+repr_format: YAML
 ```
