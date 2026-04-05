@@ -3,6 +3,10 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.7.9 (2026-04-05)
+
+- Python: global_env() returns formatted string respecting repr_format
+- Consolidate env flags into GlobalEnv proto; single global_env() accessor
 ## v3.7.8 (2026-04-04)
 
 - Python: Chunk repr/str shows "(id)" when code equals id; cleanup
@@ -48,12 +52,3 @@ Only the latest 10 releases are shown.
 
 - Rename Seed128 constructors: new(high,low) for raw IDs, from_dp(d,p) for Domain+Pod
 - Add Python API reference; update CLAUDE.md and pylisp README
-## v3.7.0 (2026-04-03)
-
-- Export DomainPrefix and Hint enums to Python; fix notebooks
-- Simplify SparkleIdentity: remove Domain/Pod params, use defaults
-- Rust/Python: Seed128 embeds Domain+Pod; composites take Seed128
-- Rename NewSeed128 to take (Domain, Pod); remove FromDomainPod
-- Refactor: Seed128 embeds Domain+Pod; composites take Seed128
-- Revert ruff formatting on proto-generated _pb2.py files
-- Exclude _pb2.py files from ruff format via extend-exclude
