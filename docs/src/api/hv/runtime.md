@@ -46,11 +46,8 @@ export KONGMING_LEARNER_SAMPLING=CLASSIC
 
 ## Querying the Current Environment
 
-Use `global_env()` to inspect all active settings at runtime. The output format follows the active `KONGMING_REPR_FORMAT`:
+Use `global_env()` to inspect all active settings at runtime. Returns a `GlobalEnv` protobuf message — new fields added to the proto automatically appear.
 
 ```python
->>> print(hv.global_env())
-rng: xoshiro256++
-learner_sampling: fisher_yates
-repr_format: yaml
+>>> hv.global_env()
 ```
