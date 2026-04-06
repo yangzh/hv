@@ -22,6 +22,8 @@ seed_zero = hv.Seed128.zero()                      # (0, 0)
 seed_rand = hv.Seed128.random(so)                  # consumes two u64 from the RNG
 
 # Accessors
+seed.domain()                                      # Domain object
+seed.pod()                                         # Pod object
 seed.high()                                        # u64 (domain id)
 seed.low()                                         # u64 (pod seed)
 ```
