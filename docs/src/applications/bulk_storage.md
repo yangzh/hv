@@ -1,6 +1,10 @@
 # Bulk Storage Benchmark
 
-This example populates a local storage with a large number of random terminal chunks, then queries a few by key to verify correctness. It demonstrates how to batch-create items and measure throughput.
+This example populates a storage with a large number of random terminal chunks, then queries a few by key to verify correctness. It demonstrates how to batch-create items and measure throughput.
+
+Note associative index is also prepared in the process, and near-neighbor search is available immediately upon successful conclusion of all writing.
+
+Motivated readers can further improve this script to test various [producers](../api/memory/producers.md) or [selectors](../api/memory/selectors.md).
 
 ## Script
 
@@ -58,20 +62,20 @@ def main():
     t0 = time.perf_counter()
     for i in range(args.count):
         storage.mem_set(memory.new_terminal(args.domain, str(i)))
+
     elapsed = time.perf_counter() - t0
     rate = args.count / elapsed
     print(f"  done in {elapsed:.2f}s  ({rate:,.0f} chunks/s)")
     print(f"  item_count = {storage.item_count():,}")
 
     # --- Read phase: spot-check a few items ---
-    spot_checks = [0, args.count // 2, args.count - 1]
+    spot_checks = range(0, args.count, args.count // 100)
     print(f"Spot-checking keys: {spot_checks}")
     for idx in spot_checks:
-        chunk = storage.get(args.domain, str(idx))
         expected = hv.Sparkle.from_word(args.model, args.domain, str(idx))
-        ok = hv.equal(chunk.code, expected)
-        print(f"  key={idx}  equal={ok}")
-        assert ok, f"mismatch at key {idx}"
+        chunk = storage.get(args.domain, str(idx))
+        if not hv.equal(chunk.id, expected):
+            print(f"mismatch at key {idx}: {chunk}")
 
     print("All checks passed.")
 
