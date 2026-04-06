@@ -9,6 +9,8 @@ This example populates a local storage with a large number of random terminal ch
 """Populate local storage with random terminal chunks and verify retrieval."""
 
 import argparse
+import shutil
+import tempfile
 import time
 from kongming import hv, memory
 
@@ -27,9 +29,29 @@ def main():
         "--domain", type=str, default="bench",
         help="Domain name for all chunks (default: bench)",
     )
+    parser.add_argument(
+        "--backend", type=str, choices=["inmemory", "embedded"], default="inmemory",
+        help="Storage backend (default: inmemory)",
+    )
+    parser.add_argument(
+        "--path", type=str, default=None,
+        help="Disk path for embedded backend (default: temp directory)",
+    )
     args = parser.parse_args()
 
-    storage = memory.InMemory(args.model)
+    # --- Create storage ---
+    tmpdir = None
+    if args.backend == "embedded":
+        if args.path:
+            path = args.path
+        else:
+            tmpdir = tempfile.mkdtemp()
+            path = f"{tmpdir}/bench_store"
+        storage = memory.Embedded(args.model, path)
+        print(f"Backend: Embedded (path={path})")
+    else:
+        storage = memory.InMemory(args.model)
+        print("Backend: InMemory")
 
     # --- Write phase ---
     print(f"Writing {args.count:,} terminal chunks …")
@@ -53,6 +75,11 @@ def main():
 
     print("All checks passed.")
 
+    # --- Cleanup ---
+    if tmpdir:
+        del storage
+        shutil.rmtree(tmpdir)
+
 
 if __name__ == "__main__":
     main()
@@ -61,8 +88,14 @@ if __name__ == "__main__":
 ## Usage
 
 ```bash
-# Default: 10K chunks with MODEL_1M_10BIT
+# Default: 10K chunks, in-memory
 python bulk_storage.py
+
+# Embedded (disk-backed) storage
+python bulk_storage.py --backend embedded
+
+# Embedded with a specific path
+python bulk_storage.py --backend embedded --path /tmp/my_bench
 
 # Custom count
 python bulk_storage.py -n 100000
