@@ -55,3 +55,4 @@
 
 - [Mexican Dollar](applications/mexican_dollar.md)
 - [LISP Interpreter](applications/pylisp.md)
+- [Bulk Storage Benchmark](applications/bulk_storage.md)
