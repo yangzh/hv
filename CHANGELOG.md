@@ -3,6 +3,11 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.2 (2026-04-06)
+
+- Add seed128() and hint() to all Python HyperBinary types via macro
+- Rename Domain.with_prefix→from_prefix_and_name; remove Seed128.create
+- Producers accept flexible domain/pod types; add extra protobuf payload support
 ## v3.8.1 (2026-04-06)
 
 - Rename first_picked_chunk→first_picked, terminal→new_terminal in Python bindings
@@ -68,7 +73,3 @@ Only the latest 10 releases are shown.
 
 - Switch default RNG to xoshiro256++ with PCG as classic fallback
 - Python: add SparseSegmented-specific methods back to PySparseSegmented
-## v3.7.4 (2026-04-03)
-
-- Go: stop embedding SparseSegmented in core; prevent method promotion leak
-- Python: remove leaked SparseSegmented methods from HyperBinary types; add bind_direct
