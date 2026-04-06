@@ -3,6 +3,10 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.1 (2026-04-06)
+
+- Rename first_picked_chunk→first_picked, terminal→new_terminal in Python bindings
+- YAML: render Prewired enum as string name instead of numeric value
 ## v3.8.0 (2026-04-06)
 
 - Clean up obsolete build tooling: remove govvv, proto plugins, ruff.sh
@@ -68,6 +72,3 @@ Only the latest 10 releases are shown.
 
 - Go: stop embedding SparseSegmented in core; prevent method promotion leak
 - Python: remove leaked SparseSegmented methods from HyperBinary types; add bind_direct
-## v3.7.3 (2026-04-03)
-
-- tweaks to make Python API match Go/Rust.
