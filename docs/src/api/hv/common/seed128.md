@@ -9,14 +9,21 @@ The current random number generator expects 2 64-bit seeds: the same (seed_high,
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-seed = hv.Seed128(0, 42)           # from two u64 values (domain id, pod seed)
-seedZero = hv.Seed128.zero()       # zero seed
+# From Domain and Pod arguments (each accepts Domain/Pod, int, or str)
+seed = hv.Seed128("animals", "cat")                # domain name + pod word
+seed = hv.Seed128(0, 42)                           # default domain + raw pod seed
+seed = hv.Seed128("animals", 42)                   # domain name + raw pod seed
+seed = hv.Seed128(hv.Domain("animals"), hv.Pod("cat"))  # explicit Domain/Pod objects
 
-# also take str form for domain, pod. The strings are hashed to provide u64 values.
-seed1 = hv.Seed128("domain", "pod") 
+# Zero seed
+seed_zero = hv.Seed128.zero()                      # (0, 0)
 
-seed.high()                        # u64 (domain id)
-seed.low()                         # u64 (pod seed)
+# Random seed from a SparseOperation
+seed_rand = hv.Seed128.random(so)                  # consumes two u64 from the RNG
+
+# Accessors
+seed.high()                                        # u64 (domain id)
+seed.low()                                         # u64 (pod seed)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -41,7 +48,7 @@ All composite constructors take a `Seed128`, as seed for the bundle operator:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-seed = hv.Seed128(0, 42)
+seed = hv.Seed128("fruits", "fruit_set")
 
 s = hv.Set(seed, a, b, c)
 seq = hv.Sequence(seed, a, b, c)
