@@ -45,13 +45,10 @@ let d = Domain::with_prefix(DomainPrefix::Nlp, "concept");
 
 ### Domain Prefix Constants
 
-| Constant | Value | Label |
-|----------|-------|-------|
-| `hv.DOMAIN_PREFIX_UNKNOWN` | 0 | (none) |
-| `hv.DOMAIN_PREFIX_INTERNAL` | 1 | ⚙️ |
-| `hv.DOMAIN_PREFIX_USER` | 2 | 🎭 |
-| `hv.DOMAIN_PREFIX_NLP` | 3 | 💬 |
-| `hv.DOMAIN_PREFIX_LISP` | 4 | λ |
+| Constant | Label |
+|----------|-------|
+| `hv.DOMAIN_PREFIX_USER` | 🎭 |
+| `hv.DOMAIN_PREFIX_NLP` | 💬 |
 
 Domain prefixes provide namespacing for domains. When a prefix is set, the domain id is derived from the prefix label (and optional name), ensuring consistent hashing across languages.
 
@@ -102,18 +99,18 @@ let p = Pod::from_prewired(Prewired::SetMarker);
 
 Prewired pods are infrastructure-level constants with fixed seeds:
 
-| Constant | Value | Label |
-|----------|-------|-------|
-| `hv.PREWIRED_NIL` | 1 | ∅ |
-| `hv.PREWIRED_FALSE` | 2 | ❎ |
-| `hv.PREWIRED_TRUE` | 3 | ✅ |
-| `hv.PREWIRED_BEGIN` | 4 | 🚀 |
-| `hv.PREWIRED_END` | 5 | 🏁 |
-| `hv.PREWIRED_LEFT` | 6 | ⬅️ |
-| `hv.PREWIRED_RIGHT` | 7 | ➡️ |
-| `hv.PREWIRED_UP` | 8 | ⬆️ |
-| `hv.PREWIRED_DOWN` | 9 | ⬇️ |
-| `hv.PREWIRED_MIDDLE` | 10 | ⏺️ |
-| `hv.PREWIRED_STEP` | 11 | 𓊍 |
-| `hv.PREWIRED_SET_MARKER` | 16 | 🫧 |
-| `hv.PREWIRED_SEQUENCE_MARKER` | 17 | 📿 |
+| Constant | Label |
+|----------|-------|
+| `hv.PREWIRED_NIL` | ∅ |
+| `hv.PREWIRED_FALSE` | ❎ |
+| `hv.PREWIRED_TRUE` | ✅ |
+| `hv.PREWIRED_BEGIN` | 🚀 |
+| `hv.PREWIRED_END` | 🏁 |
+| `hv.PREWIRED_LEFT` | ⬅️ |
+| `hv.PREWIRED_RIGHT` | ➡️ |
+| `hv.PREWIRED_UP` | ⬆️ |
+| `hv.PREWIRED_DOWN` | ⬇️ |
+| `hv.PREWIRED_MIDDLE` | ⏺️ |
+| `hv.PREWIRED_STEP` | 𓊍 |
+| `hv.PREWIRED_SET_MARKER` | 🫧 |
+| `hv.PREWIRED_SEQUENCE_MARKER` | 📿 |
