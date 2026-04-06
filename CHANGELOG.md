@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.3 (2026-04-06)
+
+- Improve Python docstrings: add constructors, flexible types, remove redundant create()
 ## v3.8.2 (2026-04-06)
 
 - Add seed128() and hint() to all Python HyperBinary types via macro
@@ -69,7 +72,3 @@ Only the latest 10 releases are shown.
 - Python: add Seed128.from_dp(domain, pod) constructor
 - Use canonical lowercase xoshiro256++ in all comments and docs
 - Rust: fix env.rs doc table to match Go (xoshiro++ not xoshiro)
-## v3.7.5 (2026-04-03)
-
-- Switch default RNG to xoshiro256++ with PCG as classic fallback
-- Python: add SparseSegmented-specific methods back to PySparseSegmented
