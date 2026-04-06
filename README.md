@@ -19,7 +19,7 @@ Supports Linux, macOS, and Windows on Python 3.10–3.14.
 
 Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github.io/hv/)**, including:
 
-- [Concepts](https://yangzh.github.io/hv/concepts/hypervectors.html) — hypervectors, models, composites, operators, associative index, near-neighbor search
+- [Concepts](https://yangzh.github.io/hv/concepts/hypervectors.html) — hypervectors, models, composites, operators, constant-time near-neighbor search
 - [API Reference](https://yangzh.github.io/hv/api/sparkle.html) — Python, Go, and Rust side by side
 - [Python Quick Start](https://yangzh.github.io/hv/guides/python/quick-start.html) — installation, examples, and notebooks
 - [Notebook Quick Start](https://yangzh.github.io/hv/guides/notebook/quick-start.html) — cell-by-cell Jupyter walkthrough
