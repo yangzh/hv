@@ -1,12 +1,12 @@
 # Operators
 
-Kongming provides three core algebraic operations on hypervectors, plus convenience functions.
+Kongming provides two core algebraic operations on hypervectors.
 
 ## Bind
 
 **Binding** ($\otimes$) combines two vectors into a result that is dissimilar to both inputs. It is the multiplicative operation in the HDC algebra.
 
-**Mathematical properties:**
+**Mathematically**
 
 $$A \otimes B = B \otimes A \quad \text{(commutative)}$$
 
@@ -18,13 +18,13 @@ $$A \otimes A^{-1} = I \quad \text{(inverse)}$$
 
 $$O(A \otimes B, A) \approx O(A \otimes B, B) \approx \text{noise} \quad \text{(dissimilarity)}$$
 
-Implementation: segment-wise offset addition modulo segment size.
+**Implementation**: segment-wise offset addition modulo segment size: check out [original paper](../introduction.md#reference) for details.
 
 Check out [code snippets](../api/hv/operators.md#bind) from the API reference.
 
 ### Release
 
-Occasionally we use **releae**, which derived from **bind**, as the equivalent of division, as opposed of multiplication.
+Occasionally we use **release**, which is derived from **bind**, as the equivalent of division, as opposed to multiplication.
 
 $$ A \oslash B = A \otimes B^{-1} $$
 
@@ -37,7 +37,7 @@ Check out [code snippets](../api/hv/operators.md#release) from the API reference
 
 **Bundling** ($\oplus$) creates a superposition of vectors — the result is similar to all inputs. It is the additive operation within VSA algebra.
 
-**Mathematical properties:**
+**Mathematically**
 
 $$S = \sum_{i, \oplus} A_i$$
 
@@ -45,9 +45,6 @@ $$O(S, A_i) \gg O_{\text{random}} \quad \text{(similarity to each member)}$$
 
 $$O(S, X) \approx O_{\text{random}} \quad \text{for } X \notin \{A_i\} \quad \text{(dissimilarity to non-members)}$$
 
-<div class="callout callout-warning">
-<div class="callout-title">Not Reversible</div>
-Individual members cannot be recovered from the bundle without extra help (e.g., <a href="near_neighbor_search.html">near-neighbor search</a>). Weights can be applied to emphasize certain members.
-</div>
+Check out [original paper](../introduction.md#reference) for details on bundle operator.
 
 Check out [code snippets](../api/hv/operators.md#bundle) from the API reference.

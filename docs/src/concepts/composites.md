@@ -2,7 +2,7 @@
 
 Composites combine multiple hypervectors into higher-level structures. Each composite type uses a different combination strategy, preserving different kinds of relationships between its members.
 
-All composites implement the HyperBinary interface and can be nested — a Set can contain Sparkles, Knots, or even other Sets.
+All composites follows the same contract (interface in Go and traits in Rust) and can be nested — a Set can contain Sparkles, Knots, or even other Sets.
 
 ## Set
 
@@ -12,7 +12,7 @@ $$S = S_{marker} \otimes (\sum_{i,\oplus} M_i)$$
 
 where $S_{marker}$ is a special marker to distinguish a set from its individual members. 
 
-This mark is tuned for the domain, so that it WILL be shared among all sets within the same domain. 
+This mark is tuned for the domain, so that it will be shared among all sets within the same domain. 
 
 Use when: you need to represent "these things together" without order.
 
@@ -26,7 +26,7 @@ $$S = S_{marker} \otimes (\sum_{i,\oplus} M_i \otimes S_{step}^{i})$$
 
 where $S_{step}$ is a generic hypervector for positional encoding.
 
-$S_{marker}$ is a special marker to distinguish a sequence from its individual members. This mark is tuned for the domain, so that it WILL be shared among all sequences within the same domain. 
+$S_{marker}$ is a special marker to distinguish a sequence from its individual members. This mark is tuned for the domain, so that it will be shared among all sequences within the same domain. 
 
 Use when: order matters (e.g., words in a sentence, events in time).
 
@@ -60,9 +60,9 @@ The result of **bundling** (additive composition).
 
 $$S = \sum_{i,\oplus} M_i$$
 
-Unlike direct bundling, Parcel tracks its members for serialization and introspection.
+Unlike direct bundling, Parcel keeps tracking of its members for serialization and introspection.
 
-Use when: you need a superposition of concepts with optional weights.
+Use when: you need a superposition of concepts, with optional weights.
 
 Check out [code snippets](../api/hv/parcel.md) from the API reference.
 

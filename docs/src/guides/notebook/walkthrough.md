@@ -20,7 +20,7 @@ so = hv.SparseOperation(model, 0, 1)
 ```python
 # Cell 2: Create vectors for a set of words
 words = ["cat", "dog", "fish", "bird", "tree", "rock"]
-vectors = {w: hv.Sparkle.with_word(model, "vocab", w) for w in words}
+vectors = {w: hv.Sparkle.from_word(model, "vocab", w) for w in words}
 
 print(f"Created {len(vectors)} vectors")
 print(f"Model: {model}, Cardinality: {hv.cardinality(model)}")
@@ -107,11 +107,11 @@ Output:
 ```python
 # Cell 6: Create a structured representation
 #   "a cat that is red"
-color_role = hv.Sparkle.with_word(model, "role", "color")
-animal_role = hv.Sparkle.with_word(model, "role", "animal")
+color_role = hv.Sparkle.from_word(model, "role", "color")
+animal_role = hv.Sparkle.from_word(model, "role", "animal")
 
-red = hv.Sparkle.with_word(model, "color", "red")
-blue = hv.Sparkle.with_word(model, "color", "blue")
+red = hv.Sparkle.from_word(model, "color", "red")
+blue = hv.Sparkle.from_word(model, "color", "blue")
 cat = vectors["cat"]
 
 # Bind role with filler, then bundle the pairs

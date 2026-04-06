@@ -8,7 +8,7 @@ An ordered collection of hypervectors with positional encoding. See [Composites:
 {{#tab name="Python"}}
 ```python
 # Constructing a sequence, with logical index start at 1 (default to 0).
-seq = hv.Sequence(hv.Seed128(0, 42), [first, second, third], start=1)
+seq = hv.Sequence(hv.Seed128(0, 42), first, second, third, start=1)
 ```
 {{#endtab}}
 {{#tab name="Go"}}

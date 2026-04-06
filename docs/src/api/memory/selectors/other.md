@@ -32,6 +32,7 @@ Literal selector — returns a hypervector directly, no storage lookup.
 {{#tab name="Python"}}
 ```python
 sel = memory.with_code(some_hv)
+
 sel = memory.with_sparkle("animals", "cat")
 ```
 {{#endtab}}
@@ -39,7 +40,7 @@ sel = memory.with_sparkle("animals", "cat")
 
 ## Joiner
 
-Union of multiple selectors — returns first result from each.
+Union of multiple selectors — returns results from each of the inner selectors.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -54,24 +55,27 @@ sel = memory.joiner(
 
 ## Range
 
-Limits results to `[start, start+limit)`. `limit=0` means no limit.
+Limits results to `[start, start+limit)`. 
+`limit=0` (default) implies no limit, and iteration continue until there is no more results.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-sel = memory.range_sel(memory.by_item_domain("animals"), start=0, limit=10)
+sel = memory.range_sel(
+    memory.by_item_domain("animals"), start=0, limit=10)
 ```
 {{#endtab}}
 {{#endtabs}}
 
 ## OnlyDomain
 
-Filters inner selector results by domain.
+Filters inner selector results by given domain.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-sel = memory.only_domain("animals", inner_selector)
+sel = memory.only_domain(
+    "animals", inner_selector)
 ```
 {{#endtab}}
 {{#endtabs}}

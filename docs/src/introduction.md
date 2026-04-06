@@ -4,11 +4,17 @@
 
 Kongming is a hyperdimensional computing library implementing sparse binary hypervectors for cognitive computing applications.
 
-The core implementation is in **Go** with a parallel **Rust** implementation. Both strive to maintain minimal abstractions, wire-identical protobuf serialization and features in parity.
+The Python package of `kongming-rs-hv` is released under MIT license, essentially no limitation (and assumes no liability) to any use, personal or commercial.
 
-Python, on the other side, tries to present ergonomic API, while directing user requests with underlying Rust engine.
+The core engine is implemented in **Go** / **Rust** for maximum efficiency, while ergonomic APIs are open-sourced in **Python**, for better usability. 
+
+We do have an internal Go/Rust APIs that interacts directly with the core engine: overall all APIs maintains minimalistic abstractions and wire-identical serialization.
 
 See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and the sparse binary representation.
+
+## License
+
+[MIT License](https://github.com/yangzh/hv/blob/main/LICENSE)
 
 ## Install
 
@@ -26,16 +32,16 @@ See [Notebook Platforms](guides/notebook/platforms.md) for all available noteboo
 
 | Guide | Description |
 |-------|-------------|
-| [Notebook Quick Start](guides/notebook/quick-start.md) | Platform setup, interactive notebooks, cell-by-cell walkthrough |
 | [Python Quick Start](guides/python/quick-start.md) | Installation, examples, and walkthrough |
+| [Notebook Quick Start](guides/notebook/quick-start.md) | Platform setup, interactive notebooks, cell-by-cell walkthrough |
 
 ## Language Support
 
-This documentation covers implementations in the following languages. API reference pages include code snippets in multiple languages (if available) side by side.
+This documentation covers code snippets in multiple languages (if available) side by side.
 
-- **Python**: bindings to the underlying Rust implementation (public `kongming-rs-hv` on PyPI)
-- **Go**: canonical / reference implementation (proprietary package `github.com/kongming/core/kongming/hv`)
-- **Rust**: parallel implementation, carefully maintained in feature parity (proprietary `kongming` crate)
+- **Python**: bindings to the underlying Rust implementation (public `kongming-rs-hv` on PyPI);
+- **Go**: canonical / reference implementation in proprietary package;
+- **Rust**: parallel implementation, carefully maintained in feature parity;
 
 ## Reference
 

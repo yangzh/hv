@@ -9,10 +9,16 @@ Some producers only update existing chunks (e.g., <code>ClusterUpdater</code>) w
 
 ## Producer Options
 
+Producer options are additional information supplied to producer constructor to tweak behavior.
+
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-memory.terminal("d", "p", note="annotation")
+# `note` indiciates additional note for the new terminal chunk.
+memory.new_terminal("d", "p", note="annotation")
+
+# `semantic_indexing` indicates we need to index the semantic code 
+# (on top of the id vector).
 memory.from_set_members("d", "p", members, semantic_indexing=True)
 ```
 {{#endtab}}
@@ -20,7 +26,7 @@ memory.from_set_members("d", "p", members, semantic_indexing=True)
 
 ## Concrete Producers
 
-### Terminal
+### NewTerminal
 
 Creates a chunk whose code equals its identity (a bare Sparkle). Useful for registering atoms/symbols.
 
@@ -28,7 +34,7 @@ Creates a chunk whose code equals its identity (a bare Sparkle). Useful for regi
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(view, memory.terminal("fruits", "apple", note="an apple"))
+    memory.mem_set(view, memory.new_terminal("fruits", "apple", note="an apple"))
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -1,6 +1,6 @@
 # SparseSegmented 🍡
 
-The foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at the recorded offset location. All other types (Sparkle, Set, Sequence, etc.) ultimately contains a `SparseSegmented`.
+The most foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at the recorded offset location. All other types (Sparkle, Set, Sequence, etc.) ultimately contain a `SparseSegmented` in memory for processing.
 
 ## Structure
 
@@ -24,10 +24,6 @@ ss = hv.SparseSegmented.identity(model)
 
 # From raw offsets, typically discouraged...
 ss = hv.SparseSegmented(model, offsets_bytes)
-
-# Random
-so = hv.SparseOperation(model, seed_high, seed_low)
-ss = hv.SparseSegmented.random(so)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -37,10 +33,6 @@ ss := hv.NewSparseSegmentedIdentity(model)
 
 // From raw offsets (takes ownership of slice)
 ss := hv.NewSparseSegmented(model, offsets)
-
-// Random
-so := hv.NewSparseOperation(model, seedHigh, seedLow)
-ss := hv.NewRandomSparseSegmented(so)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -50,10 +42,6 @@ let ss = SparseSegmented::identity(model);
 
 // From raw offsets (takes ownership)
 let ss = SparseSegmented::new(model, Some(offsets));
-
-// Random
-let mut so = SparseOperation::new(Model::Model1m10bit, seedHigh, seedLow);
-let ss = SparseSegmented::from_random(&mut so);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -65,7 +53,7 @@ let ss = SparseSegmented::from_random(&mut so);
 ```python
 ss.is_identity()  # True if identity vector
 
-ss2 = ss.power(3)
+ss2 = ss.power(2)
 inv = ss.power(-1)
 
 # Similarity
@@ -79,7 +67,7 @@ ss.offsets()   # returns all offsets
 ```go
 ss.IsIdentity()   // bool
 
-ss2 := ss.Power(3).(hv.SparseSegmented)
+ss2 := ss.Power(2).(hv.SparseSegmented)
 inv := ss.Power(-1).(hv.SparseSegmented)
 
 // Similarity
@@ -100,7 +88,7 @@ for seg, offset := range ss.OffsetIter() {
 ```rust
 ss.is_identity()  // bool
 
-let ss2 = ss.power(3);
+let ss2 = ss.power(2);
 let inv = ss.power(-1);
 
 // Similarity

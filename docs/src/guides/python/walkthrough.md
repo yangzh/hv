@@ -10,11 +10,11 @@ from kongming import hv
 model = hv.MODEL_64K_8BIT
 
 # Create sparkles (atomic vectors) from words
-cat = hv.Sparkle.with_word(model, "animals", "cat")
-dog = hv.Sparkle.with_word(model, "animals", "dog")
+cat = hv.Sparkle.from_word(model, "animals", "cat")
+dog = hv.Sparkle.from_word(model, "animals", "dog")
 
 # Same inputs always produce the same vector
-cat2 = hv.Sparkle.with_word(model, "animals", "cat")
+cat2 = hv.Sparkle.from_word(model, "animals", "cat")
 assert cat.stable_hash() == cat2.stable_hash()
 ```
 
@@ -45,7 +45,7 @@ print(hv.overlap(a, b))  # ≈ 1
 
 ```python
 # Power creates a permuted vector
-s = hv.Sparkle.with_word(model, "pos", "step")
+s = hv.Sparkle.from_word(model, "pos", "step")
 s2 = s.power(2)
 s3 = s.power(3)
 

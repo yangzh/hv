@@ -2,7 +2,7 @@
 
 A `Seed128` is a 128-bit seed to drive a random number generator. 
 
-The current random number generator expects 2 64-bit seeds: the same (seed_high, seed_low) pair always produces the same sequence of random numbers, enabling reproducible vector generation across runs and languages.
+The current random number generator expects 2 64-bit seeds: the same (seed_high, seed_low) pair always produces the same sequence of random numbers, enabling reproducible and deterministic vector generation across runs and languages.
 
 ## Constructors
 
@@ -11,7 +11,9 @@ The current random number generator expects 2 64-bit seeds: the same (seed_high,
 ```python
 seed = hv.Seed128(0, 42)           # from two u64 values (domain id, pod seed)
 seedZero = hv.Seed128.zero()       # zero seed
-seed1 = hv.Seed128("domain", "pod") # also take str form for domain, pod
+
+# also take str form for domain, pod. The strings are hashed to provide u64 values.
+seed1 = hv.Seed128("domain", "pod") 
 
 seed.high()                        # u64 (domain id)
 seed.low()                         # u64 (pod seed)
@@ -34,7 +36,7 @@ let seedZero = Seed128::zero();         // zero seed
 
 ## Usage
 
-All composite constructors take a `Seed128`:
+All composite constructors take a `Seed128`, as seed for the bundle operator:
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}

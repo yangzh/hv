@@ -7,19 +7,22 @@ A **Substrate** is a pluggable storage backend. It provides transactional **view
 All storage access goes through views:
 
 - **SubstrateView** — read-only, supports key lookup and prefix scanning
-- **SubstrateMutableView** — extends SubstrateView with write staging and atomic commit
+- **SubstrateMutableView** — extends SubstrateView with write staging and atomic commit (to underlying storage)
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 # Read-only view (context manager)
 with storage.new_view() as view:
+    # Check if chunk exists, without actually reading it back.
     exists = view.chunk_exists("animals", "cat")
-    code = view.read_chunk("animals", "cat")
+
+    cat_chunk = view.read_chunk("animals", "cat")
 
 # Mutable view (auto-commits on clean exit, rollback on exception)
 with storage.new_mutable_view() as view:
     view.write_chunk(sparkle, code=some_code, note="my note")
+
     # commits automatically
 ```
 {{#endtab}}

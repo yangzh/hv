@@ -2,25 +2,24 @@
 
 The fundamental storage unit in the memory system. A Chunk pairs an **immutable identity** (always a Sparkle) with a **mutable semantic code** (any HyperBinary type).
 
-To assist debugging, each Chunk also contains a free-formed **note**, as well as an **extra** field, an arbitrary protobuf message that describes the details for this Chunk.
-
 ## Structure
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | Sparkle | Immutable identity — determines storage key |
 | `code` | HyperBinary | Semantic content (can be updated). If absent, defaults to `id` |
-| `note` | string | Human-readable annotation |
-| `extra` | protobuf Any | Extensible payload for application-specific data |
+| `note` | string | Human-readable annotation, primarily for debugging |
+| `extra` | protobuf Any | Extensible payload for application-specific data, primarily for debugging |
 
-## Creating Chunks
+## Inspection
+
+Chunks are typically created via producers (see [Producers](../memory/producers.md)), but can be inspected after retrieval (see [Selectors](../memory/selectors.md)).
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# Chunks are typically created via producers (see Producers),
-# but can be inspected after retrieval:
-chunk = memory.first_picked_chunk(view, memory.by_item_key("animals", "cat"))
+# chunk = memory.first_picked_chunk(view, memory.by_item_key("animals", "cat"))
+
 chunk.id        # Sparkle
 chunk.code      # HyperBinary
 chunk.note      # str

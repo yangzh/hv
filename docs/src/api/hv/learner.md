@@ -1,6 +1,6 @@
 # Learner 💫
 
-Learners are designed to perform online bundling for a stream of observations, for Hebbian-style learning.
+Learners are designed to perform online bundling for a stream of observations, in the form of Hebbian-style learning.
 
 The total storage / processing budget is fixed — what matters is the distribution of weights among observed vectors.
 
@@ -38,23 +38,23 @@ let mut learner = Learner::random(&mut so);
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-learner.bundle(observation)                 # single observation
+learner.bundle(a)                 # single observation
 
-learner.bundle_multiple(observation, 3)     # with weight multiplier
+learner.bundle_multiple(b, 3)     # with weight multiplier
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-learner.Bundle(observation)                 // single observation
+learner.Bundle(a)                 // single observation
 
-learner.BundleMultiple(observation, 3)      // with weight multiplier
+learner.BundleMultiple(b, 3)      // with weight multiplier
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-learner.bundle(&observation)?;              // single observation
+learner.bundle(&a)?;              // single observation
 
-learner.bundle_multiple(&observation, 3)?;  // with weight multiplier
+learner.bundle_multiple(&b, 3)?;  // with weight multiplier
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -66,21 +66,21 @@ learner.bundle_multiple(&observation, 3)?;  // with weight multiplier
 ```python
 learner.age()             # number of observations seen
 
-learner.weight(probe)     # implicit weight for a probe vector
+learner.weight(a)     # implicit weight for a probe vector
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 learner.Age()             // uint32
 
-learner.Weight(probe)     // float64
+learner.Weight(a)     // float64
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 learner.age()             // u32
 
-learner.weight(&probe)    // f64
+learner.weight(&a)    // f64
 ```
 {{#endtab}}
 {{#endtabs}}

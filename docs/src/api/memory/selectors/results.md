@@ -7,11 +7,8 @@ Returns the first chunk matching the selector. Returns an error if nothing is fo
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# Returns the code (HyperBinary) of the first match
-code = memory.first_picked(view, selector)
-
-# Returns the full Chunk object (with .id, .code, .note, .extra)
-chunk = memory.first_picked_chunk(view, selector)
+# Returns the first matching Chunk (with .id, .code, .note, .extra)
+chunk = memory.first_picked(view, selector)
 print(chunk.id, chunk.code, chunk.note)
 ```
 {{#endtab}}

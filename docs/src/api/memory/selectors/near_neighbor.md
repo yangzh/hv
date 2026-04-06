@@ -5,7 +5,8 @@ Wraps one or more [attractors](attractors.md) to perform [near-neighbor search](
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-result = memory.first_picked(view, memory.nns(
+result = memory.first_picked(
+    view, memory.nns(
     memory.set_members(memory.by_item_key("sets", "my_set")),
 ))
 ```
