@@ -35,7 +35,7 @@ def main():
     )
     parser.add_argument(
         "--backend", type=str,
-        choices=["inmemory", "embedded", "btreemap"],
+        choices=["inmemory", "embedded"],
         default="inmemory",
         help="Storage backend (default: inmemory)",
     )
@@ -55,12 +55,9 @@ def main():
             path = f"{tmpdir}/bench_store"
         storage = memory.Embedded(args.model, path)
         print(f"Backend: Embedded (path={path})")
-    elif args.backend == "btreemap":
-        storage = memory.BTreeMap(args.model)
-        print("Backend: BTreeMap (pure in-memory, no LSM)")
     else:
         storage = memory.InMemory(args.model)
-        print("Backend: InMemory (fjall on tmpdir)")
+        print("Backend: InMemory (BTreeMap, pure in-memory)")
 
     # --- Write phase ---
     print(f"Writing {args.count:,} terminal chunks …")
@@ -97,17 +94,14 @@ if __name__ == "__main__":
 ## Usage
 
 ```bash
-# Default: 10K chunks, in-memory (fjall on tmpdir)
+# Default: 10K chunks, in-memory (BTreeMap)
 python bulk_storage.py
 
-# BTreeMap backend (pure in-memory, no LSM — for comparison)
-python bulk_storage.py --backend btreemap
-
-# Embedded (disk-backed) storage
+# Embedded (disk-backed, fjall LSM)
 python bulk_storage.py --backend embedded
 
-# Embedded with a specific path
-python bulk_storage.py --backend embedded --path /tmp/my_bench
+# Embedded with a specific path (tip: use a tmpfs mount for near-in-memory speed)
+python bulk_storage.py --backend embedded --path /dev/shm/my_bench
 
 # Custom count
 python bulk_storage.py -n 100000
@@ -115,8 +109,8 @@ python bulk_storage.py -n 100000
 # Different model
 python bulk_storage.py -n 10000 --model 1
 
-# Compare all three backends
-for backend in inmemory btreemap embedded; do
+# Compare both backends
+for backend in inmemory embedded; do
     echo "=== $backend ==="
     python bulk_storage.py -n 10000 --backend $backend
     echo
