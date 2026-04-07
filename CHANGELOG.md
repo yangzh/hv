@@ -3,6 +3,13 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.4 (2026-04-07)
+
+- Warn when gc_interval_secs is 0 (background compaction disabled)
+- Go: move gc_interval_secs default from library (600) to caller level (0)
+- InMemory uses fjall-on-tmpdir; add BTreeMap backend for benchmarking
+- Add TTL compaction filter and background GC for fjall storage
+- Use meaningful parameter names in Python-facing constructors and static methods
 ## v3.8.3 (2026-04-06)
 
 - Improve Python docstrings: add constructors, flexible types, remove redundant create()
@@ -62,13 +69,3 @@ Only the latest 10 releases are shown.
 ## v3.7.7 (2026-04-03)
 
 - Python: Seed128 constructor accepts Domain/int/str for each arg
-## v3.7.6 (2026-04-03)
-
-- Python: improve Chunk __repr__ and __str__
-- Go: add Set.Unmasked() and Sequence.Unmasked()
-- Expose read-only env flag accessors in Go, Rust, and Python
-- tweak.
-- Add Notebook Sync CI; remove notebook sync from Rust Wheels
-- Python: add Seed128.from_dp(domain, pod) constructor
-- Use canonical lowercase xoshiro256++ in all comments and docs
-- Rust: fix env.rs doc table to match Go (xoshiro++ not xoshiro)
