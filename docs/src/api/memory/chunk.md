@@ -2,6 +2,8 @@
 
 The fundamental storage unit in the memory system. A Chunk pairs an **immutable identity** (always a Sparkle) with a **mutable semantic code** (any HyperBinary type).
 
+The unique id for a chunk facilitates the compositionality, as this chunk is either present or absent. At the same time, the potentially learnable code (for a chunk) offers opportunities to learn and adapt, just like weights from traditional neural nets.
+
 ## Structure
 
 | Field | Type | Description |
