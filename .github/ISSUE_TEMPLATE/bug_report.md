@@ -10,14 +10,14 @@ assignees: ''
 See the [CHANGELOG](../../CHANGELOG.md) for recent fixes.
 
 ```bash
-pip install -U kongming-rs-hv
+python3 -m pip install -U kongming-rs-hv
 ```
 
 ## Environment
 
 - **OS**: (e.g. macOS 14.5, Ubuntu 22.04, Windows 11)
-- **Python version**: (run `python --version`)
-- **kongming version**: (run `python -c "import kongming; print(kongming.__version__)"`)
+- **Python version**: (run `python3 --version`)
+- **kongming version**: (run `python3 -c "import kongming; print(kongming.__version__)"`)
 - **Installation method**: (pip, source build, etc.)
 
 ## Description
