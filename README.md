@@ -34,6 +34,10 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 | Colab (LISP) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true) |
 | Binder | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb) |
 
+## Community
+
+Questions, ideas, or feedback? Visit [GitHub Discussions](https://github.com/yangzh/hv/discussions) for announcements, Q&A, and general conversation. For bugs, please use [Issues](https://github.com/yangzh/hv/issues).
+
 ## References
 
 > Yang, Zhonghao (2023). Cognitive modeling and learning with sparse binary hypervectors. [arXiv:2310.18316](https://arxiv.org/abs/2310.18316) [cs.AI]
