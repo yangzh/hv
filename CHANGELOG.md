@@ -3,6 +3,14 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.6 (2026-04-07)
+
+- Notebook: add SVG visualization demo (single vector + overlap)
+- SVG renderer: move Go to hv/, add Rust/Python, palette-based overlap coloring
+- SVG renderer: replace svgo with raw fmt.Fprintf, fix square layout for all models
+- Add Dependabot: weekly checks for Cargo, Go, pip (ruff), GitHub Actions
+- Add PyPI project URLs: docs, repo, changelog, issues, discussions
+- Update parity.md for hv/ and memory/ with 2-week progress
 ## v3.8.5 (2026-04-07)
 
 - Revert InMemory to BTreeMap-backed; add read-time TTL filtering
@@ -55,13 +63,6 @@ Only the latest 10 releases are shown.
 
 - Python: global_env() returns formatted string respecting repr_format
 - Consolidate env flags into GlobalEnv proto; single global_env() accessor
-## v3.7.8 (2026-04-04)
-
-- Python: Chunk repr/str shows "(id)" when code equals id; cleanup
-- Python: accept Domain/int/str and Pod/int/str everywhere; remove Seed128.from_dp
-- Python: Sparkle constructors accept Domain/int/str for all args
-- Python: SparseOperation accepts flexible seed args; refactor shared helpers
-- Update notebooks for Seed128/xoshiro256++ API changes
 ## v3.7.8 (2026-04-04)
 
 - Python: Chunk repr/str shows "(id)" when code equals id; cleanup
