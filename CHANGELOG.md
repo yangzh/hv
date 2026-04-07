@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.5 (2026-04-07)
+
+- Revert InMemory to BTreeMap-backed; add read-time TTL filtering
 ## v3.8.4 (2026-04-07)
 
 - Warn when gc_interval_secs is 0 (background compaction disabled)
@@ -66,6 +69,3 @@ Only the latest 10 releases are shown.
 - Python: Sparkle constructors accept Domain/int/str for all args
 - Python: SparseOperation accepts flexible seed args; refactor shared helpers
 - Update notebooks for Seed128/xoshiro256++ API changes
-## v3.7.7 (2026-04-03)
-
-- Python: Seed128 constructor accepts Domain/int/str for each arg
