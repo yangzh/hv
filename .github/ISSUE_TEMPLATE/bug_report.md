@@ -6,6 +6,13 @@ labels: bug
 assignees: ''
 ---
 
+**Before filing**: please upgrade to the latest version and check if the issue persists.
+See the [CHANGELOG](../../CHANGELOG.md) for recent fixes.
+
+```bash
+pip install -U kongming-rs-hv
+```
+
 ## Environment
 
 - **OS**: (e.g. macOS 14.5, Ubuntu 22.04, Windows 11)
