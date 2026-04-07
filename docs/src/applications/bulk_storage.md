@@ -34,7 +34,9 @@ def main():
         help="Domain name for all chunks (default: bench)",
     )
     parser.add_argument(
-        "--backend", type=str, choices=["inmemory", "embedded"], default="inmemory",
+        "--backend", type=str,
+        choices=["inmemory", "embedded", "btreemap"],
+        default="inmemory",
         help="Storage backend (default: inmemory)",
     )
     parser.add_argument(
@@ -53,9 +55,12 @@ def main():
             path = f"{tmpdir}/bench_store"
         storage = memory.Embedded(args.model, path)
         print(f"Backend: Embedded (path={path})")
+    elif args.backend == "btreemap":
+        storage = memory.BTreeMap(args.model)
+        print("Backend: BTreeMap (pure in-memory, no LSM)")
     else:
         storage = memory.InMemory(args.model)
-        print("Backend: InMemory")
+        print("Backend: InMemory (fjall on tmpdir)")
 
     # --- Write phase ---
     print(f"Writing {args.count:,} terminal chunks …")
@@ -92,8 +97,11 @@ if __name__ == "__main__":
 ## Usage
 
 ```bash
-# Default: 10K chunks, in-memory
+# Default: 10K chunks, in-memory (fjall on tmpdir)
 python bulk_storage.py
+
+# BTreeMap backend (pure in-memory, no LSM — for comparison)
+python bulk_storage.py --backend btreemap
 
 # Embedded (disk-backed) storage
 python bulk_storage.py --backend embedded
@@ -106,4 +114,11 @@ python bulk_storage.py -n 100000
 
 # Different model
 python bulk_storage.py -n 10000 --model 1
+
+# Compare all three backends
+for backend in inmemory btreemap embedded; do
+    echo "=== $backend ==="
+    python bulk_storage.py -n 10000 --backend $backend
+    echo
+done
 ```
