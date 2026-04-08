@@ -3,6 +3,9 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.8 (2026-04-08)
+
+- SVG: unique pattern IDs (random), show_svg helper with zoom/pan in notebook
 ## v3.8.7 (2026-04-08)
 
 - Notebook: scrollable SVG containers; auto-mirror releases to hv repo
@@ -63,7 +66,3 @@ Only the latest 10 releases are shown.
 - Python: Seed128 preserves Domain/Pod metadata; add Seed128.random(so); update parity.md
 - GlobalEnv enums: restore UNKNOWN=0 placeholders so defaults are non-zero
 - Python: global_env() returns proto GlobalEnv message directly
-## v3.7.9 (2026-04-05)
-
-- Python: global_env() returns formatted string respecting repr_format
-- Consolidate env flags into GlobalEnv proto; single global_env() accessor
