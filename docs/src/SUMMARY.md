@@ -27,7 +27,6 @@
         - [Octopus 🐙](api/hv/octopus.md)
         - [Knot 🪢](api/hv/knot.md)
         - [Parcel 🎁](api/hv/parcel.md)
-        - [Cyclone 🌀](api/hv/cyclone.md)
     - [Operators](api/hv/operators.md)
     - [Customizing Run-time Behavior](api/hv/runtime.md)
     - [Misc](api/hv/misc.md)

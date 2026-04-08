@@ -67,4 +67,3 @@ In Rust, concrete types are wrapped in `HyperBinaryKind` (an enum) for dynamic d
 | [Octopus 🐙](octopus.md) | Key-value composite |
 | [Knot 🪢](knot.md) | Bound (multiplied) group |
 | [Parcel 🎁](parcel.md) | Bundled (added) group |
-| [Cyclone 🌀](cyclone.md) | Periodic permutation vector |

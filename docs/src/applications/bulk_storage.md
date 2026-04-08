@@ -94,10 +94,10 @@ if __name__ == "__main__":
 ## Usage
 
 ```bash
-# Default: 10K chunks, in-memory (BTreeMap)
+# Default: 10K chunks, in-memory storage substrate.
 python bulk_storage.py
 
-# Embedded (disk-backed, fjall LSM)
+# Embedded (disk-backed storage substrate).
 python bulk_storage.py --backend embedded
 
 # Embedded with a specific path (tip: use a tmpfs mount for near-in-memory speed)
@@ -106,13 +106,6 @@ python bulk_storage.py --backend embedded --path /dev/shm/my_bench
 # Custom count
 python bulk_storage.py -n 100000
 
-# Different model
+# Different model, 1 implies MODEL_64K_8BIT model, etc.
 python bulk_storage.py -n 10000 --model 1
-
-# Compare both backends
-for backend in inmemory embedded; do
-    echo "=== $backend ==="
-    python bulk_storage.py -n 10000 --backend $backend
-    echo
-done
 ```
