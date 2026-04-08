@@ -36,7 +36,9 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 
 ## Community
 
-Questions, ideas, or feedback? Visit [GitHub Discussions](https://github.com/yangzh/hv/discussions) for announcements, Q&A, and general conversation. For bugs, please use [Issues](https://github.com/yangzh/hv/issues).
+Questions, ideas, or feedback? Visit [GitHub Discussions](https://github.com/yangzh/hv/discussions) for announcements, Q&A, and general conversation. For bugs, please use [Issues](https://github.com/yangzh/hv/issues). 
+
+For private inquiries, use the [contact form](https://docs.google.com/forms/d/e/1FAIpQLSeAPEzqIgcf1CYJZJepN2jtNy1QTPKtpQYkdBBs1-rNeIuoGQ/viewform).
 
 ## References
 
