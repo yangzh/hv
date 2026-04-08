@@ -6,10 +6,10 @@ Setup and behavior differ across Jupyter, Google Colab, and Binder. This page co
 
 | Notebook | Platform | Link |
 |----------|----------|------|
-| `first.ipynb` | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true) |
-| `first.ipynb` | Binder | [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb) |
-| `memory.ipynb` | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true) |
-| `lisp.ipynb` | Google Colab | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true) |
+| `first.ipynb` | Google Colab | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
+| `first.ipynb` | Binder | <a href="https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb" target="_blank"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a> |
+| `memory.ipynb` | Google Colab | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
+| `lisp.ipynb` | Google Colab | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
 
 ## Comparison
 
@@ -76,7 +76,7 @@ drive.mount('/content/drive')
 
 Binder builds a Docker image from your repo's `requirements.txt` and launches a Jupyter server. No account needed.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb)
+<a href="https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb" target="_blank"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a>
 
 - **First launch**: Takes 2–5 minutes to build the environment
 - **Subsequent launches**: Faster if the image is cached
