@@ -7,8 +7,8 @@ Wraps one or more [attractors](attractors.md) to perform [near-neighbor search](
 ```python
 result = memory.first_picked(
     view, memory.nns(
-    memory.set_members(memory.by_item_key("sets", "my_set")),
-))
+        memory.set_members(memory.by_item_key("sets", "my_set")),
+        ))
 ```
 {{#endtab}}
 {{#endtabs}}
