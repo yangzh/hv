@@ -5,18 +5,6 @@ Only the latest 10 releases are shown.
 
 ## v3.8.9 (2026-04-09)
 
-- Add CHANGELOG.md for release tracking
-- Add SparseSegmented.from_offsets() constructor (Rust + Python)
-- Update pylisp sync path: pylisp/ → examples/pylisp/
-- Fix reverse attractors: use ID instead of Code for probe binding
-- Reorder pre-commit hooks: Go → buf → ruff → rustfmt
-- Rename WithChunk→WithChunks: accept multiple chunks; proto LITERAL→LITERALS
-- Remove display_size from SVG rendering (Go/Rust/Python)
-- Notebook: SVG viewer with zoom/pan controls, minimap, and reset
-- Notebook sync: only trigger from master, not dev
-- Notebook: update cell outputs for SVG visualization
-## v3.8.9 (2026-04-09)
-
 ### API changes
 - `SparseSegmented.from_offsets(model, offsets)` — new constructor from per-segment offsets
 - `WithChunk()` renamed to `WithChunks()` — accepts multiple chunks
@@ -63,3 +51,29 @@ Only the latest 10 releases are shown.
 
 - Rename first_picked_chunk→first_picked, terminal→new_terminal in Python bindings
 - YAML: render Prewired enum as string name instead of numeric value
+## v3.8.0 (2026-04-06)
+
+- Clean up obsolete build tooling: remove govvv, proto plugins, ruff.sh
+- Update CLAUDE.md: mark lbd as unmaintained, remove redundant HvCore/Composites docs
+- support for SequenceAppender.
+- Hierarchical HMM: part 5
+- Use emoji-only in String/Display for all types; Chunk omits id when redundant
+- misc.
+- update doc for PARITY.md.
+- Fix biweekly release reminder: true biweekly on odd-week Mondays
+- Python: Seed128 preserves Domain/Pod metadata; add Seed128.random(so); update parity.md
+- GlobalEnv enums: restore UNKNOWN=0 placeholders so defaults are non-zero
+- Python: global_env() returns proto GlobalEnv message directly
+## v3.8.0 (2026-04-06)
+
+- Clean up obsolete build tooling: remove govvv, proto plugins, ruff.sh
+- Update CLAUDE.md: mark lbd as unmaintained, remove redundant HvCore/Composites docs
+- support for SequenceAppender.
+- Hierarchical HMM: part 5
+- Use emoji-only in String/Display for all types; Chunk omits id when redundant
+- misc.
+- update doc for PARITY.md.
+- Fix biweekly release reminder: true biweekly on odd-week Mondays
+- Python: Seed128 preserves Domain/Pod metadata; add Seed128.random(so); update parity.md
+- GlobalEnv enums: restore UNKNOWN=0 placeholders so defaults are non-zero
+- Python: global_env() returns proto GlobalEnv message directly
