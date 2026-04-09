@@ -46,4 +46,6 @@ For private inquiries, use the [contact form](https://docs.google.com/forms/d/e/
 
 ## License
 
-[MIT License](LICENSE)
+The Python source code, examples, and documentation in this repository are licensed under the [MIT License](LICENSE). 
+
+The compiled engine distributed via PyPI (`kongming-rs-hv`) is proprietary.

@@ -4,17 +4,15 @@
 
 Kongming is a hyperdimensional computing library implementing sparse binary hypervectors for cognitive computing applications.
 
-The Python package of `kongming-rs-hv` is released under MIT license, essentially no limitation (and assumes no liability) to any use, personal or commercial.
-
-The core engine is implemented in **Go** / **Rust** for maximum efficiency, while ergonomic APIs are open-sourced in **Python**, for better usability. 
-
-We do have an internal Go/Rust APIs that interacts directly with the core engine: overall all APIs maintains minimalistic abstractions and wire-identical serialization.
+The core engine is implemented in **Rust** for maximum efficiency, while ergonomic APIs are open-sourced in **Python** for better usability.
 
 See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and the sparse binary representation.
 
 ## License
 
-[MIT License](https://github.com/yangzh/hv/blob/main/LICENSE)
+The Python source code, examples, and documentation in this repository are licensed under the [MIT License](https://github.com/yangzh/hv/blob/main/LICENSE). 
+
+The compiled engine distributed via PyPI (`kongming-rs-hv`) is proprietary.
 
 ## Install
 
