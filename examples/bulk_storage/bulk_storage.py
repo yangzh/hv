@@ -1,48 +1,49 @@
-# Bulk Storage Benchmark
-
-> Standalone script: [`bulk_storage.py`](https://github.com/yangzh/hv/blob/main/examples/bulk_storage/bulk_storage.py)
-
-This example populates a storage with a large number of random terminal chunks, then queries a few by key to verify correctness. It demonstrates how to batch-create items and measure throughput.
-
-Note associative index is also prepared in the process, and near-neighbor search is available immediately upon successful conclusion of all writing.
-
-Motivated readers can further improve this script to test various [producers](../../api/memory/producers.md) or [selectors](../../api/memory/selectors.md).
-
-## Script
-
-```python
 #!/usr/bin/env python3
-"""Populate local storage with random terminal chunks and verify retrieval."""
+"""Populate local storage with random terminal chunks and verify retrieval.
+
+See docs: https://yangzh.github.io/hv/examples/bulk_storage/index.html
+"""
 
 import argparse
 import shutil
 import tempfile
 import time
+
 from kongming import hv, memory
 
 
 def main():
     parser = argparse.ArgumentParser(description="Bulk storage benchmark")
     parser.add_argument(
-        "-n", "--count", type=int, default=10_000,
+        "-n",
+        "--count",
+        type=int,
+        default=10_000,
         help="Number of terminal chunks to create (default: 10000)",
     )
     parser.add_argument(
-        "--model", type=int, default=hv.MODEL_1M_10BIT,
+        "--model",
+        type=int,
+        default=hv.MODEL_1M_10BIT,
         help="HV model (default: MODEL_1M_10BIT)",
     )
     parser.add_argument(
-        "--domain", type=str, default="bench",
+        "--domain",
+        type=str,
+        default="bench",
         help="Domain name for all chunks (default: bench)",
     )
     parser.add_argument(
-        "--backend", type=str,
+        "--backend",
+        type=str,
         choices=["inmemory", "embedded"],
         default="inmemory",
         help="Storage backend (default: inmemory)",
     )
     parser.add_argument(
-        "--path", type=str, default=None,
+        "--path",
+        type=str,
+        default=None,
         help="Disk path for embedded backend (default: temp directory)",
     )
     args = parser.parse_args()
@@ -91,23 +92,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
-## Usage
-
-```bash
-# Default: 10K chunks, in-memory storage substrate.
-python bulk_storage.py
-
-# Embedded (disk-backed storage substrate).
-python bulk_storage.py --backend embedded
-
-# Embedded with a specific path (tip: use a tmpfs mount for near-in-memory speed)
-python bulk_storage.py --backend embedded --path /dev/shm/my_bench
-
-# Custom count
-python bulk_storage.py -n 100000
-
-# Different model, 1 implies MODEL_64K_8BIT model, etc.
-python bulk_storage.py -n 10000 --model 1
-```

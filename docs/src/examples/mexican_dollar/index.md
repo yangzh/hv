@@ -1,5 +1,7 @@
 # Mexican Dollar
 
+> Standalone scripts: [`mexican_dollar.py`](https://github.com/yangzh/hv/blob/main/examples/mexican_dollar/mexican_dollar.py) | [`mexican_dollar_memory.py`](https://github.com/yangzh/hv/blob/main/examples/mexican_dollar/mexican_dollar_memory.py)
+
 The "What's the Dollar of Mexico?" problem is a classic demonstration of analogical reasoning with hypervectors. It shows how structured knowledge about countries can be encoded, and how algebraic operations can answer analogy questions without explicit programming.
 
 ## The Problem
@@ -147,7 +149,7 @@ swe_code = store.get("country", "SWE").code
 view = store.new_view()
 
 # "What is the USD of Mexico?"
-result = memory.first_picked_chunk(view,
+result = memory.first_picked(view,
     memory.nns(
         memory.analogical_reasoner(
             memory.with_code(mex_code),
@@ -159,7 +161,7 @@ result = memory.first_picked_chunk(view,
 print(result.id)  # → ✨:🌱MXN
 
 # "What is the Washington DC of Mexico?"
-result = memory.first_picked_chunk(view,
+result = memory.first_picked(view,
     memory.nns(
         memory.analogical_reasoner(
             memory.with_code(mex_code),
@@ -171,7 +173,7 @@ result = memory.first_picked_chunk(view,
 print(result.id)  # → ✨:🌱mexicoCity
 
 # "What is the Dollar of Sweden?"
-result = memory.first_picked_chunk(view,
+result = memory.first_picked(view,
     memory.nns(
         memory.analogical_reasoner(
             memory.with_code(swe_code),

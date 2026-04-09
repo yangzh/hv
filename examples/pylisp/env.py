@@ -54,6 +54,7 @@ class LispEnv:
 
         if path is not None:
             import os
+
             self.storage = memory.Embedded(model, os.path.join(path, "lisp.db"))
         else:
             self.storage = memory.InMemory(model)
@@ -132,9 +133,7 @@ class LispEnv:
         """Parse and evaluate until stable, return display string."""
         from . import evaluator, printer, reader
 
-        return printer.display(
-            self, evaluator.ev_until_done(self, reader.parse(self, expr_str))
-        )
+        return printer.display(self, evaluator.ev_until_done(self, reader.parse(self, expr_str)))
 
     def parse_display(self, expr_str: str) -> str:
         """Parse and display without evaluating."""
