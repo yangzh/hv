@@ -107,7 +107,7 @@ print(f"krona overlap: {hv.overlap(swedish_dollar, krona)}")  # high!
 
 ## Code (with AnalogicalReasoner)
 
-When records are stored in memory (as [Octopus](../api/hv/octopus.md) composites), the `AnalogicalReasoner` selector handles the transfer automatically:
+When records are stored in memory (as [Octopus](../../api/hv/octopus.md) composites), the `AnalogicalReasoner` selector handles the transfer automatically:
 
 ```python
 from kongming import hv, memory
@@ -194,7 +194,7 @@ This is a form of **analogical reasoning**: no explicit rules, no lookup tables 
 ## See Also
 
 - [Concepts: Operators](../concepts/operators.md) — algebraic foundations
-- [Operators](../api/hv/operators.md) — bind, release, bundle
-- [Octopus](../api/hv/octopus.md) — key-value composite used for country records
-- [Memory: Selectors](../api/memory/selectors.md) — `analogical_reasoner`, `nns`, `with_code`
+- [Operators](../../api/hv/operators.md) — bind, release, bundle
+- [Octopus](../../api/hv/octopus.md) — key-value composite used for country records
+- [Memory: Selectors](../../api/memory/selectors.md) — `analogical_reasoner`, `nns`, `with_code`
 - [Near-neighbor search](../concepts/near_neighbor_search.md) — how the reasoner finds answers

@@ -51,8 +51,8 @@
     - [Quick Example](guides/python/example.md)
     - [Walkthrough](guides/python/walkthrough.md)
 
-# Applications
+# Examples
 
-- [Mexican Dollar](applications/mexican_dollar.md)
-- [LISP Interpreter](applications/pylisp.md)
-- [Bulk Storage Benchmark](applications/bulk_storage.md)
+- [Mexican Dollar](examples/mexican_dollar/index.md)
+- [LISP Interpreter](examples/pylisp/index.md)
+- [Bulk Storage Benchmark](examples/bulk_storage/index.md)

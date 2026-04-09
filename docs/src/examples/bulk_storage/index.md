@@ -4,7 +4,7 @@ This example populates a storage with a large number of random terminal chunks, 
 
 Note associative index is also prepared in the process, and near-neighbor search is available immediately upon successful conclusion of all writing.
 
-Motivated readers can further improve this script to test various [producers](../api/memory/producers.md) or [selectors](../api/memory/selectors.md).
+Motivated readers can further improve this script to test various [producers](../../api/memory/producers.md) or [selectors](../../api/memory/selectors.md).
 
 ## Script
 
