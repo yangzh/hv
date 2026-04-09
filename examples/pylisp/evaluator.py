@@ -160,7 +160,9 @@ def _eval_define(env: LispEnv, args: HyperBinary) -> HyperBinary:
 
     name_str = env.name_of(name) or "?"
     fn_name = hv.Sparkle.from_word(env.model, env.fn_domain, name_str)
-    cell = cons_mod.cons_parcel(env, hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), name, lambda_expr)
+    cell = cons_mod.cons_parcel(
+        env, hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), name, lambda_expr
+    )
     env.storage.store_chunk(fn_name, code=cell)
 
     return env.nil

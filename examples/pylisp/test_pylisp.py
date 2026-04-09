@@ -61,7 +61,10 @@ def test_cons_eval():
 
 def test_cond():
     env = LispEnv()
-    assert env.eval("(COND ((EQ (QUOTE A) (QUOTE B)) (QUOTE NO)) (T (QUOTE YES)))") == "YES"
+    assert (
+        env.eval("(COND ((EQ (QUOTE A) (QUOTE B)) (QUOTE NO)) (T (QUOTE YES)))")
+        == "YES"
+    )
 
 
 # ── Lambda / Define / Label ──────────────────────────────────────────
@@ -86,7 +89,8 @@ def test_define_and_call():
 def test_define_last():
     env = LispEnv()
     env.eval(
-        "(DEFINE LAST (LAMBDA (L) ((LABEL REC (LAMBDA (X) (COND ((ATOM (CDR X)) (CAR X)) (T (REC (CDR X)))))) L)))"
+        "(DEFINE LAST (LAMBDA (L) ((LABEL REC (LAMBDA (X) "
+        "(COND ((ATOM (CDR X)) (CAR X)) (T (REC (CDR X)))))) L)))"
     )
     assert env.eval_full("(LAST (QUOTE (A B C)))") == "C"
 
