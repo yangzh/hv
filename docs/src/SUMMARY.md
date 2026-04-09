@@ -53,7 +53,8 @@
 
 # Examples
 
-- [Operators from Scratch](examples/operators/index.md)
-- [Mexican Dollar](examples/mexican_dollar/index.md)
-- [Bulk Storage Benchmark](examples/bulk_storage/index.md)
-- [LISP Interpreter](examples/pylisp/index.md)
+- [Examples](examples/index.md)
+    - [Operators from Scratch](examples/operators/index.md)
+    - [Mexican Dollar](examples/mexican_dollar/index.md)
+    - [Bulk Storage Benchmark](examples/bulk_storage/index.md)
+    - [LISP Interpreter](examples/pylisp/index.md)
