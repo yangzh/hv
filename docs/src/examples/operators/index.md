@@ -36,12 +36,18 @@ Properties:
 ## Bundle
 
 PRNG-based random selection among inputs. For each segment, a seeded PRNG
-picks which input vector contributes its offset:
+picks which input vector contributes its offset. The selection probability
+is proportional to each input's weight.
 
 ```python
-# Divide [0, 65535] into N equal ranges, one per input vector.
-# For 3 inputs: anchors = [21845, 43690, 65535]
-anchors = [int((i + 1) / n * 65535) for i in range(n)]
+# Compute cumulative anchors from weights (weights sum to 1.0).
+# For equal weights [0.33, 0.33, 0.33]: anchors ≈ [21845, 43690, 65535]
+# For weighted [0.6, 0.2, 0.2]:        anchors ≈ [39321, 52428, 65535]
+cumulative = 0.0
+anchors = []
+for w in weights:
+    cumulative += w
+    anchors.append(int(cumulative * 65535))
 
 for seg in range(0, cardinality, 4):
     r = so.uint64()                          # one PRNG call → 4 × 16-bit values
@@ -52,7 +58,7 @@ for seg in range(0, cardinality, 4):
 ```
 
 Properties:
-- Result is similar to all inputs (overlap ≈ cardinality / N)
+- Result is similar to all inputs (overlap ≈ weight × cardinality)
 - Not reversible — information is lost
 
 **Note**: The library supports two bundling strategies: `classic` (shown above) and `fisher_yates` (default). To verify exact match with the pure Python implementation, set:
