@@ -3,6 +3,17 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.8.9 (2026-04-09)
+
+### API changes
+- `SparseSegmented.from_offsets(model, offsets)` — new constructor from per-segment offsets
+- `WithChunk()` renamed to `WithChunks()` — accepts multiple chunks
+- Removed `display_size` parameter from `to_svg()` / `to_svg_overlap()` — client-side handles viewport
+
+### Notebook
+- SVG viewer with zoom/pan controls, minimap, and reset button
+
+
 ## v3.8.8 (2026-04-08)
 
 - SVG: unique pattern IDs (random), show_svg helper with zoom/pan in notebook
