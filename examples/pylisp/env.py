@@ -45,9 +45,9 @@ class LispEnv:
         self.model = model
 
         # Domains (all under the LISP prefix: λ)
-        self.sym_domain = hv.Domain.with_prefix(_LISP_PREFIX, "sym")
-        self.cons_domain = hv.Domain.with_prefix(_LISP_PREFIX, ns)
-        self.fn_domain = hv.Domain.with_prefix(_LISP_PREFIX, f"{ns}.fn")
+        self.sym_domain = hv.Domain.from_prefix_and_name(_LISP_PREFIX, "sym")
+        self.cons_domain = hv.Domain.from_prefix_and_name(_LISP_PREFIX, ns)
+        self.fn_domain = hv.Domain.from_prefix_and_name(_LISP_PREFIX, f"{ns}.fn")
 
         # PCG-based RNG for generating unique cons cell sparkles.
         self._rng = hv.SparseOperation(model, _RNG_SEED_HIGH, hv.curr_time_as_seed())

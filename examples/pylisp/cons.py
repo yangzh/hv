@@ -72,5 +72,5 @@ def cleanup(env: LispEnv, probe: HyperBinary) -> HyperBinary:
     Returns the chunk id (not code), matching Rust's ``chunk.id`` pattern.
     """
     sel = memory.nns(memory.with_code(probe))
-    chunk = memory.first_picked_chunk(env.storage.new_view(), sel)
+    chunk = memory.first_picked(env.storage.new_view(), sel)
     return chunk.id
