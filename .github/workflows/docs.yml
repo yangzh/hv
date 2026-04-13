@@ -2,8 +2,10 @@ name: Deploy docs
 
 on:
   push:
-    branches: [main]
-    paths: [docs/**, .github/workflows/docs.yml]
+    # Deploy docs only when a release tag lands (synced from primary).
+    # Raw markdown on main may be ahead of the deployed site — this is
+    # intentional so the published docs stay in lockstep with PyPI.
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
