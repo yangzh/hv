@@ -1,0 +1,42 @@
+name: Cleanup old releases
+
+on:
+  schedule:
+    - cron: '0 6 * * 0'  # Every Sunday at 6:00 AM UTC
+  workflow_dispatch:
+    inputs:
+      keep_latest:
+        description: 'Number of latest releases to keep'
+        required: false
+        default: '10'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old releases (keep latest N)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KEEP: ${{ inputs.keep_latest || '10' }}
+        run: |
+          REPO="${GITHUB_REPOSITORY}"
+          echo "Keeping latest ${KEEP} releases for ${REPO}"
+
+          # List all releases sorted by date, skip the latest N, delete the rest
+          TAGS=$(gh release list --repo "${REPO}" --limit 100 \
+            --json tagName -q ".[${KEEP}:][].tagName" | sort -u)
+
+          if [ -z "${TAGS}" ]; then
+            echo "Nothing to clean up."
+            exit 0
+          fi
+
+          for TAG in ${TAGS}; do
+            echo "Deleting release: ${TAG}"
+            gh release delete "${TAG}" --repo "${REPO}" --yes --cleanup-tag || true
+          done
+
+          echo "Done. Deleted $(echo "${TAGS}" | wc -w | tr -d ' ') releases."
