@@ -3,6 +3,17 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.9.0 (2026-04-16)
+
+### New features
+- `hv.bind_more(knot, *more)` → `Knot` — extend an existing Knot with additional parts without re-binding from scratch. `bind_more(bind(a, b), c)` is equivalent to `bind(a, b, c)`. Returns a new Knot; the original is unchanged. Raises `ValueError` if no additional operands are passed.
+
+### Performance
+- `bind_direct()` short-circuits on a single operand, skipping the bind loop and buffer allocation.
+
+### Docs
+- Docker installation guide in the Python Quick Start: one-liner REPL, reusable image, and JupyterLab container.
+
 ## v3.8.10 (2026-04-11)
 
 ### New features
