@@ -42,3 +42,69 @@ hv.MODEL_16M_12BIT     # 3
 hv.MODEL_256M_14BIT    # 4
 hv.MODEL_4G_16BIT      # 5
 ```
+
+## Docker
+
+If you'd rather not install anything on your host, you can run `kongming-rs-hv`
+inside a container. This works on any system with Docker — no Python, no
+virtualenv, no wheel compatibility to worry about.
+
+### One-liner: throwaway Python REPL
+
+Drop straight into a Python shell with the package preinstalled:
+
+```bash
+docker run --rm -it python:3.12-slim \
+    sh -c "pip install --quiet kongming-rs-hv && python"
+```
+
+`--rm` removes the container on exit. Nothing is persisted. Re-running reinstalls
+from PyPI, which takes a few seconds.
+
+### Reusable image
+
+For repeat use, build a small image once:
+
+```dockerfile
+# Dockerfile
+FROM python:3.12-slim
+RUN pip install --no-cache-dir kongming-rs-hv
+CMD ["python"]
+```
+
+```bash
+docker build -t kongming-hv .
+docker run --rm -it kongming-hv
+```
+
+To run a script from the host instead of an interactive REPL, mount the current
+directory:
+
+```bash
+docker run --rm -v "$PWD":/work -w /work kongming-hv python my_script.py
+```
+
+### JupyterLab in a container
+
+For interactive exploration with notebooks:
+
+```dockerfile
+# Dockerfile.jupyter
+FROM python:3.12-slim
+RUN pip install --no-cache-dir kongming-rs-hv jupyterlab
+WORKDIR /notebooks
+EXPOSE 8888
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--no-browser", \
+     "--ServerApp.token=''", "--ServerApp.password=''"]
+```
+
+```bash
+docker build -f Dockerfile.jupyter -t kongming-hv-jupyter .
+docker run --rm -p 8888:8888 -v "$PWD":/notebooks kongming-hv-jupyter
+```
+
+Open <http://localhost:8888> in your browser. Notebooks saved under `/notebooks`
+are persisted to the mounted host directory.
+
+> The disabled token/password above is fine for local use. Do not expose this
+> container on a public network without adding authentication.
