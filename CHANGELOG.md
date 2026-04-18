@@ -3,6 +3,11 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v3.9.1 (2026-04-18)
+
+### Packaging
+- New `manylinux_2_28_aarch64` wheel for Linux ARM64. `pip install kongming-rs-hv` now works natively inside ARM Linux containers — e.g. `docker run python:3.12-slim` on Apple Silicon no longer needs `--platform=linux/amd64` / Rosetta emulation.
+
 ## v3.9.0 (2026-04-16)
 
 ### New features
