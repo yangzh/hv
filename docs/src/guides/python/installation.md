@@ -54,12 +54,15 @@ virtualenv, no wheel compatibility to worry about.
 Drop straight into a Python shell with the package preinstalled:
 
 ```bash
-docker run --rm -it python:3.12-slim \
-    sh -c "pip install --quiet kongming-rs-hv && python"
+docker run --rm -it python:3.12-slim sh -c "\
+    pip install --quiet --root-user-action=ignore \
+        --disable-pip-version-check kongming-rs-hv && python"
 ```
 
 `--rm` removes the container on exit. Nothing is persisted. Re-running reinstalls
-from PyPI, which takes a few seconds.
+from PyPI, which takes a few seconds. The `--root-user-action=ignore` and
+`--disable-pip-version-check` flags silence pip's root-user and upgrade notices,
+which are harmless inside a throwaway container.
 
 ### Reusable image
 
@@ -68,7 +71,7 @@ For repeat use, build a small image once:
 ```dockerfile
 # Dockerfile
 FROM python:3.12-slim
-RUN pip install --no-cache-dir kongming-rs-hv
+RUN pip install --no-cache-dir --disable-pip-version-check kongming-rs-hv
 CMD ["python"]
 ```
 
@@ -91,7 +94,8 @@ For interactive exploration with notebooks:
 ```dockerfile
 # Dockerfile.jupyter
 FROM python:3.12-slim
-RUN pip install --no-cache-dir kongming-rs-hv jupyterlab
+RUN pip install --no-cache-dir --disable-pip-version-check \
+    kongming-rs-hv jupyterlab
 WORKDIR /notebooks
 EXPOSE 8888
 CMD ["jupyter", "lab", "--ip=0.0.0.0", "--no-browser", \
