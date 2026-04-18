@@ -54,7 +54,7 @@ virtualenv, no wheel compatibility to worry about.
 Drop straight into a Python shell with the package preinstalled:
 
 ```bash
-docker run --rm -it python:3.12-slim sh -c "\
+docker run --rm -it --platform=linux/amd64 python:3.12-slim sh -c "\
     pip install --quiet --root-user-action=ignore \
         --disable-pip-version-check kongming-rs-hv && python"
 ```
@@ -63,6 +63,11 @@ docker run --rm -it python:3.12-slim sh -c "\
 from PyPI, which takes a few seconds. The `--root-user-action=ignore` and
 `--disable-pip-version-check` flags silence pip's root-user and upgrade notices,
 which are harmless inside a throwaway container.
+
+`--platform=linux/amd64` is pinned because today we only publish a
+`manylinux_x86_64` wheel. On Apple Silicon this runs under Rosetta emulation
+(functional but slower than native). A native `linux_aarch64` wheel is on the
+roadmap — once published, you can drop the `--platform` flag.
 
 ### Reusable image
 
