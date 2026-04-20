@@ -72,9 +72,6 @@ KONGMING_LEARNER_SAMPLING=classic python operators.py
 ```bash
 pip install kongming-rs-hv
 
-# Default (fisher_yates) — bind/release exact, bundle approximate
-python operators.py
-
 # Classic sampling — all operators match exactly
 KONGMING_LEARNER_SAMPLING=classic python operators.py
 ```
