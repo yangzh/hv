@@ -31,7 +31,7 @@ let eq = hyper_binary::equal(&a, &b);                       // bool
 {{#endtab}}
 {{#endtabs}}
 
-## Release
+### Release
 
 Extracts one component from a binding: $A \oslash B = A \otimes B^{-1}$
 
@@ -52,6 +52,35 @@ recovered := hv.Release(bound, role)  // ≈ filler
 ```rust
 let bound = operators::bind_hb(vec![role.clone(), filler.clone()]);
 let recovered = operators::release(&bound, &role);
+```
+{{#endtab}}
+{{#endtabs}}
+
+### Bind more
+
+Extends an existing [Knot](knot.md) with additional operands without
+re-binding from scratch. `bind_more(bind(a, b), c)` produces the same
+result as `bind(a, b, c)`.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+bound = hv.bind(a, b)
+expanded = hv.bind_more(bound, c)       # Knot — ≡ hv.bind(a, b, c)
+# The input `bound` is unchanged; a new Knot is returned.
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+bound := hv.Bind(a, b)
+expanded := hv.BindMore(bound, c)       // ≡ hv.Bind(a, b, c)
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let bound = operators::bind_hb(vec![a.clone(), b.clone()]);
+let expanded = operators::bind_more(bound.clone(), vec![c]); // ≡ bind_hb(vec![a, b, c])
+// `bind_more` consumes the Knot — clone first if you still need `bound`.
 ```
 {{#endtab}}
 {{#endtabs}}
