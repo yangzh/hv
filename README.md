@@ -25,6 +25,11 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 - [Notebook Quick Start](https://yangzh.github.io/hv/guides/notebook/quick-start.html) — cell-by-cell Jupyter walkthrough
 - [PDF download](https://yangzh.github.io/hv/kongming-hv.pdf)
 
+> The published site is deployed from release tags (`v*`) and tracks the
+> latest `kongming-rs-hv` release on PyPI. The `main` branch of this repo is
+> the working head — it may describe APIs or examples that haven't been
+> released yet.
+
 ## Try Online
 
 | Platform | Link |

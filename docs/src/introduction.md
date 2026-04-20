@@ -41,6 +41,18 @@ This documentation covers code snippets in multiple languages (if available) sid
 - **Go**: canonical / reference implementation in proprietary package;
 - **Rust**: parallel implementation, carefully maintained in feature parity;
 
+## Docs versioning
+
+The documentation on **[yangzh.github.io/hv](https://yangzh.github.io/hv/)** is
+deployed from release tags (`v*`) and stays in lockstep with the latest
+`kongming-rs-hv` release on PyPI. Whatever you read there matches what
+`pip install kongming-rs-hv` gives you.
+
+The [`main` branch](https://github.com/yangzh/hv/tree/main/docs/src) of this
+repository is the working head — it may describe APIs or examples that haven't
+been released yet. If you browse the raw markdown on GitHub, expect it to
+occasionally be ahead of the published site.
+
 ## Reference
 
 The work was initially outlined in [this arxiv paper](https://arxiv.org/abs/2310.18316), built on top of the work from many others, and here is the citation:
