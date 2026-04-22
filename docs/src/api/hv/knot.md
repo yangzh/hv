@@ -28,28 +28,32 @@ let k = Knot::new(Seed128::new(0, 42), parts);
 
 ## Extending a Knot
 
-An existing Knot can be extended with additional parts via the
-[`bind_more`](operators.md#bind-more) operator (`Knot::expand` in Rust),
-which is equivalent to re-binding all parts together but avoids
-recomputing the base.
+An existing Knot can be extended with additional parts via
+[`expand`](operators.md#expand-extend-a-knot). This **mutates the Knot
+in place** — equivalent to re-binding all parts from scratch but
+without reconstructing the base.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 k = hv.bind(a, b)
-k2 = hv.bind_more(k, c)   # ≡ hv.bind(a, b, c); `k` unchanged
+k.expand(c)       # k is now equivalent to hv.bind(a, b, c)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 k := hv.Bind(a, b)
-k2 := hv.BindMore(k, c)   // ≡ hv.Bind(a, b, c)
+k.Expand(c)       // k is now equivalent to hv.Bind(a, b, c)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let k = operators::bind_hb(vec![a.clone(), b.clone()]);
-let k2 = k.clone().expand(vec![c]);   // or: operators::bind_more(k.clone(), vec![c])
+let mut k = operators::bind_hb(vec![a.clone(), b.clone()]);
+k.expand(vec![c]);  // k is now equivalent to bind_hb(vec![a, b, c])
 ```
 {{#endtab}}
 {{#endtabs}}
+
+If you need to preserve the original, clone before expanding — see the
+[Expand operator](operators.md#expand-extend-a-knot) section for full
+examples including clone-first patterns.

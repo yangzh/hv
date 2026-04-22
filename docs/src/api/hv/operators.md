@@ -56,31 +56,47 @@ let recovered = operators::release(&bound, &role);
 {{#endtab}}
 {{#endtabs}}
 
-### Bind more
+### Expand (extend a Knot)
 
 Extends an existing [Knot](knot.md) with additional operands without
-re-binding from scratch. `bind_more(bind(a, b), c)` produces the same
-result as `bind(a, b, c)`.
+re-binding from scratch. `k.expand(c)` on `k = bind(a, b)` gives the
+same result as `bind(a, b, c)` — but **mutates `k` in place**, so clone
+first if you need the original.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-bound = hv.bind(a, b)
-expanded = hv.bind_more(bound, c)       # Knot — ≡ hv.bind(a, b, c)
-# The input `bound` is unchanged; a new Knot is returned.
+import copy
+
+k = hv.bind(a, b)
+k.expand(c)                 # k is now equivalent to hv.bind(a, b, c)
+
+# To preserve the original, clone first:
+base = hv.bind(a, b)
+k1 = copy.copy(base)
+k1.expand(c)                # base is untouched
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-bound := hv.Bind(a, b)
-expanded := hv.BindMore(bound, c)       // ≡ hv.Bind(a, b, c)
+k := hv.Bind(a, b)
+k.Expand(c)                 // k is now equivalent to hv.Bind(a, b, c)
+
+// To preserve the original, clone first (Clone returns HyperBinary):
+base := hv.Bind(a, b)
+k1 := base.Clone().(hv.Knot)
+k1.Expand(c)                // base is untouched
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let bound = operators::bind_hb(vec![a.clone(), b.clone()]);
-let expanded = operators::bind_more(bound.clone(), vec![c]); // ≡ bind_hb(vec![a, b, c])
-// `bind_more` consumes the Knot — clone first if you still need `bound`.
+let mut k = operators::bind_hb(vec![a.clone(), b.clone()]);
+k.expand(vec![c.clone()]);   // k is now equivalent to bind_hb(vec![a, b, c])
+
+// To preserve the original, clone first:
+let base = operators::bind_hb(vec![a.clone(), b.clone()]);
+let mut k1 = base.clone();
+k1.expand(vec![c]);           // base is untouched
 ```
 {{#endtab}}
 {{#endtabs}}
