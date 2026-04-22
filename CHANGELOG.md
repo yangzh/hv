@@ -3,6 +3,13 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.0.0 (2026-04-21)
+
+Major version bump to signal the underlying PyO3 runtime change — the public Python API is unchanged, but the extension is rebuilt against a new binding layer that's a 5-minor-version jump ahead.
+
+### Internal
+- Upgrade pyo3 0.23 → 0.28.3. Migration covers `PyObject` → `Py<PyAny>`, `Python::with_gil` → `Python::attach`, and explicit `from_py_object` opt-in on 15 pyclass types. Smoke tests and three Jupyter notebooks (first, memory, lisp — 79 code cells) pass without regression.
+
 ## v3.9.1 (2026-04-18)
 
 ### Packaging
