@@ -22,8 +22,8 @@ The offsets are bit-packed according to the model's sparsity bits — they do **
 # Identity
 ss = hv.SparseSegmented.identity(model)
 
-# From raw offsets, typically discouraged...
-ss = hv.SparseSegmented(model, offsets_bytes)
+# From per-segment offsets, typically discouraged...
+ss = hv.SparseSegmented.from_offsets(model, [off0, off1, ...])
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -31,8 +31,8 @@ ss = hv.SparseSegmented(model, offsets_bytes)
 // Identity
 ss := hv.NewSparseSegmentedIdentity(model)
 
-// From raw offsets (takes ownership of slice)
-ss := hv.NewSparseSegmented(model, offsets)
+// With explicit domain/pod and packed offsets (takes ownership of slice)
+ss := hv.NewSparseSegmented(model, domain, pod, offsets)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -40,8 +40,8 @@ ss := hv.NewSparseSegmented(model, offsets)
 // Identity
 let ss = SparseSegmented::identity(model);
 
-// From raw offsets (takes ownership)
-let ss = SparseSegmented::new(model, Some(offsets));
+// With explicit domain/pod and packed offsets (takes ownership)
+let ss = SparseSegmented::new(model, domain, pod, Some(offsets));
 ```
 {{#endtab}}
 {{#endtabs}}

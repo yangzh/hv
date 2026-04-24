@@ -101,6 +101,34 @@ k1.expand(vec![c]);           // base is untouched
 {{#endtab}}
 {{#endtabs}}
 
+### BindDirect
+
+Like `Bind`, but returns a raw [SparseSegmented](sparse_segmented.md) instead of a
+[Knot](knot.md) — no operand tracking. Cheaper for intermediate computations
+where you don't need to reverse the bind or inspect the operand list.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# domain/pod default to the zero Domain/Pod
+ss = hv.bind_direct(a, b, c)
+
+# Or supply an explicit seed (annotates the resulting SparseSegmented):
+ss = hv.bind_direct(a, b, domain=d, pod=p)
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+ss := hv.BindDirect(domain, pod, a, b, c)  // SparseSegmented
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let ss = operators::bind_direct(domain, pod, &[a, b, c]);  // SparseSegmented
+```
+{{#endtab}}
+{{#endtabs}}
+
 ## Bundle
 
 {{#tabs global="lang"}}

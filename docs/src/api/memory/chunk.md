@@ -1,15 +1,15 @@
 # Chunk
 
-The fundamental storage unit in the memory system. A Chunk pairs an **immutable identity** (always a Sparkle) with a **mutable semantic code** (any HyperBinary type).
+The fundamental storage unit in the memory system. A Chunk carries a **semantic code** (any HyperBinary type) along with its **derived identity** (a Sparkle as implied from the code's domain/pod).
 
-The unique id for a chunk facilitates the compositionality, as this chunk is either present or absent. At the same time, the potentially learnable code (for a chunk) offers opportunities to learn and adapt, just like weights from traditional neural nets.
+The identity determines the storage key and drives compositionality — a chunk is either present or absent. The code is potentially learnable, offering opportunities to adapt over time, just like weights from traditional neural nets.
 
 ## Structure
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | Sparkle | Immutable identity — determines storage key |
-| `code` | HyperBinary | Semantic content (can be updated). If absent, defaults to `id` |
+| `code` | HyperBinary | Semantic content (can be updated). Required — its domain/pod determines the chunk's identity. |
+| `id` | Sparkle | identity vector, as derived from `code`'s domain/pod; determines the storage key. |
 | `note` | string | Human-readable annotation, primarily for debugging |
 | `extra` | protobuf Any | Extensible payload for application-specific data, primarily for debugging |
 
