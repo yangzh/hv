@@ -1,4 +1,4 @@
-# words_index — letter-sequence encoding with multi-attractor NNS
+# word_indexer — letter-sequence encoding with multi-attractor NNS
 
 A small end-to-end example using [`kongming-rs-hv`](../../docs/python_api.md):
 encode 5,000 English words as letter-Sparkle sequences and query them by
@@ -124,34 +124,36 @@ cheap; the substrate work is what dominates).
 
 ```bash
 pip install kongming-rs-hv
-python examples/words_index/ingest_and_query.py
+python examples/word_indexer/word_indexer.py
 ```
 
 Expected output shape:
 
 ```
-Ingested 4915 words.
+Ingested 4982 words in 3.5s.
 
-by word 'the': 1 match(es)
+by word 'the': 1 match(es) [0.3 ms]
    1. the
 
-by word 'people': 1 match(es)
+by word 'people': 1 match(es) [0.3 ms]
    1. people
 
-by word 'language': 1 match(es)
+by word 'language': 1 match(es) [0.3 ms]
    1. language
 
-****er  (6 letters): N match(es)
+****er  (6 letters): N match(es) [~180 ms]
    1. <some six-letter -er word>
    2. ...
 
-*******tion (11 letters): M match(es)
+*******tion (11 letters): M match(es) [~110 ms]
    1. <some eleven-letter -tion word>
    ...
 ```
 
 (Exact counts depend on the word list; the `*******tion` query may return
-zero if the top 5,000 contains no eleven-letter `-tion` words.)
+zero if the top 5,000 contains no eleven-letter `-tion` words. Times are
+approximate, measured on an Apple Silicon laptop with the `InMemory`
+backend.)
 
 ## Switching to persistent storage
 

@@ -6,9 +6,10 @@ per-letter Sparkles; demonstrates exact retrieval by word and positional
 suffix retrieval via NNS with multiple sequence_attractors.
 
 Run:
-    python examples/words_index/ingest_and_query.py
+    python examples/word_indexer/word_indexer.py
 """
 
+import time
 from pathlib import Path
 
 from kongming import hv, memory
@@ -63,10 +64,12 @@ def ingest(storage, words: list[str], letters: dict[str, "hv.Sparkle"]) -> None:
 
 
 def report(label: str, storage, build_selector) -> None:
-    """Print match count, then first 10 results."""
+    """Print match count + first 10 results, prefixed with elapsed query time."""
+    t0 = time.perf_counter()
     all_hits = storage.mem_get(build_selector())
     top10 = storage.mem_get(memory.range_sel(build_selector(), 0, 10))
-    print(f"\n{label}: {len(all_hits)} match(es)")
+    dt_ms = (time.perf_counter() - t0) * 1000
+    print(f"\n{label}: {len(all_hits)} match(es) [{dt_ms:.1f} ms]")
     for i, c in enumerate(top10, 1):
         print(f"  {i:>2}. {c.note}")
 
@@ -75,8 +78,9 @@ def main() -> None:
     letters = build_letter_alphabet()
     words = read_words(DATA_PATH)
     storage = memory.InMemory(MODEL)
+    t0 = time.perf_counter()
     ingest(storage, words, letters)
-    print(f"Ingested {len(words)} words.")
+    print(f"Ingested {len(words)} words in {time.perf_counter() - t0:.2f}s.")
 
     # Query A — exact lookup
     for w in ["the", "people", "language"]:

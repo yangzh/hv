@@ -1,6 +1,6 @@
-# Words Index
+# Word Indexer
 
-> Standalone script: [`ingest_and_query.py`](https://github.com/yangzh/hv/blob/main/examples/words_index/ingest_and_query.py)
+> Standalone script: [`word_indexer.py`](https://github.com/yangzh/hv/blob/main/examples/word_indexer/word_indexer.py)
 
 This example encodes ~5,000 English words as `Sequence`s of per-letter `Sparkle`s, then queries them by **exact word** or by **positional suffix** ("six-letter words ending in `er`", "eleven-letter words ending in `tion`") using multi-attractor near-neighbor search.
 
@@ -101,28 +101,40 @@ See [Working with Results](../../api/memory/selectors/results.md) for more on sh
 
 ```bash
 pip install kongming-rs-hv
-python examples/words_index/ingest_and_query.py
+python examples/word_indexer/word_indexer.py
 ```
 
 Expected output shape:
 
 ```
-Ingested 4915 words.
+Ingested 4982 words in 3.5s.
 
-by word 'the': 1 match(es)
+by word 'the': 1 match(es) [0.3 ms]
    1. the
 
-by word 'people': 1 match(es)
+by word 'people': 1 match(es) [0.3 ms]
    1. people
 
-****er  (6 letters): N match(es)
+****er  (6 letters): N match(es) [~180 ms]
    1. <some six-letter -er word>
    ...
 
-*******tion (11 letters): M match(es)
+*******tion (11 letters): M match(es) [~110 ms]
    1. <some eleven-letter -tion word>
    ...
 ```
+
+Approximate timings on an Apple Silicon laptop with the `InMemory` backend:
+
+| Operation | Time |
+|-----------|------|
+| Ingest ~5,000 words (each = letter Sequence) | ~3.5 s |
+| Exact lookup via `by_item_key` | <1 ms |
+| Multi-attractor NNS (2 attractors, e.g. `*****er`) | ~180 ms |
+| Multi-attractor NNS (4 attractors, e.g. `*******tion`) | ~110 ms |
+
+The 4-attractor query is *faster* than the 2-attractor one because each
+extra attractor narrows the candidate slot intersection more aggressively.
 
 ## Switching to persistent storage
 
