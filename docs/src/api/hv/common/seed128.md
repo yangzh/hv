@@ -73,3 +73,31 @@ let seq = Sequence::new(seed, 0, vec![a, b, c]);
 ```
 {{#endtab}}
 {{#endtabs}}
+
+## Polymorphic arguments (Python-only)
+
+Anywhere a Python factory expects a `Seed128` (composite constructors
+like `hv.Set` / `hv.Sequence` / `hv.Octopus`, the `hv.bundle` operator,
+etc.) you can pass either a `Seed128` instance or a `(domain, pod)`
+tuple — the binding extracts and constructs the seed for you.
+
+| Parameter type | Accepted Python forms |
+|----------------|-----------------------|
+| `Seed128` | `Seed128` instance, or a `(domain, pod)` tuple |
+
+The tuple **composes** with the polymorphic forms accepted by Domain
+and Pod (see
+[Domain & Pod → Polymorphic arguments](domain_pod.md#polymorphic-arguments-python-only)),
+so each side can itself be a string / int / Prewired enum / `(prefix, name)`
+tuple — letting you skip the `hv.Seed128(...)` wrap entirely:
+
+```python
+# Equivalent to hv.Sequence(hv.Seed128("words", "hi"), m1, m2):
+seq = hv.Sequence(("words", "hi"), m1, m2)
+
+# Tuple form composes with Domain's (DomainPrefix, str) tuple:
+seq = hv.Sequence(((hv.DOMAIN_PREFIX_NLP, "concept"), "myseq"), m1, m2)
+
+# And with Pod's Prewired enum:
+seq = hv.Sequence(("internal", hv.PREWIRED_STEP), m1, m2)
+```
