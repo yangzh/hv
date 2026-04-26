@@ -19,18 +19,13 @@ with storage.new_view() as view:
 
     cat_chunk = view.read_chunk("animals", "cat")
 
-# Mutable view (auto-commits on clean exit, rollback on exception)
+# Mutable view (auto-commits on clean exit, rollback on exception).
+# Stage writes by running producers against the view via
+# producer.produce(view) — the recommended path for batched writes.
 with storage.new_mutable_view() as view:
-    # Preferred: build via a producer and stage it with producer.produce(view).
-    memory.from_sequence_members("words", "hi", members,
+    memory.new_terminal("words", "hi").produce(view)
+    memory.from_sequence_members("words", "greet", members,
                                   semantic_indexing=True).produce(view)
-
-    # Shortcut for one-off writes when you already hold the final
-    # HyperBinary in Python. Pass semantic_indexing=True to index the
-    # code (needed for sequence_attractor / set_members / etc.); the
-    # id-Sparkle is always indexed.
-    view.write_chunk(sparkle, note="my note")
-
     # commits automatically
 ```
 {{#endtab}}
