@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from kongming_rs import hv
+from kongming import hv
 
 from . import cons as cons_mod
 from .types import HyperBinary

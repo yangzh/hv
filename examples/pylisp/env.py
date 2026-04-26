@@ -2,22 +2,17 @@
 
 from __future__ import annotations
 
-from kongming_rs import hv, memory
-from kongming_rs.api.v1.hv_pb2 import (
-    MODEL_64K_8BIT,
-    DomainPrefix,
-    Prewired,
-)
+from kongming import hv, memory
 
 from .types import HyperBinary
 
-# Proto enum shortcuts for readability.
-_LISP_PREFIX: int = DomainPrefix.E.Value("LISP")
-_NIL: int = Prewired.E.Value("NIL")
-_TRUE: int = Prewired.E.Value("TRUE")
-_FALSE: int = Prewired.E.Value("FALSE")
-_LEFT: int = Prewired.E.Value("LEFT")
-_RIGHT: int = Prewired.E.Value("RIGHT")
+# Constant shortcuts for readability (all exposed as IntEnum members on hv).
+_LISP_PREFIX: int = hv.DOMAIN_PREFIX_LISP
+_NIL: int = hv.PREWIRED_NIL
+_TRUE: int = hv.PREWIRED_TRUE
+_FALSE: int = hv.PREWIRED_FALSE
+_LEFT: int = hv.PREWIRED_LEFT
+_RIGHT: int = hv.PREWIRED_RIGHT
 
 DEFAULT_NAMESPACE: str = "default"
 
@@ -37,7 +32,7 @@ class LispEnv:
 
     def __init__(
         self,
-        model: int = MODEL_64K_8BIT,
+        model: int = hv.MODEL_64K_8BIT,
         namespace: str | None = None,
         path: str | None = None,
     ) -> None:
@@ -54,6 +49,7 @@ class LispEnv:
 
         if path is not None:
             import os
+
             self.storage = memory.Embedded(model, os.path.join(path, "lisp.db"))
         else:
             self.storage = memory.InMemory(model)
@@ -105,7 +101,7 @@ class LispEnv:
         """Register a new symbol: add to lexicon and store in substrate."""
         self.name_to_sparkle[name] = sparkle
         self.hash_to_name[sparkle.stable_hash()] = name
-        self.storage.store_chunk(sparkle)
+        self.storage.put(memory.Chunk(sparkle))
 
     def name_of(self, hb: HyperBinary) -> str | None:
         return self.hash_to_name.get(hb.stable_hash())
@@ -132,9 +128,7 @@ class LispEnv:
         """Parse and evaluate until stable, return display string."""
         from . import evaluator, printer, reader
 
-        return printer.display(
-            self, evaluator.ev_until_done(self, reader.parse(self, expr_str))
-        )
+        return printer.display(self, evaluator.ev_until_done(self, reader.parse(self, expr_str)))
 
     def parse_display(self, expr_str: str) -> str:
         """Parse and display without evaluating."""

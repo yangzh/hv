@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from kongming_rs import hv, memory
+from kongming import hv, memory
 
 from .types import HyperBinary
 
@@ -20,9 +20,7 @@ if TYPE_CHECKING:
     from .env import LispEnv
 
 
-def cons_parcel(
-    env: LispEnv, seed: hv.Seed128, a: HyperBinary, b: HyperBinary
-) -> hv.Parcel:
+def cons_parcel(env: LispEnv, seed: hv.Seed128, a: HyperBinary, b: HyperBinary) -> hv.Parcel:
     """Build a cons-encoded Parcel: bundle(bind(a, lhs), bind(b, rhs))."""
     return hv.bundle(seed, hv.bind(a, env.lhs), hv.bind(b, env.rhs))
 
@@ -31,7 +29,9 @@ def cons(env: LispEnv, a: HyperBinary, b: HyperBinary) -> hv.Sparkle:
     """Create a cons cell (a . b). Returns the id Sparkle."""
     id = env.random_sparkle()
     cell = cons_parcel(env, hv.Seed128(id.domain().id(), id.pod().seed()), a, b)
-    env.storage.store_chunk(id, code=cell)
+    # cell shares (domain, pod) with id (built from id's Seed128 above),
+    # so put() addresses it under the same chunk-id we just generated.
+    env.storage.put(memory.Chunk(cell))
     return id
 
 
