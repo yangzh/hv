@@ -114,3 +114,52 @@ Prewired pods are infrastructure-level constants with fixed seeds:
 | `hv.PREWIRED_STEP` | 𓊍 |
 | `hv.PREWIRED_SET_MARKER` | 🫧 |
 | `hv.PREWIRED_SEQUENCE_MARKER` | 📿 |
+
+## Polymorphic arguments (Python)
+
+Most Python factories that take a `Domain`, `Pod`, or `Seed128` accept
+the underlying primitives directly — you rarely need to wrap them
+explicitly:
+
+| Parameter type | Accepted Python forms |
+|----------------|-----------------------|
+| `Domain` | `Domain` instance, `str` (→ `Domain.from_name`), `int` (→ `Domain.from_id`), `(DomainPrefix, str)` tuple (→ `Domain.with_prefix`) |
+| `Pod` | `Pod` instance, `Prewired` enum (→ `Pod.from_prewired`), `str` (→ `Pod.from_word`), `int` (→ `Pod.from_seed`) |
+| `Seed128` | `Seed128` instance, or a `(domain, pod)` tuple — each side polymorphic per the rows above (so the tuple can nest) |
+
+```python
+# Domain — four equivalent forms in any factory expecting a Domain:
+memory.by_item_key("animals", "cat")
+memory.by_item_key(hv.Domain.from_name("animals"), "cat")
+memory.by_item_key(0x1234, "cat")                           # from numeric id
+memory.by_item_key((hv.DOMAIN_PREFIX_NLP, "concept"), "p")  # from (prefix, name)
+
+# Pod — Prewired enum is recognized:
+memory.new_terminal("internal", hv.PREWIRED_STEP)           # Pod from Prewired
+memory.new_terminal("animals", "cat")                       # Pod from word
+memory.new_terminal("animals", 0xCAFE_BABE)                 # Pod from raw seed
+
+# Seed128 — (domain, pod) tuple:
+seq = hv.Sequence(("words", "hi"), m1, m2)
+seq = hv.Sequence(hv.Seed128("words", "hi"), m1, m2)        # equivalent
+
+# Tuple forms compose — Seed128 with a prefixed Domain:
+seq = hv.Sequence(((hv.DOMAIN_PREFIX_NLP, "concept"), "myseq"), m1, m2)
+```
+
+Disambiguation rules (order-sensitive in the extractor):
+
+- `Pod` checks the `Prewired` enum **before** `int` so `hv.PREWIRED_STEP`
+  (which is also an `IntEnum` member, hence also an `int`) routes to
+  `Pod.from_prewired`, not `Pod.from_seed`.
+- `Domain` checks the `(DomainPrefix, str)` tuple **before** the `int`
+  branch for the same reason — `DomainPrefix` members extract as ints.
+
+Applies to `memory.*` producers/selectors (`new_terminal`,
+`new_learner`, `from_set_members`, `from_sequence_members`,
+`from_key_values`, `by_item_key`, `by_item_domain`, `with_sparkle`,
+`only_domain`, `set_attractor`, `sequence_attractor`), storage
+convenience methods (`storage.get/exists/delete/note/names`,
+`view.read_chunk/chunk_exists`), and `hv.*` composite constructors
+(`Set`, `Sequence`, `Octopus`, `Dart`, `Cyclone`, `Learner`,
+`Knot`, `Parcel`, `bundle`, `bind_direct`).

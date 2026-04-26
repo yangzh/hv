@@ -20,8 +20,10 @@ from pathlib import Path
 from kongming import hv, memory
 
 MODEL = hv.MODEL_1M_10BIT
+# Domain/Pod arguments to memory.* factories accept str directly — no
+# need to wrap in hv.Domain.from_name(...) / hv.Pod.from_word(...).
 LETTER_DOMAIN = "letters"
-WORDS_DOMAIN = hv.Domain.from_name("words")
+WORDS_DOMAIN = "words"
 DATA_PATH = Path(__file__).resolve().parent / "top5000.txt"
 BATCH_SIZE = 1000
 
@@ -59,7 +61,7 @@ def ingest(storage, words: list[str]) -> None:
             # semantic_indexing=True: index the Sequence's code so suffix
             # queries (sequence_attractor) can find words by structure.
             memory.from_sequence_members(
-                WORDS_DOMAIN.name(),
+                WORDS_DOMAIN,
                 w,
                 members,
                 note=w,
@@ -93,7 +95,7 @@ def main() -> None:
         report(
             f"by word {w!r}",
             storage,
-            lambda w=w: memory.by_item_key("words", w),
+            lambda w=w: memory.by_item_key(WORDS_DOMAIN, w),
         )
 
     # Query B — six-letter words ending in "er": positions 4='e', 5='r'
@@ -101,8 +103,8 @@ def main() -> None:
         "****er  (6 letters)",
         storage,
         lambda: memory.nns(
-            memory.sequence_attractor(memory.by_item_key("letters", "e"), 4, WORDS_DOMAIN),
-            memory.sequence_attractor(memory.by_item_key("letters", "r"), 5, WORDS_DOMAIN),
+            memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "e"), 4, WORDS_DOMAIN),
+            memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "r"), 5, WORDS_DOMAIN),
         ),
     )
 
@@ -112,7 +114,7 @@ def main() -> None:
         storage,
         lambda: memory.nns(
             *[
-                memory.sequence_attractor(memory.by_item_key("letters", ch), pos, WORDS_DOMAIN)
+                memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, ch), pos, WORDS_DOMAIN)
                 for pos, ch in [(7, "t"), (8, "i"), (9, "o"), (10, "n")]
             ]
         ),
