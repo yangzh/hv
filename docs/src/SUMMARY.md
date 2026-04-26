@@ -57,4 +57,5 @@
     - [Operators from Scratch](examples/operators/index.md)
     - [Mexican Dollar](examples/mexican_dollar/index.md)
     - [Bulk Storage Benchmark](examples/bulk_storage/index.md)
+    - [Words Index](examples/words_index/index.md)
     - [LISP Interpreter](examples/pylisp/index.md)
