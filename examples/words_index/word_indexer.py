@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Words-as-letter-sequences index, queried by suffix via multi-attractor NNS.
 
 Encodes each word from top5000.txt as a Sequence whose members are
@@ -5,7 +6,6 @@ per-letter Sparkles; demonstrates exact retrieval by word and positional
 suffix retrieval via NNS with multiple sequence_attractors.
 
 Run:
-
     python examples/words_index/ingest_and_query.py
 """
 
