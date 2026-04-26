@@ -8,7 +8,7 @@ It demonstrates four ideas together:
 
 - Using [`Sparkle`](../../api/hv/sparkle.md) as a stable per-symbol code (one Sparkle per `a`–`z`).
 - Using [`Sequence`](../../api/hv/sequence.md) with a `Pod`-derived seed so chunks are addressable both by word (exact) and by structure (positional).
-- Batched writes via `SubstrateMutableView`'s context-manager / `commit()` semantics.
+- The **ChunkProducer API** (`new_terminal`, `from_sequence_members`, `joiner`) staged through a batched `SubstrateMutableView` via `producer.produce(view)`.
 - Multi-attractor [`nns`](../../api/memory/selectors/near_neighbor.md) over [`SequenceAttractor`](../../api/memory/selectors/attractors.md#reverse-attractors) for positional conjunctive queries.
 
 ## The general idea
@@ -24,40 +24,39 @@ letters domain                       words domain
                                      members = letter Sparkles in order
 ```
 
-- **Letters as Sparkles.** Pre-write 26 random-looking `Sparkle`s, one per `a–z`, into a `letters` domain. Each letter's Pod is the letter itself, so you can fetch it by `by_item_key("letters", "e")`.
-- **Words as Sequences.** Each word is a `Sequence` in a `words` domain whose ordered members are the letter-Sparkles spelling it. The Sequence's Pod is the word, so exact lookup is `by_item_key("words", "language")`.
+- **Letters as Sparkles.** Pre-write 26 random-looking `Sparkle`s, one per `a–z`, into a `letters` domain via `new_terminal(letters, ch)`. Each letter's Pod is the letter itself, so you can fetch it by `by_item_key("letters", "e")`.
+- **Words as Sequences.** Each word is a `Sequence` in a `words` domain whose ordered members are the letter-Sparkles spelling it, built by `from_sequence_members(...)` with a `joiner(...)` of per-letter `by_item_key` selectors. The Sequence's Pod is the word, so exact lookup is `by_item_key("words", "language")`.
 - **`note` carries the word string.** Each word-chunk is written with `note=<word>`, so `chunk.note` recovers the word in result loops without decoding the Pod.
 
-A word-Sequence is constructed as:
+## Batched writes via the ChunkProducer API
 
-```python
-hv.Sequence(
-    hv.Seed128(WORDS_DOMAIN, hv.Pod.from_word(word)),
-    *[letters[ch] for ch in word],
-)
-```
+This example uses the producer API end-to-end. Producers compute their
+chunks at `produce()` time against a mutable view, mirroring Go's
+`producer.Produce(ctx, view)` and Rust's `producer.produce(view, index)`.
+Storage's `new_mutable_view()` is a context manager with transactional
+semantics:
 
-The `Seed128(domain, pod)` argument names the chunk.
-
-## Batched writes via `SubstrateMutableView`
-
-Storage exposes `new_mutable_view()` as a context manager with transactional semantics:
-
-- All `view.write_chunk(...)` calls between `__enter__` and `__exit__` are staged in a single batch.
+- All writes staged by `producer.produce(view)` calls between `__enter__` and `__exit__` go into a single batch.
 - Clean exit auto-commits; an exception inside the block discards everything.
-- `view.commit()` mid-block flushes the current batch and lets you continue staging into a fresh one — useful for pacing memory pressure on large ingests.
+- `view.commit()` mid-block flushes the current batch and lets you continue staging — useful for pacing memory pressure on large ingests.
 
-This example writes letters and words in two separate views and commits every `BATCH_SIZE = 1000` words within the second:
+Letters and words go into two separate views; the second commits every
+`BATCH_SIZE = 1000` words:
 
 ```python
 with storage.new_mutable_view() as view:
-    for sp in letters.values():
-        view.write_chunk(sp)
+    for ch in "abcdefghijklmnopqrstuvwxyz":
+        memory.new_terminal("letters", ch).produce(view)
     # auto-commits on __exit__
 
 with storage.new_mutable_view() as view:
     for i, w in enumerate(words, start=1):
-        view.write_chunk(word_to_sequence(w, letters), note=w)
+        members = memory.joiner(*[memory.by_item_key("letters", ch) for ch in w])
+        # semantic_indexing=True: index the Sequence's code so suffix
+        # queries (sequence_attractor) can find words by structure.
+        memory.from_sequence_members(
+            "words", w, members, note=w, semantic_indexing=True,
+        ).produce(view)
         if i % BATCH_SIZE == 0:
             view.commit()
     # trailing writes auto-commit on __exit__
@@ -107,7 +106,7 @@ python examples/word_indexer/word_indexer.py
 Expected output shape:
 
 ```
-Ingested 4982 words in 3.5s.
+Ingested 4982 words in 8.4s.
 
 by word 'the': 1 match(es) [0.3 ms]
    1. the
@@ -115,11 +114,11 @@ by word 'the': 1 match(es) [0.3 ms]
 by word 'people': 1 match(es) [0.3 ms]
    1. people
 
-****er  (6 letters): N match(es) [~180 ms]
+****er  (6 letters): N match(es) [~190 ms]
    1. <some six-letter -er word>
    ...
 
-*******tion (11 letters): M match(es) [~110 ms]
+*******tion (11 letters): M match(es) [~480 ms]
    1. <some eleven-letter -tion word>
    ...
 ```
@@ -128,13 +127,22 @@ Approximate timings on an Apple Silicon laptop with the `InMemory` backend:
 
 | Operation | Time |
 |-----------|------|
-| Ingest ~5,000 words (each = letter Sequence) | ~3.5 s |
+| Ingest ~5,000 words via producer API | ~9 s |
 | Exact lookup via `by_item_key` | <1 ms |
-| Multi-attractor NNS (2 attractors, e.g. `*****er`) | ~180 ms |
-| Multi-attractor NNS (4 attractors, e.g. `*******tion`) | ~110 ms |
+| Multi-attractor NNS (2 attractors, e.g. `*****er`) | ~200 ms |
+| Multi-attractor NNS (4 attractors, e.g. `*******tion`) | ~460 ms |
 
-The 4-attractor query is *faster* than the 2-attractor one because each
-extra attractor narrows the candidate slot intersection more aggressively.
+## A note on `semantic_indexing`
+
+For NNS by composite structure (i.e. "find Sequences whose member at
+position N matches X"), each word's producer is constructed with
+`semantic_indexing=True`. This impresses the Sequence's *code* into the
+associative index alongside the chunk's id-Sparkle (which is always
+indexed). Without the flag, only the id is indexed and
+`sequence_attractor` queries return zero hits.
+
+The letter terminals are written without the flag because their code
+*is* the id-Sparkle, so id-only indexing is sufficient.
 
 ## Switching to persistent storage
 
@@ -148,7 +156,13 @@ Everything else is identical.
 
 ## Data attribution
 
-Word-frequency data in `top5000.txt` is sourced from [**www.wordfrequency.info**](https://www.wordfrequency.info/) (top-5000 English words, with rank, part-of-speech tag, raw frequency, and dispersion). Please credit the source when reusing this data.
+Word-frequency data in `top5000.txt` is sourced from [**www.wordfrequency.info**](https://www.wordfrequency.info/) (top-5000 English words). Please credit the source when reusing this data.
+
+Format (tab-separated, no header):
+
+```
+Rank    Word    POS    Frequency    Dispersion
+```
 
 ## See Also
 

@@ -5,6 +5,11 @@ Encodes each word from top5000.txt as a Sequence whose members are
 per-letter Sparkles; demonstrates exact retrieval by word and positional
 suffix retrieval via NNS with multiple sequence_attractors.
 
+This example uses the **ChunkProducer API** end-to-end (mirroring
+Go/Rust): producers compute and stage their chunks at ``produce()`` time
+against a batched mutable view, instead of pre-computing Sparkles or
+Sequences in Python.
+
 Run:
     python examples/word_indexer/word_indexer.py
 """
@@ -15,15 +20,10 @@ from pathlib import Path
 from kongming import hv, memory
 
 MODEL = hv.MODEL_1M_10BIT
-LETTER_DOMAIN = hv.Domain.from_name("letters")
+LETTER_DOMAIN = "letters"
 WORDS_DOMAIN = hv.Domain.from_name("words")
 DATA_PATH = Path(__file__).resolve().parent / "top5000.txt"
 BATCH_SIZE = 1000
-
-
-def build_letter_alphabet() -> dict[str, "hv.Sparkle"]:
-    """One Sparkle per a-z, keyed by (MODEL, LETTER_DOMAIN, Pod.from_word(letter))."""
-    return {ch: hv.Sparkle(MODEL, LETTER_DOMAIN, hv.Pod.from_word(ch)) for ch in "abcdefghijklmnopqrstuvwxyz"}
 
 
 def read_words(path: Path) -> list[str]:
@@ -41,23 +41,30 @@ def read_words(path: Path) -> list[str]:
     return out
 
 
-def word_to_sequence(word: str, letters: dict[str, "hv.Sparkle"]) -> "hv.Sequence":
-    return hv.Sequence(
-        hv.Seed128(WORDS_DOMAIN, hv.Pod.from_word(word)),
-        *[letters[ch] for ch in word],
-    )
+def ingest(storage, words: list[str]) -> None:
+    """Stage 26 letter-terminals + one Sequence-producer per word.
 
-
-def ingest(storage, words: list[str], letters: dict[str, "hv.Sparkle"]) -> None:
-    """Write 26 letters in one view, then all word-sequences in another."""
+    Letters are written as Terminal producers (chunk code = id Sparkle).
+    Each word becomes a from_sequence_members producer whose ``members``
+    selector pulls the right letter chunks at produce() time.
+    """
     with storage.new_mutable_view() as view:
-        for sp in letters.values():
-            view.write_chunk(sp)
+        for ch in "abcdefghijklmnopqrstuvwxyz":
+            memory.new_terminal(LETTER_DOMAIN, ch).produce(view)
         # auto-commits on __exit__
 
     with storage.new_mutable_view() as view:
         for i, w in enumerate(words, start=1):
-            view.write_chunk(word_to_sequence(w, letters), note=w)
+            members = memory.joiner(*[memory.by_item_key(LETTER_DOMAIN, ch) for ch in w])
+            # semantic_indexing=True: index the Sequence's code so suffix
+            # queries (sequence_attractor) can find words by structure.
+            memory.from_sequence_members(
+                WORDS_DOMAIN.name(),
+                w,
+                members,
+                note=w,
+                semantic_indexing=True,
+            ).produce(view)
             if i % BATCH_SIZE == 0:
                 view.commit()
         # trailing writes auto-commit on __exit__
@@ -75,11 +82,10 @@ def report(label: str, storage, build_selector) -> None:
 
 
 def main() -> None:
-    letters = build_letter_alphabet()
     words = read_words(DATA_PATH)
     storage = memory.InMemory(MODEL)
     t0 = time.perf_counter()
-    ingest(storage, words, letters)
+    ingest(storage, words)
     print(f"Ingested {len(words)} words in {time.perf_counter() - t0:.2f}s.")
 
     # Query A — exact lookup
