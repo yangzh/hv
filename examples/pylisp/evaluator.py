@@ -160,9 +160,9 @@ def _eval_define(env: LispEnv, args: HyperBinary) -> HyperBinary:
 
     name_str = env.name_of(name) or "?"
     fn_name = hv.Sparkle.from_word(env.model, env.fn_domain, name_str)
-    cell = cons_mod.cons_parcel(env, hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), name, lambda_expr)
-    # cell shares (domain, pod) with fn_name (built from fn_name's Seed128
-    # above), so put() addresses it under the same chunk-id.
+    cell = cons_mod.cons_parcel(
+        env, hv.Seed128(fn_name.domain().id(), fn_name.pod().seed()), name, lambda_expr
+    )
     env.storage.put(memory.Chunk(cell))
 
     return env.nil

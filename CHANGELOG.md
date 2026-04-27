@@ -3,6 +3,31 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.1.0 (2026-04-26)
+
+A meaty release with two themes: a sweep of polymorphic Python ergonomics across the Domain / Pod / Seed128 / Selector surface, plus full producer-API parity with Go/Rust including a new `producer.produce(view)` batched-write entry point.
+
+### New features
+
+- **Polymorphic Domain / Pod / Seed128 inputs**. Anywhere a `Domain` is expected: `Domain | str | int | (DomainPrefix, str)` tuple. Anywhere a `Pod`: `Pod | Prewired enum | str | int`. Anywhere a `Seed128`: `Seed128 | (domain, pod)` tuple — and the tuple composes (so a prefixed Domain inside a Seed128 tuple Just Works). Drops the `hv.Domain.from_name(...)` / `hv.Pod.from_word(...)` / `hv.Seed128(...)` wrap at every call site. See `docs/api/hv/common/domain_pod.md` and `docs/api/hv/common/seed128.md` for the full table.
+- **`producer.produce(view)`**. Run a producer against an open `MutableSubstrateView`, mirroring internal API. The recommended path for batched producer-driven writes; cheaper than `storage.mem_set(producer)` (which opens its own one-shot view).
+- **`semantic_indexing` + `extra` kwargs on producer factories**. `from_set_members`, `from_sequence_members`, `from_key_values` now accept `semantic_indexing=False` (impresses the composite's *code* in addition to the id-Sparkle, needed for `set_members` / `tentacle` / `sequence_attractor` queries) and `extra=None` (proto Any payload).
+- **`memory.lazy_selector_iter(view, selector)`**. Streaming iterator mirroring Go's `SelectorIter` — yields `(Chunk, SelectorExtra)` pairs lazily. Use when you need NNS scores or want to early-terminate without materializing the full result set.
+- **`Sequence.append(*more)` / `prepend(*more)` / `reset(start)`**. In-place mutation methods on Sequence (mirrors `Knot.expand`). `__copy__` / `__deepcopy__` added so `copy.copy(seq)` works for the clone-before-mutate pattern.
+- **`Set.member(i)` / `Sequence.member(i)` / `Octopus.value_by_key(k)`** accessors for inspecting composite members after retrieval.
+- **`hv.bind_direct(*operands, domain=None, pod=None)`**. Returns a raw `SparseSegmented` (no Knot tracking) — cheaper for intermediate computations.
+
+### API changes
+
+- **`storage.put(chunk, semantic_indexing=False)`** now takes a `memory.Chunk` instead of a bare HyperBinary. Wrap with `memory.Chunk(hv)` (or `memory.Chunk(hv, note="...")`). Always indexes the chunk's id-Sparkle; `semantic_indexing=True` additionally indexes the code (mirrors the producer convention).
+- **Removed `storage.store_chunk`** — `storage.put(memory.Chunk(...))` covers the same ground.
+- **Removed `view.write_chunk`** — use the producer-API path (`producer.produce(view)`) for batched writes against a mutable view.
+- **`hv.bind_more(...)` removed** in favor of in-place `Knot.expand(*more)` (the v3.9.0 free function went away when the refactor made the in-place mutation cleaner).
+
+### Bug fixes
+
+- **`view.write_chunk` (now removed) used to silently skip the associative-index update**, so chunks written via the batched-view path were findable by exact-key lookup but not by NNS. The fix threaded `Substrate::index_arc()` through `MutableSubstrateView`. The followup API redesign (above) replaces the path entirely with `producer.produce(view)`.
+
 ## v4.0.0 (2026-04-21)
 
 Major version bump to signal the underlying PyO3 runtime change — the public Python API is unchanged, but the extension is rebuilt against a new binding layer that's a 5-minor-version jump ahead.
@@ -49,14 +74,15 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 ### Notebook
 - SVG viewer with zoom/pan controls, minimap, and reset button
 
-
 ## v3.8.8 (2026-04-08)
 
 - SVG: unique pattern IDs (random), show_svg helper with zoom/pan in notebook
+
 ## v3.8.7 (2026-04-08)
 
 - Notebook: scrollable SVG containers; auto-mirror releases to hv repo
 - SVG: add display_size parameter to Go/Rust/Python (0 = auto)
+
 ## v3.8.6 (2026-04-07)
 
 - Notebook: add SVG visualization demo (single vector + overlap)
@@ -65,51 +91,7 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 - Add Dependabot: weekly checks for Cargo, Go, pip (ruff), GitHub Actions
 - Add PyPI project URLs: docs, repo, changelog, issues, discussions
 - Update parity.md for hv/ and memory/ with 2-week progress
+
 ## v3.8.5 (2026-04-07)
 
 - Revert InMemory to BTreeMap-backed; add read-time TTL filtering
-## v3.8.4 (2026-04-07)
-
-- Warn when gc_interval_secs is 0 (background compaction disabled)
-- Go: move gc_interval_secs default from library (600) to caller level (0)
-- InMemory uses fjall-on-tmpdir; add BTreeMap backend for benchmarking
-- Add TTL compaction filter and background GC for fjall storage
-- Use meaningful parameter names in Python-facing constructors and static methods
-## v3.8.3 (2026-04-06)
-
-- Improve Python docstrings: add constructors, flexible types, remove redundant create()
-## v3.8.2 (2026-04-06)
-
-- Add seed128() and hint() to all Python HyperBinary types via macro
-- Rename Domain.with_prefix→from_prefix_and_name; remove Seed128.create
-- Producers accept flexible domain/pod types; add extra protobuf payload support
-## v3.8.1 (2026-04-06)
-
-- Rename first_picked_chunk→first_picked, terminal→new_terminal in Python bindings
-- YAML: render Prewired enum as string name instead of numeric value
-## v3.8.0 (2026-04-06)
-
-- Clean up obsolete build tooling: remove govvv, proto plugins, ruff.sh
-- Update CLAUDE.md: mark lbd as unmaintained, remove redundant HvCore/Composites docs
-- support for SequenceAppender.
-- Hierarchical HMM: part 5
-- Use emoji-only in String/Display for all types; Chunk omits id when redundant
-- misc.
-- update doc for PARITY.md.
-- Fix biweekly release reminder: true biweekly on odd-week Mondays
-- Python: Seed128 preserves Domain/Pod metadata; add Seed128.random(so); update parity.md
-- GlobalEnv enums: restore UNKNOWN=0 placeholders so defaults are non-zero
-- Python: global_env() returns proto GlobalEnv message directly
-## v3.8.0 (2026-04-06)
-
-- Clean up obsolete build tooling: remove govvv, proto plugins, ruff.sh
-- Update CLAUDE.md: mark lbd as unmaintained, remove redundant HvCore/Composites docs
-- support for SequenceAppender.
-- Hierarchical HMM: part 5
-- Use emoji-only in String/Display for all types; Chunk omits id when redundant
-- misc.
-- update doc for PARITY.md.
-- Fix biweekly release reminder: true biweekly on odd-week Mondays
-- Python: Seed128 preserves Domain/Pod metadata; add Seed128.random(so); update parity.md
-- GlobalEnv enums: restore UNKNOWN=0 placeholders so defaults are non-zero
-- Python: global_env() returns proto GlobalEnv message directly
