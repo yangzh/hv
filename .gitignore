@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
