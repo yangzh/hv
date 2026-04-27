@@ -3,6 +3,20 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.1.1 (2026-04-27)
+
+Docstring polish: every PyO3-emitted item in `kongming_rs` now conforms to the
+project's docstring spec, with a structural lint to gate regressions.
+
+### Docs
+- All **442** user-facing items across `hv` (332), `memory` (~75), and `lisp` carry
+  one-line summaries plus Args / Returns / Raises / Postconditions / Examples
+  sections per `docs/python_docstring_spec.md`. `help(...)` output and IDE
+  tooltips across the API are now uniform and self-contained.
+- New `scripts/lint_pydocstrings.py` — structural checker, **strict by default**
+  (`--no-strict` for warning mode). Filters to items defined in the target
+  module; ready to drop into CI.
+
 ## v4.1.0 (2026-04-26)
 
 A meaty release with two themes: a sweep of polymorphic Python ergonomics across the Domain / Pod / Seed128 / Selector surface, plus full producer-API parity with Go/Rust including a new `producer.produce(view)` batched-write entry point.
@@ -92,6 +106,3 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 - Add PyPI project URLs: docs, repo, changelog, issues, discussions
 - Update parity.md for hv/ and memory/ with 2-week progress
 
-## v3.8.5 (2026-04-07)
-
-- Revert InMemory to BTreeMap-backed; add read-time TTL filtering
