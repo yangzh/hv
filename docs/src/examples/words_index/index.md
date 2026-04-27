@@ -95,7 +95,7 @@ For "eleven-letter words ending in `tion`", anchor `t/i/o/n` at positions 7/8/9/
 
 `range_sel(inner, start, limit)` consumes its inner selector, so to demonstrate both **count** and **top 10** the example builds the NNS selector twice (cheap; the substrate work dominates).
 
-See [Working with Results](../../api/memory/selectors/results.md) for more on shaping selector output.
+See [Working with Results](../../api/memory/selectors/results.md) for more on shaping selector output. When you need per-result `SelectorExtra` (e.g. NNS scores) or lazy iteration, reach for `memory.lazy_selector_iter(view, selector)` — `mem_get` returns Chunks only.
 
 ## Running
 
