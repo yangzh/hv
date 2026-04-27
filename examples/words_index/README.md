@@ -115,11 +115,10 @@ list. Two helpers shape the output:
 both **count** and **top 10** the example builds the NNS selector twice (it's
 cheap; the substrate work is what dominates).
 
-> **Note**: Python does not currently expose a streaming `SelectorIter` —
-> `mem_get` always materializes the full list. For very large result sets
-> where you want lazy evaluation or early-termination semantics, this would
-> be a useful addition to the PyO3 bindings. For now, `range_sel` is the
-> right tool to bound work to the top-N.
+> **Note**: For lazy evaluation or per-result selector metadata
+> (`SelectorExtra`), use `memory.lazy_selector_iter(view, selector)` instead —
+> it yields `(Chunk, Optional[SelectorExtra])` tuples. `mem_get` is the right
+> call when you only need Chunks; `range_sel` is the right wrapper for top-N.
 
 ## Running
 

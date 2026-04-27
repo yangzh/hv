@@ -14,22 +14,36 @@ print(chunk.id, chunk.code, chunk.note)
 {{#endtab}}
 {{#endtabs}}
 
-## Iterator — iterate all matches
+## mem_get — eager batch read (Chunks only)
 
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-Not available as iterator in Python. Use `mem_get()` for batch reads.
-{{#endtab}}
-{{#endtabs}}
-
-## mem_get — high-level batch read
+Returns every match as a `list[Chunk]`. **No extras** — any per-result `SelectorExtra` produced by the selector (e.g. NNS scores) is discarded. Use this when you only need the Chunks.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-results = storage.mem_get(selector)
-for hv in results:
-    print(hv)
+chunks = storage.mem_get(selector)        # list[Chunk]
+for chunk in chunks:
+    print(chunk.id, chunk.note)
+```
+{{#endtab}}
+{{#endtabs}}
+
+## lazy_selector_iter — stream Chunks with extras
+
+Yields `(Chunk, Optional[SelectorExtra])` tuples one at a time. This is the **only** way to access per-result `SelectorExtra` in Python; `mem_get` drops it.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# Streaming — useful for large result sets or early termination
+for chunk, extra in memory.lazy_selector_iter(view, selector):
+    print(chunk.id, extra)
+    if done():
+        break
+
+# Eager with extras — wrap in list()
+results = list(memory.lazy_selector_iter(view, selector))
+# results: list[tuple[Chunk, Optional[SelectorExtra]]]
 ```
 {{#endtab}}
 {{#endtabs}}
