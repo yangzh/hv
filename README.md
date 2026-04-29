@@ -34,10 +34,20 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 
 | Platform | Link |
 |----------|------|
-| Colab (tutorial) | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
-| Colab (Memory) | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
-| Colab (LISP) | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
+| Colab — tutorial walkthrough | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
+| Colab — hypervector storage | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
 | Binder | <a href="https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb" target="_blank"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a> |
+
+## Applications
+
+Runnable scripts under [`examples/`](examples/) including:
+* [Mexican Dollar](https://yangzh.github.io/hv/examples/mexican_dollar/index.html): analogical reasoning;
+* [Word Indexer](https://yangzh.github.io/hv/examples/word_indexer/index.html): suffix-queryable word indexing;
+* [Bulk Storage](https://yangzh.github.io/hv/examples/bulk_storage/index.html): storage benchmarks;
+* [Operators from Scratch](https://yangzh.github.io/hv/examples/operators/index.html): the math underneath the library;
+* [LISP Interpreter](https://yangzh.github.io/hv/examples/pylisp/index.html): where every value is a hypervector.
+
+See the [examples index](https://yangzh.github.io/hv/examples/index.html) for walkthroughs.
 
 ## Community
 
