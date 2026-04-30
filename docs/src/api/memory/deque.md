@@ -12,15 +12,28 @@ A deque occupies its own 64-bit `deque_domain`. The structure has two kinds of c
     - `LEFT` ⬅️ — id-Sparkle of the previous carriage, or identity if leftmost.
     - `RIGHT` ➡️ — id-Sparkle of the next carriage, or identity if rightmost.
 
+A 3-carriage deque (payloads `A`, `B`, `C` in left-to-right order):
+
 ```text
-            sentinel 🚂                       carriages 🚃 🚃 🚃
-       (deque_domain, P0)              (deque_domain, *)
-       ┌──────────────┐                ┌─────┐  ┌─────┐  ┌─────┐
-       │ PAYLOAD = ⊥  │                │ A   │  │ B   │  │ C   │
-       │ LEFT  ────────────────────────►│     │  │     │  │     │
-       │ RIGHT ──────────────────────►──┴────┴──┴─────┴──┴─────┘
-       └──────────────┘
+       🚂                🚃                🚃                🚃
+   ┌──────────┐      ┌──────────┐      ┌──────────┐      ┌──────────┐
+   │ sentinel │ <--> │    A     │ <--> │    B     │ <--> │    C     │
+   │  pod=P0  │      │ pod=p_A  │      │ pod=p_B  │      │ pod=p_C  │
+   └──────────┘      └──────────┘      └──────────┘      └──────────┘
 ```
+
+Each box is one Octopus chunk. Each `◄──►` between adjacent boxes represents one bidirectional `LEFT`/`RIGHT` pointer pair. The slot values inside each chunk are:
+
+| Chunk | `PAYLOAD` | `LEFT` | `RIGHT` |
+|-------|-----------|--------|---------|
+| sentinel 🚂 (`pod=P0`) | identity ⊥ | leftmost carriage (A) | rightmost carriage (C) |
+| carriage A             | `Sparkle(A*)` | identity ⊥ (no left neighbor) | carriage B |
+| carriage B             | `Sparkle(B*)` | carriage A                    | carriage C |
+| carriage C             | `Sparkle(C*)` | carriage B                    | identity ⊥ (no right neighbor) |
+
+Where `A*`, `B*`, `C*` are the actual payload chunks living elsewhere in item memory.
+
+Note that the sentinel's `LEFT`/`RIGHT` are **anchor pointers** (jumps directly to the leftmost / rightmost), not neighbor pointers — that's why iteration starting at the sentinel follows the *opposite* direction key (e.g., follow `LEFT` to go forward, jumping to the leftmost) and then walks neighbor `RIGHT` pointers from there. The carriages' `LEFT`/`RIGHT` are conventional neighbor pointers.
 
 ## Pushing
 
@@ -28,8 +41,13 @@ A deque occupies its own 64-bit `deque_domain`. The structure has two kinds of c
 {{#tab name="Python"}}
 ```python
 # memory.deque_appender / memory.deque_prepender consume a Selector for the payload.
-storage.mem_set(memory.deque_appender(deque_domain, memory.with_sparkle(payload_domain, "A")))
-storage.mem_set(memory.deque_prepender(deque_domain, memory.with_sparkle(payload_domain, "Z")))
+storage.mem_set(
+    memory.deque_appender(
+        deque_domain, memory.with_sparkle(payload_domain, "A")))
+
+storage.mem_set(
+    memory.deque_prepender(
+        deque_domain, memory.with_sparkle(payload_domain, "Z")))
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -66,11 +84,15 @@ The starting carriage's payload **is** yielded too (inclusive start), matching C
 {{#tab name="Python"}}
 ```python
 # Whole-deque iteration from the sentinel.
-for chunk in storage.mem_get(memory.deque_forward(memory.deque_carriage(deque_domain))):
+for chunk in storage.mem_get(
+    memory.deque_forward(
+        memory.deque_carriage(deque_domain))):
     print(chunk.note)
 
 # Iterate from a specific carriage onward (inclusive of that carriage).
-for chunk in storage.mem_get(memory.deque_backward(memory.deque_carriage(deque_domain, carriage_pod))):
+for chunk in storage.mem_get(
+    memory.deque_backward(
+        memory.deque_carriage(deque_domain, carriage_pod))):
     print(chunk.note)
 ```
 {{#endtab}}
