@@ -39,6 +39,7 @@
         - [Other Selectors](api/memory/selectors/other.md)
         - [Working with Results](api/memory/selectors/results.md)
     - [Producers](api/memory/producers.md)
+    - [Deque](api/memory/deque.md)
 
 # Guides
 
