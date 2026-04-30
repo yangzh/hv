@@ -30,15 +30,15 @@ d.is_default()      # True if id == 0
 {{#tab name="Go"}}
 ```go
 d := hv.NewDomain("animals")
-d := hv.NewDomainByID(0x1234567890abcdef)
-d := hv.NewDomainWithPrefix(api.DomainPrefix_NLP, "concept")
+d := hv.NewDomainFromID(0x1234567890abcdef)
+d := hv.NewDomainFromPrefix(api.DomainPrefix_NLP, "concept")
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 let d = Domain::from_name("animals");
 let d = Domain::from_id(0x1234567890abcdef);
-let d = Domain::with_prefix(DomainPrefix::Nlp, "concept");
+let d = Domain::from_prefix(DomainPrefix::Nlp, "concept");
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -81,9 +81,9 @@ p.is_default() # True if seed == 0
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.NewPodByWord("cat")
-p := hv.NewPodBySeed(42)
-p := hv.NewPodByPrewired(api.Prewired_SET_MARKER)
+p := hv.NewPodFromWord("cat")
+p := hv.NewPodFromSeed(42)
+p := hv.NewPodFromPrewired(api.Prewired_SET_MARKER)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
