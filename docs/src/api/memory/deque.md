@@ -7,10 +7,11 @@ A doubly-linked, payload-carrying chunk data structure built on Octopus chunks. 
 A deque occupies its own 64-bit `deque_domain`. The structure has two kinds of chunks:
 
 - **Sentinel locomotive 🚂** — the chunk at `(deque_domain, P0)`. Anchors both ends of the train. Its `LEFT` slot points at the leftmost carriage, its `RIGHT` slot at the rightmost. Its `PAYLOAD` slot is identity (no payload).
-- **Carriage 🚃** — a chunk at `(deque_domain, carriage_pod)` for some non-zero pod. Each carriage is a specialized Octopus with three slots:
+- **Carriage 🚃** — a chunk at `(deque_domain, carriage_pod)` for some non-zero pod. Each carriage is a specialized Octopus with four slots:
     - `PAYLOAD` 📨 — points at the actual payload chunk in item memory (`Sparkle(payload_domain, payload_pod)`). Always non-identity.
     - `LEFT` ⬅️ — id-Sparkle of the previous carriage, or identity if leftmost.
     - `RIGHT` ➡️ — id-Sparkle of the next carriage, or identity if rightmost.
+    - `CHILDREN` 👨‍👩‍👧‍👦 — optional pointer at a child structure (typically the sentinel of a child deque). Identity when no children are attached.
 
 A 3-carriage deque (payloads `A`, `B`, `C` in left-to-right order):
 
@@ -22,25 +23,24 @@ A 3-carriage deque (payloads `A`, `B`, `C` in left-to-right order):
    └──────────┘      └──────────┘      └──────────┘      └──────────┘
 ```
 
-Each box is one Octopus chunk. Each `◄──►` between adjacent boxes represents one bidirectional `LEFT`/`RIGHT` pointer pair. The slot values inside each chunk are:
+Each box is one Octopus chunk. Each `<-->` between adjacent boxes represents one bidirectional `LEFT`/`RIGHT` pointer pair. The slot values inside each chunk are:
 
-| Chunk | `PAYLOAD` | `LEFT` | `RIGHT` |
-|-------|-----------|--------|---------|
-| sentinel 🚂 (`pod=P0`) | identity ⊥ | leftmost carriage (A) | rightmost carriage (C) |
-| carriage A             | `Sparkle(A*)` | identity ⊥ (no left neighbor) | carriage B |
-| carriage B             | `Sparkle(B*)` | carriage A                    | carriage C |
-| carriage C             | `Sparkle(C*)` | carriage B                    | identity ⊥ (no right neighbor) |
+| Chunk | `PAYLOAD` | `LEFT` | `RIGHT` | `CHILDREN` |
+|-------|-----------|--------|---------|------------|
+| sentinel 🚂 (`pod=P0`) | identity ⊥ | leftmost (A) | rightmost (C) | identity ⊥ (or a child structure) |
+| carriage A             | `Sparkle(A*)` | identity ⊥ | carriage B | identity ⊥ (or a child structure) |
+| carriage B             | `Sparkle(B*)` | carriage A | carriage C | identity ⊥ (or a child structure) |
+| carriage C             | `Sparkle(C*)` | carriage B | identity ⊥ | identity ⊥ (or a child structure) |
 
 Where `A*`, `B*`, `C*` are the actual payload chunks living elsewhere in item memory.
 
-Note that the sentinel's `LEFT`/`RIGHT` are **anchor pointers** (jumps directly to the leftmost / rightmost), not neighbor pointers — that's why iteration starting at the sentinel follows the *opposite* direction key (e.g., follow `LEFT` to go forward, jumping to the leftmost) and then walks neighbor `RIGHT` pointers from there. The carriages' `LEFT`/`RIGHT` are conventional neighbor pointers.
+The sentinel's `LEFT`/`RIGHT` are **anchor pointers** (jumps directly to the leftmost / rightmost), not neighbor pointers. The carriages' `LEFT`/`RIGHT` are conventional neighbor pointers.
 
 ## Pushing
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# memory.deque_appender / memory.deque_prepender consume a Selector for the payload.
 storage.mem_set(
     memory.deque_appender(
         deque_domain, memory.with_sparkle(payload_domain, "A")))
@@ -74,25 +74,32 @@ The sentinel is auto-created on the first push — no separate "init deque" step
 
 > ⚠️ **Single-writer per deque.** Concurrent pushes from independent mutable views on the same deque WILL race on the sentinel and on the previous tail/head — last-write wins, with dropped pushes possible. Callers expecting concurrent appenders must synchronize externally (e.g., serialize through a single goroutine/task, or take an external lock keyed on `deque_domain`). Reads through a `View` are always snapshot-consistent per chunk.
 
-## Iterating
+## Iterating — cursor-straddle semantics
 
 `DequeForward` / `DequeBackward` walk the train, yielding each carriage's *payload chunk*. The starting point is itself a Selector — pass `DequeCarriage(domain)` (with no pod) to start from the sentinel for a full-deque iteration, or `DequeCarriage(domain, pod)` to start from a specific carriage.
 
-The starting carriage's payload **is** yielded too (inclusive start), matching C++/Python iterator conventions. The sentinel itself yields no payload (its `PAYLOAD` is identity), so starting from the sentinel produces the natural "iterate the whole deque" semantic.
+**The cursor straddles between elements**, similar to Java's `ListIterator` or C++'s `std::list::iterator`:
+
+- `start` is the cursor; iteration is **exclusive of `start`'s own payload**.
+- When `start` resolves to the sentinel, iteration covers the whole deque (sentinel acts as both before-leftmost and after-rightmost).
+- When `start` resolves to a member carriage, iteration yields the elements *strictly after* it in the chosen direction; the start carriage's own payload is NOT yielded.
+
+| `start` | `DequeForward` yields | `DequeBackward` yields |
+|---------|----------------------|------------------------|
+| sentinel | leftmost, …, rightmost | rightmost, …, leftmost |
+| carriage X | X.right, X.right.right, … | X.left, X.left.left, … |
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 # Whole-deque iteration from the sentinel.
 for chunk in storage.mem_get(
-    memory.deque_forward(
-        memory.deque_carriage(deque_domain))):
+    memory.deque_forward(memory.deque_carriage(deque_domain))):
     print(chunk.note)
 
-# Iterate from a specific carriage onward (inclusive of that carriage).
+# From a specific carriage onward (exclusive of that carriage).
 for chunk in storage.mem_get(
-    memory.deque_backward(
-        memory.deque_carriage(deque_domain, carriage_pod))):
+    memory.deque_backward(memory.deque_carriage(deque_domain, carriage_pod))):
     print(chunk.note)
 ```
 {{#endtab}}
@@ -104,7 +111,7 @@ for c := range memory.SelectorIter(ctx, view,
     fmt.Println(c.Note)
 }
 
-// From a specific carriage onward.
+// From a specific carriage onward (exclusive).
 for c := range memory.SelectorIter(ctx, view,
     memory.DequeBackward(memory.DequeCarriage(dequeDomain, &carriagePod))) {
     fmt.Println(c.Note)
@@ -113,10 +120,7 @@ for c := range memory.SelectorIter(ctx, view,
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-// Whole-deque iteration.
 let sel = deque_forward(Box::new(deque_carriage(deque_domain.clone(), None)));
-
-// From a specific carriage onward.
 let sel = deque_backward(Box::new(deque_carriage(
     deque_domain.clone(),
     Some(carriage_pod),
@@ -125,12 +129,84 @@ let sel = deque_backward(Box::new(deque_carriage(
 {{#endtab}}
 {{#endtabs}}
 
-## Iteration rule
+### Single-step shorthands: `DequeNext` / `DequePrev`
 
-Three rules handle both starting cases (sentinel or carriage) uniformly:
+`DequeNext(start)` is shorthand for `Range(0, 1, DequeForward(start))` — the next single payload from the cursor's position. `DequePrev(start)` is the backward mirror. They follow the same exclusive-start rule.
 
-1. **Identity** — the sentinel is identified by `pod == P0`. The sentinel MUST have an identity `PAYLOAD`; a carriage MUST have a non-identity `PAYLOAD`. Either violation returns `FailedPrecondition` (the deque structure is malformed).
-2. **Yield** — yield the current chunk's payload only if it's a carriage.
-3. **Advance** — for a carriage, follow the matching-direction key (`RIGHT` for forward, `LEFT` for backward) to its next neighbor. For the sentinel, follow the *opposite-direction* key — sentinel's `LEFT`/`RIGHT` are anchor pointers at the leftmost/rightmost, not neighbor pointers, so the opposite key takes you to the appropriate end. Stop when the next pointer is identity.
+| Cursor | `DequeNext` yields | `DequePrev` yields |
+|--------|--------------------|--------------------|
+| sentinel | leftmost carriage's payload | rightmost carriage's payload |
+| carriage X | X's right neighbor's payload (or empty if X is rightmost) | X's left neighbor's payload (or empty if X is leftmost) |
 
-This unification means starting at the sentinel and starting at a carriage use the same loop — there's no special-case branch in iteration.
+```python
+# Peek at the front / back of the deque.
+front = next(iter(storage.mem_get(
+    memory.deque_next(memory.deque_carriage(deque_domain))))).note
+back  = next(iter(storage.mem_get(
+    memory.deque_prev(memory.deque_carriage(deque_domain))))).note
+```
+
+### Iteration rule (implementation)
+
+Each step:
+
+1. **Integrity** — sentinel is identified by `pod == P0`. The sentinel MUST have an identity `PAYLOAD`; a carriage MUST have a non-identity `PAYLOAD`. Either violation returns `FailedPrecondition` (the deque is malformed).
+2. **Advance** — on a carriage, follow the matching-direction key (`RIGHT` for forward, `LEFT` for backward) to the next neighbor. On the sentinel, follow the *opposite*-direction key — sentinel's `LEFT`/`RIGHT` are anchor pointers, so the opposite key takes you to the appropriate end.
+3. **Yield** — yield the chunk you advanced to. Stop when the next pointer is identity.
+
+The advance-then-yield order is what makes the iteration exclusive of `start`.
+
+## Hierarchy: the `CHILDREN` slot
+
+Each carriage's `CHILDREN` 👨‍👩‍👧‍👦 slot can point at the sentinel of another deque (or any other chunk). Attach one at push time via the `children` argument; query it via the `DequeChildren(parent)` selector.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# Push a parent carriage whose CHILDREN points at a child deque's sentinel.
+storage.mem_set(memory.deque_appender(
+    parent_domain,
+    memory.with_sparkle(payload_domain, "B"),
+    children=memory.deque_carriage(child_domain),
+))
+
+# Walk the child deque from the parent.
+for chunk in storage.mem_get(
+    memory.deque_forward(
+        memory.deque_children(
+            memory.deque_carriage(parent_domain, parent_carriage_pod)))):
+    print(chunk.note)
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+// Push parent carriage with CHILDREN attached.
+p.Memory.Set(ctx, memory.DequeAppender(
+    parentDomain, payloadSelector,
+    memory.PChildren(memory.DequeCarriage(childDomain, nil)),
+))
+
+// Walk the child deque.
+for c := range memory.SelectorIter(ctx, view,
+    memory.DequeForward(memory.DequeChildren(
+        memory.DequeCarriage(parentDomain, &parentCarriagePod)))) {
+    fmt.Println(c.Note)
+}
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+// Build args with children attached.
+let mut args = chunk_producer_proto::Args::default();
+args.children = Some(Box::new(deque_carriage(child_domain, None).to_proto()?));
+storage.set(producers::deque_appender(parent_domain, payload_sel, args))?;
+
+// Walk the child deque.
+let sel = deque_forward(Box::new(deque_children(Box::new(
+    deque_carriage(parent_domain, Some(parent_carriage_pod)),
+))));
+```
+{{#endtab}}
+{{#endtabs}}
+
+`DequeChildren(parent)` yields zero chunks (no error) when the parent has identity `CHILDREN` or is missing entirely. Hierarchical traversal is the caller's job — walk a parent deque, recurse into `DequeChildren` on each carriage.
