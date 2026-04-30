@@ -4,6 +4,8 @@ A key-value composite where each value is bound with its key's Sparkle. See [Com
 
 ## Constructor
 
+Keys are `Pod`s. In Python, strings (and any value polymorphically convertible to `Pod`) are accepted and auto-converted.
+
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
@@ -12,11 +14,13 @@ oct = hv.Octopus(hv.Seed128(0, 42), ["color", "shape"], red, circle)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-oct := hv.NewOctopus(hv.NewSeed128(0, 42), []string{"color", "shape"}, red, circle)
+keys := []hv.Pod{hv.NewPod("color"), hv.NewPod("shape")}
+oct := hv.NewOctopus(hv.NewSeed128(0, 42), keys, red, circle)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
+let keys = vec![Pod::from_word("color"), Pod::from_word("shape")];
 let oct = Octopus::new(Seed128::new(0, 42), keys, values);
 ```
 {{#endtab}}
@@ -27,17 +31,17 @@ let oct = Octopus::new(Seed128::new(0, 42), keys, values);
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-oct.value_by_key("color") # returns the value, or raises ValueError
+oct.value_by_key("color")  # accepts Pod | str | int | Prewired
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-oct.ValueByKey("color")  // HyperBinary — lookup by key
+oct.ValueByKey(hv.NewPod("color"))  // HyperBinary — lookup by Pod
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-oct.value_by_key("color")  // Option<&HyperBinaryKind>
+oct.value_by_key(&Pod::from_word("color"))  // Option<&HyperBinaryKind>
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -29,7 +29,13 @@ d.is_default()      # True if id == 0
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-d := hv.NewDomain("animals")
+// Polymorphic — dispatches by argument type:
+d := hv.NewDomain("animals")               // string → name-based
+d := hv.NewDomain(uint64(0x1234567890abcdef)) // uint64 → id-based
+d := hv.NewDomain(api.DomainPrefix_NLP)    // enum → prefix-based (no name)
+
+// Explicit forms (equivalent, zero overhead, compile-time safe):
+d := hv.NewDomainFromName("animals")
 d := hv.NewDomainFromID(0x1234567890abcdef)
 d := hv.NewDomainFromPrefix(api.DomainPrefix_NLP, "concept")
 ```
@@ -81,6 +87,12 @@ p.is_default() # True if seed == 0
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
+// Polymorphic — dispatches by argument type:
+p := hv.NewPod("cat")                   // string → word pod
+p := hv.NewPod(uint64(42))              // uint64 → seed pod
+p := hv.NewPod(api.Prewired_SET_MARKER) // enum → prewired pod
+
+// Explicit forms (equivalent, zero overhead, compile-time safe):
 p := hv.NewPodFromWord("cat")
 p := hv.NewPodFromSeed(42)
 p := hv.NewPodFromPrewired(api.Prewired_SET_MARKER)

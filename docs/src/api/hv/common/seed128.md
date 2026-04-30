@@ -32,7 +32,7 @@ seed.low()                                         # u64 (pod seed)
 ```go
 seed := hv.NewSeed128(0, 42)          // from raw uint64 values
 seedZero := hv.Seed128Zero()          // zero seed
-seed1 := hv.NewSeed128FromDP(hv.NewDomain("domain"), hv.NewPodFromWord("pod"))
+seed1 := hv.NewSeed128FromDP(hv.NewDomain("domain"), hv.NewPod("pod"))
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
