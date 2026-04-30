@@ -64,7 +64,7 @@ storage.set(producers::deque_prepender(deque_domain, payload_selector, args))?;
 {{#endtab}}
 {{#endtabs}}
 
-Each push rewrites **three chunks** atomically through one mutable view:
+Each push rewrites **up to three chunks** atomically through one mutable view:
 
 1. The new carriage at `(deque_domain, fresh_pod)`.
 2. The previous tail/head carriage, with its tail-side neighbor link updated to the new carriage. (Skipped on the first push, when the deque is empty.)
@@ -73,6 +73,59 @@ Each push rewrites **three chunks** atomically through one mutable view:
 The sentinel is auto-created on the first push — no separate "init deque" step is needed.
 
 > ⚠️ **Single-writer per deque.** Concurrent pushes from independent mutable views on the same deque WILL race on the sentinel and on the previous tail/head — last-write wins, with dropped pushes possible. Callers expecting concurrent appenders must synchronize externally (e.g., serialize through a single goroutine/task, or take an external lock keyed on `deque_domain`). Reads through a `View` are always snapshot-consistent per chunk.
+
+### Mid-deque insertion: `DequeInsertAfter` / `DequeInsertBefore`
+
+`DequeAppender` and `DequePrepender` are thin wrappers over the more general `DequeInsertAfter` / `DequeInsertBefore`, which take a *reference carriage selector* instead of a domain. The new carriage is wedged on the chosen side of the reference. The deque domain is taken from the resolved reference carriage.
+
+| Reference carriage | `DequeInsertAfter` | `DequeInsertBefore` |
+|--------------------|--------------------|---------------------|
+| sentinel 🚂 (`DequeCarriage(domain)`) | append (new rightmost) | prepend (new leftmost) |
+| member carriage X | wedge between X and X.right | wedge between X.left and X |
+
+Sentinel-as-reference is the wraparound bookend case: since the sentinel sits on both ends of the train, "after the sentinel" means "right of the rightmost," and "before the sentinel" means "left of the leftmost." On an empty deque, either becomes the first and only member.
+
+Each insert rewrites:
+
+1. The new carriage.
+2. The carriage on each side whose neighbor link points at the new one (one rewrite for end-inserts, two for mid-deque inserts).
+3. The sentinel, only when its anchor pointer changes (i.e., the new carriage becomes the leftmost or rightmost).
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# Mid-deque: wedge M between B and C.
+storage.mem_set(memory.deque_insert_after(
+    memory.deque_carriage(deque_domain, b_pod),
+    memory.with_sparkle(payload_domain, "M"),
+))
+
+# Sentinel-as-ref: equivalent to deque_appender.
+storage.mem_set(memory.deque_insert_after(
+    memory.deque_carriage(deque_domain),
+    memory.with_sparkle(payload_domain, "tail"),
+))
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+p.Memory.Set(ctx, memory.DequeInsertAfter(
+    memory.DequeCarriage(dequeDomain, &bPod), payloadSelector))
+
+p.Memory.Set(ctx, memory.DequeInsertBefore(
+    memory.DequeCarriage(dequeDomain, nil), payloadSelector))
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+storage.set(producers::deque_insert_after(
+    Box::new(deque_carriage(deque_domain.clone(), Some(b_pod))),
+    payload_selector,
+    args,
+))?;
+```
+{{#endtab}}
+{{#endtabs}}
 
 ## Iterating — cursor-straddle semantics
 
