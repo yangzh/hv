@@ -127,6 +127,33 @@ storage.set(producers::deque_insert_after(
 {{#endtab}}
 {{#endtabs}}
 
+## Empty check: `DequeIsEmpty`
+
+A direct query that reads the sentinel and reports whether both `LEFT` and `RIGHT` anchors are identity. A deque whose sentinel hasn't been written yet (never touched) is also reported empty — no auto-init.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+with storage.new_view() as view:
+    if memory.deque_is_empty(view, deque_domain):
+        print("nothing to process")
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+view := p.Memory.Substrate().NewView(nil)
+defer view.Discard()
+empty, err := memory.DequeIsEmpty(ctx, view, dequeDomain)
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let view = substrate.new_view(None);
+let empty = memory::deque::deque_is_empty(&*view, &deque_domain)?;
+```
+{{#endtab}}
+{{#endtabs}}
+
 ## Iterating — cursor-straddle semantics
 
 `DequeForward` / `DequeBackward` walk the train, yielding each carriage's *payload chunk*. The starting point is itself a Selector — pass `DequeCarriage(domain)` (with no pod) to start from the sentinel for a full-deque iteration, or `DequeCarriage(domain, pod)` to start from a specific carriage.
