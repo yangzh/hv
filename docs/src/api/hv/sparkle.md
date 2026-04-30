@@ -32,13 +32,13 @@ s4 = hv.Sparkle.random("animals", so)
 {{#tab name="Go"}}
 ```go
 // From a word string
-s0 := hv.NewSparkleWithWord(model, domain, "cat")
+s0 := hv.NewSparkleFromWord(model, domain, "cat")
 
 // From a numeric seed
-s1 := hv.NewSparkleWithSeed(model, domain, 42)
+s1 := hv.NewSparkleFromSeed(model, domain, 42)
 
 // From a prewired enum
-s2 := hv.NewSparkleWithPrewired(model, domain, api.Prewired_SET_MARKER)
+s2 := hv.NewSparkleFromPrewired(model, domain, api.Prewired_SET_MARKER)
 
 // Identity vector
 s3 := hv.NewSparkleIdentity(model)
@@ -46,20 +46,20 @@ s3 := hv.NewSparkleIdentity(model)
 // Random (from SparseOperation)
 s4 := hv.NewRandomSparkle(domain, so)
 
-// From an explicit Seed128 (domain + pod bundled)
-s5 := hv.NewSparkleFromSeed(model, hv.NewSeed128FromDP(domain, pod))
+// From an explicit Seed128 (domain + pod bundled) — primary constructor
+s5 := hv.NewSparkle(model, hv.NewSeed128FromDP(domain, pod))
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 // From a word string
-let s0 = Sparkle::with_word(model, domain, "cat");
+let s0 = Sparkle::from_word(model, domain, "cat");
 
 // From a numeric seed
-let s1 = Sparkle::with_seed(model, domain, 42);
+let s1 = Sparkle::from_seed(model, domain, 42);
 
 // From a prewired enum
-let s2 = Sparkle::with_prewired(model, domain, Prewired::SetMarker);
+let s2 = Sparkle::from_prewired(model, domain, Prewired::SetMarker);
 
 // Identity vector
 let s3 = Sparkle::identity(model);
@@ -67,8 +67,8 @@ let s3 = Sparkle::identity(model);
 // Random (from SparseOperation)
 let s4 = Sparkle::from_random(domain, &mut so);
 
-// From an explicit Seed128 (domain + pod bundled)
-let s5 = Sparkle::from_seed(model, Seed128::from_dp(domain, pod));
+// From an explicit Seed128 (domain + pod bundled) — primary constructor
+let s5 = Sparkle::new(model, Seed128::from_dp(domain, pod));
 ```
 {{#endtab}}
 {{#endtabs}}
