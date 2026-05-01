@@ -3,6 +3,18 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.2.0 (2026-04-30)
+
+A meaty release: a new **Deque** chunk-level data structure, a Rust port of NLP `training` / `viterbi_decoder` / `memory_test`, and a few `hv` constructor renames for naming consistency.
+
+### New: Deque
+
+A doubly-linked, payload-carrying chunk chain. See `docs/api/memory/deque.md` for the full reference.
+
+### Refactors / breaking renames
+
+These are mostly Go/Rust internals; the Python public surface is largely unchanged.
+
 ## v4.1.1 (2026-04-27)
 
 Docstring polish: every PyO3-emitted item in `kongming_rs` now conforms to the
@@ -97,12 +109,4 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 - Notebook: scrollable SVG containers; auto-mirror releases to hv repo
 - SVG: add display_size parameter to Go/Rust/Python (0 = auto)
 
-## v3.8.6 (2026-04-07)
-
-- Notebook: add SVG visualization demo (single vector + overlap)
-- SVG renderer: move Go to hv/, add Rust/Python, palette-based overlap coloring
-- SVG renderer: replace svgo with raw fmt.Fprintf, fix square layout for all models
-- Add Dependabot: weekly checks for Cargo, Go, pip (ruff), GitHub Actions
-- Add PyPI project URLs: docs, repo, changelog, issues, discussions
-- Update parity.md for hv/ and memory/ with 2-week progress
 
