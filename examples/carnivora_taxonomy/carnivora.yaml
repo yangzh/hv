@@ -1,0 +1,159 @@
+# Carnivora taxonomy — 4 families × ~100 species, all leaves are 2-part
+# binomial Latin names (Genus species). Common name follows as a `#` comment.
+#
+# Hierarchy (variable depth):
+#   Carnivora (order)
+#     ├── Felidae       (cats — Pantherinae and Felinae subfamilies)
+#     ├── Canidae       (dogs/wolves/foxes)
+#     ├── Ursidae       (bears)
+#     └── Mustelidae    (otters/weasels)
+#
+# Lists are leaves; mappings are internal nodes. Pick of species is
+# representative, not exhaustive — Mustelidae alone has ~60 extant
+# species and we sample ~17.
+
+Carnivora:
+  Felidae:
+    Pantherinae:
+      Panthera:
+        - Panthera tigris        # Tiger
+        - Panthera leo           # Lion
+        - Panthera pardus        # Leopard
+        - Panthera onca          # Jaguar
+        - Panthera uncia         # Snow Leopard (formerly Uncia uncia)
+      Neofelis:
+        - Neofelis nebulosa      # Clouded Leopard
+        - Neofelis diardi        # Sunda Clouded Leopard
+    Felinae:
+      Acinonyx:
+        - Acinonyx jubatus       # Cheetah
+      Puma:
+        - Puma concolor          # Cougar / Mountain Lion / Puma
+      Lynx:
+        - Lynx lynx              # Eurasian Lynx
+        - Lynx canadensis        # Canada Lynx
+        - Lynx pardinus          # Iberian Lynx
+        - Lynx rufus             # Bobcat
+      Felis:
+        - Felis catus            # Domestic Cat
+        - Felis silvestris       # European Wildcat
+        - Felis lybica           # African Wildcat (domestic-cat ancestor)
+        - Felis margarita        # Sand Cat
+        - Felis nigripes         # Black-footed Cat
+        - Felis chaus            # Jungle Cat
+        - Felis bieti            # Chinese Mountain Cat
+      Caracal:
+        - Caracal caracal        # Caracal
+        - Caracal aurata         # African Golden Cat
+      Leopardus:
+        - Leopardus pardalis     # Ocelot
+        - Leopardus wiedii       # Margay
+        - Leopardus tigrinus     # Oncilla / Northern Tiger Cat
+        - Leopardus geoffroyi    # Geoffroy's Cat
+        - Leopardus jacobita     # Andean Mountain Cat
+        - Leopardus colocola     # Pampas Cat
+        - Leopardus guigna       # Kodkod (smallest American cat)
+      Prionailurus:
+        - Prionailurus bengalensis   # Leopard Cat — note shared epithet w/ Vulpes bengalensis
+        - Prionailurus viverrinus    # Fishing Cat
+        - Prionailurus planiceps     # Flat-headed Cat
+        - Prionailurus rubiginosus   # Rusty-spotted Cat (smallest cat)
+      Otocolobus:
+        - Otocolobus manul       # Pallas's Cat (the meme cat)
+      Pardofelis:
+        - Pardofelis marmorata   # Marbled Cat
+      Catopuma:
+        - Catopuma temminckii    # Asian Golden Cat
+        - Catopuma badia         # Bay Cat
+      Leptailurus:
+        - Leptailurus serval     # Serval
+      Herpailurus:
+        - Herpailurus yagouaroundi   # Jaguarundi
+
+  Canidae:
+    Canis:
+      - Canis lupus              # Gray Wolf (includes the domestic dog)
+      - Canis latrans            # Coyote
+      - Canis aureus             # Golden Jackal
+      - Canis simensis           # Ethiopian Wolf
+      - Canis lupaster           # African Wolf
+    Lupulella:
+      - Lupulella mesomelas      # Black-backed Jackal (formerly Canis)
+      - Lupulella adusta         # Side-striped Jackal
+    Vulpes:
+      - Vulpes vulpes            # Red Fox (a tautonym)
+      - Vulpes zerda             # Fennec Fox
+      - Vulpes lagopus           # Arctic Fox
+      - Vulpes corsac            # Corsac Fox
+      - Vulpes rueppellii        # Rüppell's Fox
+      - Vulpes velox             # Swift Fox
+      - Vulpes macrotis          # Kit Fox
+      - Vulpes cana              # Blanford's Fox
+      - Vulpes pallida           # Pale Fox
+      - Vulpes chama             # Cape Fox
+      - Vulpes bengalensis       # Bengal Fox — shared epithet w/ Prionailurus bengalensis
+      - Vulpes ferrilata         # Tibetan Fox
+    Urocyon:
+      - Urocyon cinereoargenteus # Gray Fox
+      - Urocyon littoralis       # Island Fox
+    Cuon:
+      - Cuon alpinus             # Dhole / Asian Wild Dog
+    Lycaon:
+      - Lycaon pictus            # African Wild Dog / Painted Wolf
+    Cerdocyon:
+      - Cerdocyon thous          # Crab-eating Fox
+    Atelocynus:
+      - Atelocynus microtis      # Short-eared Dog
+    Speothos:
+      - Speothos venaticus       # Bush Dog
+    Chrysocyon:
+      - Chrysocyon brachyurus    # Maned Wolf
+    Otocyon:
+      - Otocyon megalotis        # Bat-eared Fox
+    Nyctereutes:
+      - Nyctereutes procyonoides # Raccoon Dog
+    Lycalopex:
+      - Lycalopex vetulus        # Hoary Fox
+      - Lycalopex gymnocercus    # Pampas Fox
+      - Lycalopex griseus        # South American Gray Fox
+      - Lycalopex culpaeus       # Culpeo / Andean Fox
+      - Lycalopex sechurae       # Sechuran Fox
+      - Lycalopex fulvipes       # Darwin's Fox
+
+  Ursidae:
+    Ursus:
+      - Ursus arctos             # Brown Bear (incl. Grizzly, Kodiak)
+      - Ursus americanus         # American Black Bear
+      - Ursus thibetanus         # Asian Black Bear
+      - Ursus maritimus          # Polar Bear
+    Helarctos:
+      - Helarctos malayanus      # Sun Bear
+    Melursus:
+      - Melursus ursinus         # Sloth Bear
+    Ailuropoda:
+      - Ailuropoda melanoleuca   # Giant Panda
+    Tremarctos:
+      - Tremarctos ornatus       # Spectacled Bear / Andean Bear
+
+  Mustelidae:
+    Mustela:
+      - Mustela putorius         # European Polecat
+      - Mustela erminea          # Stoat / Ermine
+      - Mustela nivalis          # Least Weasel
+      - Mustela lutreola         # European Mink
+      - Mustela nigripes         # Black-footed Ferret
+      - Mustela frenata          # Long-tailed Weasel
+      - Mustela itatsi           # Japanese Weasel
+      - Mustela sibirica         # Siberian Weasel
+      - Mustela altaica          # Mountain Weasel
+      - Mustela eversmanii       # Steppe Polecat
+    Lontra:
+      - Lontra canadensis        # North American River Otter
+      - Lontra provocax          # Southern River Otter
+      - Lontra longicaudis       # Neotropical Otter
+      - Lontra felina            # Marine Otter
+    Lutra:
+      - Lutra lutra              # Eurasian Otter (a tautonym)
+      - Lutra maculicollis       # Spotted-necked Otter
+    Enhydra:
+      - Enhydra lutris           # Sea Otter
