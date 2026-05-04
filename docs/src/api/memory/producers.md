@@ -117,6 +117,45 @@ with storage.new_mutable_view() as view:
 {{#endtab}}
 {{#endtabs}}
 
+### FromSourceDest
+
+Creates a [Pointer 👉](../hv/pointer.md) chunk — a directional reference from a `source` chunk to a `dest` chunk. Both selectors must resolve to a single chunk; the produced Pointer's bit-level value is `source.id ⊗ Inv(dest.id)`.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+with storage.new_mutable_view() as view:
+    memory.mem_set(
+        view,
+        memory.from_source_dest(
+            "edges", "earth_to_moon",
+            memory.by_item_key("planets", "earth"),
+            memory.by_item_key("planets", "moon"),
+        ))
+```
+{{#endtab}}
+{{#tab name="Go"}}
+```go
+memory.FromSourceDest(
+    hv.NewDomain("edges"), hv.NewPodFromWord("earth_to_moon"),
+    memory.WithChunks(earth),
+    memory.WithChunks(moon),
+).Produce(ctx, view)
+```
+{{#endtab}}
+{{#tab name="Rust"}}
+```rust
+let producer = producers::from_source_dest(
+    Domain::from_name("edges"),
+    Pod::from_word("earth_to_moon"),
+    Box::new(selector_impls::with_chunks(vec![earth])),
+    Box::new(selector_impls::with_chunks(vec![moon])),
+    args,
+);
+```
+{{#endtab}}
+{{#endtabs}}
+
 ### ClusterUpdater
 
 Feeds an observed chunk into an existing Learner, updating its accumulated code via bundling.
