@@ -27,6 +27,7 @@
         - [Octopus 🐙](api/hv/octopus.md)
         - [Knot 🪢](api/hv/knot.md)
         - [Parcel 🎁](api/hv/parcel.md)
+        - [Pointer 👉](api/hv/pointer.md)
     - [Operators](api/hv/operators.md)
     - [Customizing Run-time Behavior](api/hv/runtime.md)
     - [Misc](api/hv/misc.md)

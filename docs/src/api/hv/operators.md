@@ -35,23 +35,25 @@ let eq = hyper_binary::equal(&a, &b);                       // bool
 
 Extracts one component from a binding: $A \oslash B = A \otimes B^{-1}$
 
+`release` returns a [Pointer](pointer.md) — a directional reference from `composite` to `role` that retains both endpoints for inspection and serialization. The bit-level value is identical to `bind(composite, inverse(role))`.
+
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 bound = hv.bind(role, filler)
-recovered = hv.release(bound, role)  # ≈ filler
+recovered = hv.release(bound, role)  # Pointer; ≈ filler at the bit level
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 bound := hv.Bind(role, filler)
-recovered := hv.Release(bound, role)  // ≈ filler
+recovered := hv.Release(bound, role)  // Pointer; ≈ filler at the bit level
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 let bound = operators::bind_hb(vec![role.clone(), filler.clone()]);
-let recovered = operators::release(&bound, &role);
+let recovered = operators::release(&bound, &role);  // Pointer
 ```
 {{#endtab}}
 {{#endtabs}}
