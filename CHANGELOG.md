@@ -3,6 +3,10 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.3.0 (2026-05-06)
+
+Major refactoring for internal APIs.
+
 ## v4.2.0 (2026-04-30)
 
 A meaty release: a new **Deque** chunk-level data structure, a Rust port of NLP `training` / `viterbi_decoder` / `memory_test`, and a few `hv` constructor renames for naming consistency.
@@ -103,10 +107,4 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 ## v3.8.8 (2026-04-08)
 
 - SVG: unique pattern IDs (random), show_svg helper with zoom/pan in notebook
-
-## v3.8.7 (2026-04-08)
-
-- Notebook: scrollable SVG containers; auto-mirror releases to hv repo
-- SVG: add display_size parameter to Go/Rust/Python (0 = auto)
-
 
