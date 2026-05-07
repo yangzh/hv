@@ -109,7 +109,7 @@ print(f"krona overlap: {hv.overlap(swedish_dollar, krona)}")  # high!
 
 ## Code (with AnalogicalReasoner)
 
-When records are stored in memory (as [Octopus](../../api/hv/octopus.md) composites), the `AnalogicalReasoner` selector handles the transfer automatically:
+When records are stored in memory (as [Octopus](../../api/hv/octopus.md) composites), `analogical_reasoner` handles the transfer:
 
 ```python
 from kongming import hv, memory
@@ -185,7 +185,7 @@ result = memory.first_picked(view,
 print(result.id)  # → ✨:🌱SEK
 ```
 
-The `AnalogicalReasoner` computes the transfer vector internally and uses [near-neighbor search](../concepts/near_neighbor_search.md) to find the best match in memory — no manual algebra needed.
+`analogical_reasoner` computes the transfer vector `feature ⊗ inverse(src)` internally and uses [near-neighbor search](../concepts/near_neighbor_search.md) to find the best match in memory — no manual algebra needed.
 
 ## Why It Works
 

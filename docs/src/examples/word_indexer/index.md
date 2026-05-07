@@ -66,7 +66,7 @@ See [Substrate & Views](../../api/memory/substrate.md) for the full view API.
 
 ## Multi-attractor NNS
 
-A [`sequence_attractor(member_selector, pos, domain)`](../../api/memory/selectors/attractors.md#reverse-attractors) is a positional constraint: "Sequences in `domain` whose member at `pos` overlaps with `member_selector`". Position is **0-based**.
+A [`sequence_attractor(model, member_selector, pos, domain)`](../../api/memory/selectors/attractors.md#reverse-attractors) is a positional constraint: "Sequences in `domain` whose member at `pos` overlaps with `member_selector`". Position is **0-based**.
 
 `nns(*attractors)` evaluates all attractors and ranks Sequences by combined overlap. With multiple attractors, the result is a conjunction — a chunk must satisfy each positional constraint to score well.
 
@@ -74,8 +74,8 @@ For "six-letter words ending in `er`":
 
 ```python
 memory.nns(
-    memory.sequence_attractor(memory.by_item_key("letters", "e"), 4, WORDS_DOMAIN),
-    memory.sequence_attractor(memory.by_item_key("letters", "r"), 5, WORDS_DOMAIN),
+    memory.sequence_attractor(model, memory.by_item_key("letters", "e"), 4, WORDS_DOMAIN),
+    memory.sequence_attractor(model, memory.by_item_key("letters", "r"), 5, WORDS_DOMAIN),
 )
 ```
 
