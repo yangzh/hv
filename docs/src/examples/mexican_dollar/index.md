@@ -107,9 +107,9 @@ swedish_dollar = hv.bind(dollar, transfer_to_sweden)
 print(f"krona overlap: {hv.overlap(swedish_dollar, krona)}")  # high!
 ```
 
-## Code (with WithCodeModifier)
+## Code (with AnalogicalReasoner)
 
-When records are stored in memory (as [Octopus](../../api/hv/octopus.md) composites), `with_code_modifier` applies the precomputed transfer vector to each candidate:
+When records are stored in memory (as [Octopus](../../api/hv/octopus.md) composites), the `AnalogicalReasoner` selector handles the transfer automatically:
 
 ```python
 from kongming import hv, memory
@@ -151,9 +151,10 @@ view = store.new_view()
 # "What is the USD of Mexico?"
 result = memory.first_picked(view,
     memory.nns(
-        memory.with_code_modifier(
+        memory.analogical_reasoner(
             memory.with_code(mex_code),
-            hv.bind(fillers["USD"], hv.inverse(us_code)),
+            us_code,
+            fillers["USD"],
         )
     )
 )
@@ -162,9 +163,10 @@ print(result.id)  # → ✨:🌱MXN
 # "What is the Washington DC of Mexico?"
 result = memory.first_picked(view,
     memory.nns(
-        memory.with_code_modifier(
+        memory.analogical_reasoner(
             memory.with_code(mex_code),
-            hv.bind(fillers["dc"], hv.inverse(us_code)),
+            us_code,
+            fillers["dc"],
         )
     )
 )
@@ -173,17 +175,17 @@ print(result.id)  # → ✨:🌱mexicoCity
 # "What is the Dollar of Sweden?"
 result = memory.first_picked(view,
     memory.nns(
-        memory.with_code_modifier(
+        memory.analogical_reasoner(
             memory.with_code(swe_code),
-            hv.bind(fillers["USD"], hv.inverse(us_code)),
+            us_code,
+            fillers["USD"],
         )
     )
 )
 print(result.id)  # → ✨:🌱SEK
 ```
 
-The caller computes the transfer vector `feature ⊗ inverse(src)` once;
-`with_code_modifier` applies it to each candidate code, and [near-neighbor search](../concepts/near_neighbor_search.md) finds the best match in memory.
+The `AnalogicalReasoner` computes the transfer vector internally and uses [near-neighbor search](../concepts/near_neighbor_search.md) to find the best match in memory — no manual algebra needed.
 
 ## Why It Works
 
@@ -196,5 +198,5 @@ This is a form of **analogical reasoning**: no explicit rules, no lookup tables 
 - [Concepts: Operators](../concepts/operators.md) — algebraic foundations
 - [Operators](../../api/hv/operators.md) — bind, release, bundle
 - [Octopus](../../api/hv/octopus.md) — key-value composite used for country records
-- [Memory: Selectors](../../api/memory/selectors.md) — `with_code_modifier`, `nns`, `with_code`
+- [Memory: Selectors](../../api/memory/selectors.md) — `analogical_reasoner`, `nns`, `with_code`
 - [Near-neighbor search](../concepts/near_neighbor_search.md) — how the reasoner finds answers
