@@ -10,7 +10,7 @@ Roughly forward attractors try to find parts from a given a composite.
 |-----------|-------|-------|
 | **SetMembersAttractor** | Releases SET_MARKER from a Set | All members of the Set |
 | **SequenceMemberAttractor** | Releases with SEQUENCE_MARKER + positional marker | Sequence member at a specific position |
-| **TentacleAttractor** | Release with key | Octopus value for a given key |
+| **WithCodeModifier(octopus, ¬key)** | Binds the Octopus code with the inverse of `key` | Octopus value for that key (the "tentacle" pattern) |
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -19,7 +19,11 @@ memory.set_members(memory.by_item_key("sets", "my_set"))
 
 memory.sequence_member(memory.by_item_key("seqs", "my_seq"), pos=2)
 
-memory.tentacle(memory.by_item_key("records", "person"), key="name")
+# Tentacle pattern: get the value at a key from an Octopus.
+key = hv.Sparkle(model, "", "name")
+memory.with_code_modifier(
+    memory.by_item_key("records", "person"),
+    hv.inverse(key))
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -28,31 +32,47 @@ memory.tentacle(memory.by_item_key("records", "person"), key="name")
 
 Roughly reverse attractors try to locate composites given a part.
 
-| Attractor | Query | Attracts |
+| Attractor | Modifier | Attracts |
 |-----------|-------|-------|
-| **SetAttractor** | Binds member with SET_MARKER | All Sets that contain a given member |
-| **SequenceAttractor** | Binds member with SEQUENCE_MARKER + position | All Sequences containing the given member at a specific position |
-| **OctopusAttractor** | Binds value with key | Octopuses with a given key-value pair |
+| `WithIDModifier(member, SET_MARKER@d)` | `Bind(member.id, SET_MARKER@d)` | All Sets in domain `d` containing the member |
+| `WithIDModifier(member, SEQ_MARKER@d ⊗ Step^pos)` | `Bind(member.id, …)` | All Sequences in domain `d` with member at `pos` |
+| `WithIDModifier(value, Sparkle(key))` | `Bind(value.id, Sparkle(key))` | Octopuses with that key/value pair |
+
+`WithIDModifier(inner, modifier)` runs `inner.select`, then for each chunk
+`c` it yields, replaces `c.code` with `Bind(c.id, modifier)`. The composite
+recipes for the three reverse-attractor cases are stable patterns — the
+caller precomputes the marker / step / key vector once and reuses it.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-memory.set_attractor(memory.by_item_key("animals", "cat"), domain="sets")
+# All Sets in domain "sets" that contain "cat".
+set_marker = hv.Sparkle(model, "sets", hv.PREWIRED_SET_MARKER)
+memory.with_id_modifier(
+    memory.by_item_key("animals", "cat"),
+    set_marker)
 
-memory.sequence_attractor(memory.by_item_key("animals", "cat"), pos=0, domain="seqs")
+# All Sequences in domain "seqs" with "cat" at position 0.
+seq_marker = hv.Sparkle(model, "seqs", hv.PREWIRED_SEQUENCE_MARKER)
+step = hv.Sparkle(model, "", hv.PREWIRED_STEP)
+memory.with_id_modifier(
+    memory.by_item_key("animals", "cat"),
+    hv.bind(seq_marker, step.power(0)))
 
-# NOTE the value is specified with another selector.
-memory.octopus_attractor(key="color", value=memory.by_item_key("colors", "red"))
+# All Octopuses with key="color" and value pointing at the "red" terminal.
+key = hv.Sparkle(model, "", "color")
+memory.with_id_modifier(
+    memory.by_item_key("colors", "red"),
+    key)
 ```
 {{#endtab}}
 {{#endtabs}}
 
-# Analogical Reasoner
+# Analogical Reasoning
 
-Analogical reasoner tries to perform analogical reasoning, like "A is to B as C is to ?".
+`WithCodeModifier(dst, Bind(feature, inverse(src)))` performs analogical reasoning ("A is to B as C is to ?"): for each chunk `c` yielded by `dst`, it computes `Bind(c.code, feature, inverse(src))`. NNS then finds the nearest match.
 
-
-Given the analogy "king is to queen as man is to ?"
+Given the analogy "king is to queen as man is to ?":
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -61,16 +81,13 @@ king   = hv.Sparkle(model, "role", "king")
 queen  = hv.Sparkle(model, "role", "queen")
 man    = hv.Sparkle(model, "role", "man")
 
-# Analogy: "king is to queen as man is to ?"
-#   src     = king   (the known source of the relationship)
-#   feature = queen  (the known feature/attribute of src)
-#   dst     = man    (the target; we want to find its corresponding feature)
-#
-# The attractor computes: dst ⊗ feature ⊗ src⁻¹
-# This produces a code that should overlap with "woman"
+# src = king (known source), feature = queen (known relation), dst = man.
+# Modifier = queen ⊗ inverse(king); applied to man → produces a code
+# overlapping with "woman".
 memory.nns(
-    memory.analogical_reasoner(memory.with_code(man), src=king, feature=queen)
-)
+    memory.with_code_modifier(
+        memory.with_code(man),
+        hv.bind(queen, hv.inverse(king))))
 ```
 {{#endtab}}
 {{#endtabs}}

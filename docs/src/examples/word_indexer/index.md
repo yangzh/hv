@@ -9,7 +9,7 @@ It demonstrates four ideas together:
 - Using [`Sparkle`](../../api/hv/sparkle.md) as a stable per-symbol code (one Sparkle per `a`–`z`).
 - Using [`Sequence`](../../api/hv/sequence.md) with a `Pod`-derived seed so chunks are addressable both by word (exact) and by structure (positional).
 - The **ChunkProducer API** (`new_terminal`, `from_sequence_members`, `joiner`) staged through a batched `SubstrateMutableView` via `producer.produce(view)`.
-- Multi-attractor [`nns`](../../api/memory/selectors/near_neighbor.md) over [`SequenceAttractor`](../../api/memory/selectors/attractors.md#reverse-attractors) for positional conjunctive queries.
+- Multi-attractor [`nns`](../../api/memory/selectors/near_neighbor.md) over [`with_id_modifier`](../../api/memory/selectors/attractors.md#reverse-attractors) for positional conjunctive queries.
 
 ## The general idea
 
@@ -53,7 +53,7 @@ with storage.new_mutable_view() as view:
     for i, w in enumerate(words, start=1):
         members = memory.joiner(*[memory.by_item_key("letters", ch) for ch in w])
         # semantic_indexing=True: index the Sequence's code so suffix
-        # queries (sequence_attractor) can find words by structure.
+        # queries (with_id_modifier + SEQ_MARKER) can find words by structure.
         memory.from_sequence_members(
             "words", w, members, note=w, semantic_indexing=True,
         ).produce(view)
@@ -66,16 +66,23 @@ See [Substrate & Views](../../api/memory/substrate.md) for the full view API.
 
 ## Multi-attractor NNS
 
-A [`sequence_attractor(member_selector, pos, domain)`](../../api/memory/selectors/attractors.md#reverse-attractors) is a positional constraint: "Sequences in `domain` whose member at `pos` overlaps with `member_selector`". Position is **0-based**.
+A `with_id_modifier(member_selector, Bind(SEQ_MARKER@domain, Step^pos))` is a positional constraint: "Sequences in `domain` whose member at `pos` overlaps with `member_selector`". Position is **0-based**.
 
 `nns(*attractors)` evaluates all attractors and ranks Sequences by combined overlap. With multiple attractors, the result is a conjunction — a chunk must satisfy each positional constraint to score well.
 
 For "six-letter words ending in `er`":
 
 ```python
+seq_marker = hv.Sparkle(model, WORDS_DOMAIN, hv.PREWIRED_SEQUENCE_MARKER)
+step = hv.Sparkle(model, "", hv.PREWIRED_STEP)
+
 memory.nns(
-    memory.sequence_attractor(memory.by_item_key("letters", "e"), 4, WORDS_DOMAIN),
-    memory.sequence_attractor(memory.by_item_key("letters", "r"), 5, WORDS_DOMAIN),
+    memory.with_id_modifier(
+        memory.by_item_key("letters", "e"),
+        hv.bind(seq_marker, step.power(4))),
+    memory.with_id_modifier(
+        memory.by_item_key("letters", "r"),
+        hv.bind(seq_marker, step.power(5))),
 )
 ```
 
@@ -139,7 +146,7 @@ position N matches X"), each word's producer is constructed with
 `semantic_indexing=True`. This impresses the Sequence's *code* into the
 associative index alongside the chunk's id-Sparkle (which is always
 indexed). Without the flag, only the id is indexed and
-`sequence_attractor` queries return zero hits.
+`with_id_modifier` queries return zero hits.
 
 The letter terminals are written without the flag because their code
 *is* the id-Sparkle, so id-only indexing is sufficient.
@@ -168,7 +175,7 @@ Rank    Word    POS    Frequency    Dispersion
 
 - [Sparkle ✨](../../api/hv/sparkle.md) — per-symbol code used for letters
 - [Sequence 📿](../../api/hv/sequence.md) — ordered composite used for words
-- [Attractors](../../api/memory/selectors/attractors.md) — `sequence_attractor` and friends
+- [Attractors](../../api/memory/selectors/attractors.md) — `with_id_modifier` and friends
 - [Near-Neighbor Search](../../api/memory/selectors/near_neighbor.md) — `nns` over multiple attractors
 - [Substrate & Views](../../api/memory/substrate.md) — batched mutable views
 - [Working with Results](../../api/memory/selectors/results.md) — `range_sel`, `mem_get`
