@@ -158,17 +158,18 @@ let producer = producers::from_source_dest(
 
 ### ClusterUpdater
 
-Feeds an observed chunk into an existing Learner, updating its accumulated code via bundling.
+Feeds an observed chunk into an existing Learner, updating its accumulated code via bundling. The bundle multiplier defaults to 1; pass an explicit override (`multiple=N` in Python) to fold the same observation in repeatedly.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(view, 
+    # With explicit multiplier:
+    memory.mem_set(view,
         memory.cluster_updater(
             learner=memory.by_item_key("learners", "my_learner"),
             observed=memory.by_item_key("fruits", "apple"),
-            multiple=1,
+            multiple=3,
         ))
 ```
 {{#endtab}}
