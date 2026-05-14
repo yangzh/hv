@@ -3,6 +3,19 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.4.0 (2026-05-14)
+
+Headline: new **`LearnerPool`** SDM-style aggregator over N Learners, plus cross-language property/parity test infrastructure and a hardened memory-substrate contract.
+
+### New features
+- **`LearnerPool`** — SDM-style (Sparse Distributed Memory) aggregator that distributes writes across N Learners by access-circle.
+- **Cross-language parity oracle** — Rust now runs against Go-generated goldens (`testdata/hv/goldens.yaml`) so any Go↔Rust drift trips a test.
+- **Algebraic property tests** — 10 property tests covering Bind / Release / Bundle / Cyclone semantics, in Go (`rapid`) and mirrored in Rust (`proptest`). See `hv/parity.md`.
+
+### Build / deps
+- **`Cargo.lock` is now tracked** for reproducible Rust builds.
+- **`fjall`** pinned to 3.1.4.
+
 ## v4.1.1 (2026-04-27)
 
 Docstring polish: every PyO3-emitted item in `kongming_rs` now conforms to the
@@ -96,13 +109,3 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 
 - Notebook: scrollable SVG containers; auto-mirror releases to hv repo
 - SVG: add display_size parameter to Go/Rust/Python (0 = auto)
-
-## v3.8.6 (2026-04-07)
-
-- Notebook: add SVG visualization demo (single vector + overlap)
-- SVG renderer: move Go to hv/, add Rust/Python, palette-based overlap coloring
-- SVG renderer: replace svgo with raw fmt.Fprintf, fix square layout for all models
-- Add Dependabot: weekly checks for Cargo, Go, pip (ruff), GitHub Actions
-- Add PyPI project URLs: docs, repo, changelog, issues, discussions
-- Update parity.md for hv/ and memory/ with 2-week progress
-
