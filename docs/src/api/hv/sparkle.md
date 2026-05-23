@@ -46,8 +46,8 @@ s3 := hv.NewSparkleIdentity(model)
 // Random (from SparseOperation)
 s4 := hv.NewRandomSparkle(domain, so)
 
-// From an explicit Seed128 (domain + pod bundled) — primary constructor
-s5 := hv.NewSparkle(model, hv.NewSeed128FromDP(domain, pod))
+// From domain + pod directly — primary constructor
+s5 := hv.NewSparkle(model, domain, pod)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -67,8 +67,8 @@ let s3 = Sparkle::identity(model);
 // Random (from SparseOperation)
 let s4 = Sparkle::from_random(domain, &mut so);
 
-// From an explicit Seed128 (domain + pod bundled) — primary constructor
-let s5 = Sparkle::new(model, Seed128::from_dp(domain, pod));
+// From domain + pod directly — primary constructor
+let s5 = Sparkle::new(model, domain, pod);
 ```
 {{#endtab}}
 {{#endtabs}}
