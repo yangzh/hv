@@ -66,21 +66,33 @@ learner.bundle_multiple(&b, 3)?;  // with weight multiplier
 ```python
 learner.age()             # number of observations seen
 
-learner.weight(a)     # implicit weight for a probe vector
+learner.affinity(a)   # raw overlap; returns RandomOverlap when age==0
+learner.weight(a)     # implicit weight for a probe vector; 0.0 when age==0
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 learner.Age()             // uint32
 
-learner.Weight(a)     // float64
+learner.Affinity(a)   // uint32; returns RandomOverlap when age==0
+learner.Weight(a)     // float64; 0.0 when age==0
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
 learner.age()             // u32
 
-learner.weight(&a)    // f64
+learner.affinity(&a)  // u32; returns RandomOverlap when age==0
+learner.weight(&a)    // f64; 0.0 when age==0
 ```
 {{#endtab}}
 {{#endtabs}}
+
+<div class="callout callout-note">
+<div class="callout-title">Untrained learner is neutral</div>
+
+A fresh Learner (`age == 0`) has no offsets to overlap against. `Affinity`
+short-circuits to a non-zero baseline so that `Weight`
+yields exactly `0.0` for any probe — neutral, non-selecting, also non-rejecting.
+</div>
+</div>
