@@ -17,7 +17,7 @@ learner = hv.Learner.random(so)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-learner := hv.NewLearner(model, hv.NewSeed128(0, 42))
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42), nil)
 
 // a randomly-initialized learner.
 learner := hv.NewRandomLearner(so)
@@ -25,7 +25,7 @@ learner := hv.NewRandomLearner(so)
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut learner = Learner::new(model, Seed128::new(0, 42));
+let mut learner = Learner::new(model, Seed128::new(0, 42), None);
 
 // a randomly-initialized learner.
 let mut learner = Learner::random(&mut so);
