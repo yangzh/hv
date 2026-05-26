@@ -6,10 +6,15 @@ The total storage / processing budget is fixed — what matters is the distribut
 
 ## Constructors
 
+The third argument is an optional initial observation. Pass `None` / `nil`
+for a fresh `age == 0` learner; pass a HyperBinary to start at `age == 1`
+with that observation already bundled.
+
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-learner = hv.Learner(model, hv.Seed128(0, 42))
+learner = hv.Learner(model, hv.Seed128(0, 42))            # age == 0
+learner = hv.Learner(model, hv.Seed128(0, 42), initial=a) # age == 1
 
 # a randomly-initialized learner.
 learner = hv.Learner.random(so)
@@ -17,7 +22,8 @@ learner = hv.Learner.random(so)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-learner := hv.NewLearner(model, hv.NewSeed128(0, 42))
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42), nil) // age == 0
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42), a)   // age == 1
 
 // a randomly-initialized learner.
 learner := hv.NewRandomLearner(so)
@@ -25,7 +31,8 @@ learner := hv.NewRandomLearner(so)
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut learner = Learner::new(model, Seed128::new(0, 42));
+let mut learner = Learner::new(model, Seed128::new(0, 42), None);    // age == 0
+let mut learner = Learner::new(model, Seed128::new(0, 42), Some(a)); // age == 1
 
 // a randomly-initialized learner.
 let mut learner = Learner::random(&mut so);
