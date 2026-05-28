@@ -3,6 +3,19 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.5.0 (2026-05-28)
+
+Headline: new **`weights=`** kwarg on `hv.Parcel` plus several Python API tightenings that catch up to upstream Rust/Go drifts. Internally, a large NLP push lands OOV-token recovery and multi-token entity decoding (not Python-facing yet).
+
+### New features
+
+- **`hv.Parcel(seed, *pearls, weights=[...])`** — single Pythonic constructor that collapses Go's `NewParcel` / `NewWeightedParcel` / `NewParcelFromParts`. Omit `weights=` for uniform bundling (existing behavior); supply a list to bundle with per-pearl weights. Length mismatch raises `ValueError`.
+
+### API changes
+
+- **`hv.Sparkle(model, domain, pod)`** — simplified signature.
+- **`hv.Learner(model, seed, initial=None)`** — `initial` is now an optional kwarg defaulting to `None`.
+
 ## v4.4.0 (2026-05-14)
 
 Headline: new **`LearnerPool`** SDM-style aggregator over N Learners, plus cross-language property/parity test infrastructure and a hardened memory-substrate contract.
@@ -100,12 +113,3 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 
 ### Notebook
 - SVG viewer with zoom/pan controls, minimap, and reset button
-
-## v3.8.8 (2026-04-08)
-
-- SVG: unique pattern IDs (random), show_svg helper with zoom/pan in notebook
-
-## v3.8.7 (2026-04-08)
-
-- Notebook: scrollable SVG containers; auto-mirror releases to hv repo
-- SVG: add display_size parameter to Go/Rust/Python (0 = auto)
