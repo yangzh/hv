@@ -66,12 +66,28 @@ function initSvgViewer(cid, containerW, containerH, miniSize, panStep) {
 display(HTML(f"<script>{_JS}</script>"))
 
 
+class _SvgViewer:
+    """Multi-MIME wrapper: interactive HTML widget for Jupyter, raw SVG for static viewers (GitHub, nbviewer)."""
+
+    def __init__(self, html, svg):
+        self._html = html
+        self._svg = svg
+
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        return {"text/html": self._html, "image/svg+xml": self._svg}
+
+
 def show_svg(svg_str, width=600, height=600):
-    """Display an SVG with zoom/pan controls, minimap, and direction buttons."""
+    """Display an SVG with zoom/pan controls, minimap, and direction buttons.
+
+    Returns a multi-MIME object: Jupyter/Lab renders the interactive HTML
+    widget via JavaScript; static viewers (GitHub, nbviewer) fall back to
+    the embedded `image/svg+xml` payload.
+    """
     cid = f"svg-{uuid.uuid4().hex[:8]}"
     mini_size = 120
     pan_step = 50
-    return HTML(f'''
+    html = f'''
     <div style="display:flex; gap:10px; align-items:flex-start;">
         <div id="{cid}" style="width:{width}px; height:{height}px; overflow:hidden; border:1px solid #ccc; cursor:grab;">
             <div style="transform-origin:0 0; display:inline-block;">{svg_str}</div>
@@ -104,4 +120,5 @@ def show_svg(svg_str, width=600, height=600):
         </div>
     </div>
     <script>initSvgViewer("{cid}", {width}, {height}, {mini_size}, {pan_step});</script>
-    ''')
+    '''
+    return _SvgViewer(html, svg_str)
