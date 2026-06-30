@@ -3,6 +3,14 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.6.0 (2026-06-30)
+
+Headline: a **maintenance / internal** release — the Python bindings are rebuilt against a large memory-layer refactor that landed since v4.5.0. No new Python API.
+
+### Breaking changes
+
+- **Index keyspace redesign.** The substrate's on-disk key layout changed;
+
 ## v4.5.0 (2026-05-28)
 
 Headline: new **`weights=`** kwarg on `hv.Parcel` plus several Python API tightenings that catch up to upstream Rust/Go drifts. Internally, a large NLP push lands OOV-token recovery and multi-token entity decoding (not Python-facing yet).
@@ -113,3 +121,4 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 
 ### Notebook
 - SVG viewer with zoom/pan controls, minimap, and reset button
+
