@@ -13,9 +13,7 @@ if TYPE_CHECKING:
     from .env import LispEnv
 
 
-def evlamb(
-    env: LispEnv, lambda_expr: HyperBinary, args: list[HyperBinary]
-) -> HyperBinary:
+def evlamb(env: LispEnv, lambda_expr: HyperBinary, args: list[HyperBinary]) -> HyperBinary:
     """Apply a lambda expression to arguments (curried, one at a time)."""
     current = lambda_expr
     for arg in args:
@@ -28,9 +26,7 @@ def evlamb(
     return ev(env, current)
 
 
-def _evlambcurry(
-    env: LispEnv, lambda_expr: HyperBinary, arg: HyperBinary
-) -> HyperBinary:
+def _evlambcurry(env: LispEnv, lambda_expr: HyperBinary, arg: HyperBinary) -> HyperBinary:
     """Apply one argument to a lambda via curried beta-reduction."""
     _lambda_tag = cons_mod.car(env, lambda_expr)  # LAMBDA
     rest = cons_mod.cdr(env, lambda_expr)
@@ -52,9 +48,7 @@ def _evlambcurry(
         return cons_mod.cons(env, env.sym_lambda, params_and_body)
 
 
-def evshorn(
-    env: LispEnv, expr: HyperBinary, param: HyperBinary, arg: HyperBinary
-) -> HyperBinary:
+def evshorn(env: LispEnv, expr: HyperBinary, param: HyperBinary, arg: HyperBinary) -> HyperBinary:
     """Recursive tree-walk substitution (beta-reduction).
 
     Respects variable shadowing: if expr is (LAMBDA (params...) body)
