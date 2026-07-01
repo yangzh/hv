@@ -57,7 +57,6 @@ class LispEnv:
 
         if path is not None:
             import os
-
             self.storage = memory.Embedded(model, os.path.join(path, "lisp.db"))
         else:
             self.storage = memory.InMemory(model)
@@ -198,7 +197,9 @@ class LispEnv:
         """
         from . import evaluator, printer, reader
 
-        return printer.display(self, evaluator.ev_until_done(self, reader.parse(self, expr_str)))
+        return printer.display(
+            self, evaluator.ev_until_done(self, reader.parse(self, expr_str))
+        )
 
     def parse_display(self, expr_str: str) -> str:
         """Parse and pretty-print `expr_str` without evaluating it.

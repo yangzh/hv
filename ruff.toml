@@ -1,6 +1,14 @@
 line-length = 120
 target-version = "py311"
 
+# Copy-only, synced from the primary repo — linted/formatted at the source, not here:
+#   notebook/         <- primary notebook/            (notebook-sync.yml)
+#   examples/pylisp/  <- primary python/kongming/pylisp (rust-wheels sync-hv-repo)
+# Excluding them avoids fighting the source: e.g. ruff's isort treats `kongming`
+# as third-party here (no kongming/ package in this repo) but first-party in
+# primary, which flips import order and would flag faithfully-copied files.
+extend-exclude = ["notebook/", "examples/pylisp/"]
+
 [lint]
 select = ["E", "F", "I", "W"]
 ignore = ["E501"]

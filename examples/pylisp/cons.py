@@ -20,7 +20,9 @@ if TYPE_CHECKING:
     from .env import LispEnv
 
 
-def cons_parcel(env: LispEnv, seed: hv.Seed128, a: HyperBinary, b: HyperBinary) -> hv.Parcel:
+def cons_parcel(
+    env: LispEnv, seed: hv.Seed128, a: HyperBinary, b: HyperBinary
+) -> hv.Parcel:
     """Build a cons-encoded Parcel: bundle(bind(a, lhs), bind(b, rhs))."""
     return hv.bundle(seed, hv.bind(a, env.lhs), hv.bind(b, env.rhs))
 

@@ -57,7 +57,9 @@ def _parse_list(env: LispEnv, tokens: list[str]) -> HyperBinary:
     return _build_list_with_cdr(env, elements, env.nil)
 
 
-def _build_list_with_cdr(env: LispEnv, elements: list[HyperBinary], cdr_val: HyperBinary) -> HyperBinary:
+def _build_list_with_cdr(
+    env: LispEnv, elements: list[HyperBinary], cdr_val: HyperBinary
+) -> HyperBinary:
     result = cdr_val
     for elem in reversed(elements):
         result = cons_mod.cons(env, elem, result)
