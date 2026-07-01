@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "kongming-rs-hv: sparse binary hypervectors and learners"
+type: software
+url: "https://github.com/yangzh/hv"
+repository-code: "https://github.com/yangzh/hv"
+license: MIT
+authors:
+  - family-names: Yang
+    given-names: Zhonghao
+    email: yangzh@gmail.com
+preferred-citation:
+  type: article
+  title: "Cognitive modeling and learning with sparse binary hypervectors"
+  authors:
+    - family-names: Yang
+      given-names: Zhonghao
+  year: 2023
+  url: "https://arxiv.org/abs/2310.18316"
+  identifiers:
+    - type: other
+      value: "arXiv:2310.18316"
+      description: "arXiv preprint (cs.AI)"

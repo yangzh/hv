@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Discussions
+    url: https://github.com/yangzh/hv/discussions
+    about: Ask questions, share ideas, and browse announcements and Q&A.
+  - name: 📖 Documentation
+    url: https://yangzh.github.io/hv/
+    about: Full documentation, guides, API reference, and examples.
+  - name: 🔒 Private inquiries
+    url: https://docs.google.com/forms/d/e/1FAIpQLSeAPEzqIgcf1CYJZJepN2jtNy1QTPKtpQYkdBBs1-rNeIuoGQ/viewform
+    about: Contact the maintainer privately.
