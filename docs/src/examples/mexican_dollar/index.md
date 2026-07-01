@@ -185,7 +185,7 @@ result = memory.first_picked(view,
 print(result.id)  # → ✨:🌱SEK
 ```
 
-`analogical_reasoner` computes the transfer vector `feature ⊗ inverse(src)` internally and uses [near-neighbor search](../concepts/near_neighbor_search.md) to find the best match in memory — no manual algebra needed.
+`analogical_reasoner` computes the transfer vector `feature ⊗ inverse(src)` internally and uses [near-neighbor search](../../concepts/near_neighbor_search.md) to find the best match in memory — no manual algebra needed.
 
 ## Why It Works
 
@@ -195,8 +195,8 @@ This is a form of **analogical reasoning**: no explicit rules, no lookup tables 
 
 ## See Also
 
-- [Concepts: Operators](../concepts/operators.md) — algebraic foundations
+- [Concepts: Operators](../../concepts/operators.md) — algebraic foundations
 - [Operators](../../api/hv/operators.md) — bind, release, bundle
 - [Octopus](../../api/hv/octopus.md) — key-value composite used for country records
 - [Memory: Selectors](../../api/memory/selectors.md) — `analogical_reasoner`, `nns`, `with_code`
-- [Near-neighbor search](../concepts/near_neighbor_search.md) — how the reasoner finds answers
+- [Near-neighbor search](../../concepts/near_neighbor_search.md) — how the reasoner finds answers

@@ -1,6 +1,6 @@
 # NNS (Near-Neighbor Search)
 
-Wraps a single [attractor](attractors.md) to perform [near-neighbor search](../../concepts/near_neighbor_search.md). For multiple attractors, compose them with `joiner(...)` first.
+Wraps a single [attractor](attractors.md) to perform [near-neighbor search](../../../concepts/near_neighbor_search.md). For multiple attractors, compose them with `joiner(...)` first.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}

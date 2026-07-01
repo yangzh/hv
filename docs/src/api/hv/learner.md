@@ -95,4 +95,3 @@ A fresh Learner (`age == 0`) has no offsets to overlap against. `Affinity`
 short-circuits to a non-zero baseline so that `Weight`
 yields exactly `0.0` for any probe — neutral, non-selecting, also non-rejecting.
 </div>
-</div>
