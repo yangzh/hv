@@ -11,7 +11,7 @@ The only low-level API used:
   - a.cardinality()                    → number of segments
   - core().offset(seg)                 → ON-bit offset for a single segment
   - hv.SparseSegmented.from_offsets()  → construct from per-segment offsets
-  - hv.SparseOperation.uint64()        → same PRNG as used internall
+  - hv.SparseOperation.uint64()        → same PRNG as used internally
 
 This script does NOT call hv.bind() or hv.bundle() for computation — it
 reimplements them to show how they work.
@@ -65,7 +65,7 @@ def pure_python_release(model, composite, key):
     Returns a SparseSegmented with the result.
 
     Precondition:
-    1. `a` and `b` are of the same model (and thus the same sparsity, dimension, etc);
+    1. `composite` and `key` are of the same model (and thus the same sparsity, dimension, etc);
     """
     core_c = composite.core()
     core_k = key.core()

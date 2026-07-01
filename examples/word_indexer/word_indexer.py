@@ -12,6 +12,8 @@ Sequences in Python.
 
 Run:
     python examples/word_indexer/word_indexer.py
+
+See docs: https://yangzh.github.io/hv/examples/word_indexer/index.html
 """
 
 import time
