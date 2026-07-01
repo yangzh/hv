@@ -19,6 +19,10 @@ additional-js = ["theme/tabs.js"]
 [output.html.search]
 enable = true
 
+[output.html.fold]
+enable = true          # collapsible sidebar sections (default is off)
+level = 1              # keep the top level open, fold deeper sections
+
 [preprocessor.last-changed]
 command = "mdbook-last-changed"
 renderer = ["html"]
