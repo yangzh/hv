@@ -36,6 +36,7 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 |----------|------|
 | Colab — tutorial walkthrough | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/first.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
 | Colab — hypervector storage | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/memory.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
+| Colab — VSA LISP interpreter | <a href="https://colab.research.google.com/github/yangzh/hv/blob/main/notebook/lisp.ipynb?flush_cache=true" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a> |
 | Binder | <a href="https://mybinder.org/v2/gh/yangzh/hv/main?labpath=notebook/first.ipynb" target="_blank"><img src="https://mybinder.org/badge_logo.svg" alt="Binder"></a> |
 
 ## Applications
