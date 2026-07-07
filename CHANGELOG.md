@@ -3,6 +3,16 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.7.0 (2026-07-07)
+
+### Breaking changes
+
+- **`Learner.affinity(probe)` → `Learner.support(probe)`**.
+
+### Build / deps
+
+- PyO3 0.28 → 0.29; wheel version injected from the `rel-v*` tag (in-tree placeholder is `0.0.0`).
+
 ## v4.6.0 (2026-06-30)
 
 Headline: a **maintenance / internal** release — the Python bindings are rebuilt against a large memory-layer refactor that landed since v4.5.0. No new Python API.
@@ -112,13 +122,4 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 - Document IntEnum constants and enum classes in python_api.md
 - Fix `Domain.with_prefix` → `from_prefix_and_name` in python_api.md
 
-## v3.8.9 (2026-04-09)
-
-### API changes
-- `SparseSegmented.from_offsets(model, offsets)` — new constructor from per-segment offsets
-- `WithChunk()` renamed to `WithChunks()` — accepts multiple chunks
-- Removed `display_size` parameter from `to_svg()` / `to_svg_overlap()` — client-side handles viewport
-
-### Notebook
-- SVG viewer with zoom/pan controls, minimap, and reset button
 
