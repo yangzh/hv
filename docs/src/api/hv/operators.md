@@ -61,44 +61,31 @@ let recovered = operators::release(&bound, &role);  // Pointer
 ### Expand (extend a Knot)
 
 Extends an existing [Knot](knot.md) with additional operands without
-re-binding from scratch. `k.expand(c)` on `k = bind(a, b)` gives the
-same result as `bind(a, b, c)` — but **mutates `k` in place**, so clone
-first if you need the original.
+re-binding from scratch. `k.expand(c)` on `k = bind(a, b)` **returns a
+new Knot** equal to `bind(a, b, c)` — a Knot is an immutable value, so
+`k` itself never changes.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-import copy
-
 k = hv.bind(a, b)
-k.expand(c)                 # k is now equivalent to hv.bind(a, b, c)
-
-# To preserve the original, clone first:
-base = hv.bind(a, b)
-k1 = copy.copy(base)
-k1.expand(c)                # base is untouched
+k2 = k.expand(c)            # k2 is equivalent to hv.bind(a, b, c); k unchanged
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 k := hv.Bind(a, b)
-k.Expand(c)                 // k is now equivalent to hv.Bind(a, b, c)
-
-// To preserve the original, clone first (Clone returns HyperBinary):
-base := hv.Bind(a, b)
-k1 := base.Clone().(hv.Knot)
-k1.Expand(c)                // base is untouched
+k2 := k.Expand(c)           // k2 is equivalent to hv.Bind(a, b, c); k unchanged
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut k = operators::bind_hb(vec![a.clone(), b.clone()]);
-k.expand(vec![c.clone()]);   // k is now equivalent to bind_hb(vec![a, b, c])
+let k = operators::bind_hb(vec![a.clone(), b.clone()]);
+let k2 = k.expand(vec![c.clone()]); // equivalent to bind_hb(vec![a, b, c]); consumes k
 
-// To preserve the original, clone first:
+// Deriving several Knots from one base: clone first.
 let base = operators::bind_hb(vec![a.clone(), b.clone()]);
-let mut k1 = base.clone();
-k1.expand(vec![c]);           // base is untouched
+let k1 = base.clone().expand(vec![c]); // base still usable
 ```
 {{#endtab}}
 {{#endtabs}}

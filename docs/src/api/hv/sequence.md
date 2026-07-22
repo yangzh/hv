@@ -23,65 +23,49 @@ let seq = Sequence::new(Seed128::new(0, 42), 1, members);
 {{#endtab}}
 {{#endtabs}}
 
-## In-place edits: Append / Prepend / Reset
+## Derived Sequences: Append / Prepend / Reset
 
-`Append`, `Prepend`, and `Reset` all **mutate the Sequence in place** —
-clone first if you need to preserve the original.
+`Append`, `Prepend`, and `Reset` all **return a new Sequence** — a
+Sequence is an immutable value, so the receiver is never changed.
 
-- `Append(more...)` — add members at the end. `start` is unchanged.
-- `Prepend(more...)` — add members at the front; `start` decrements by
+- `Append(more...)` — members added at the end. `start` is unchanged.
+- `Prepend(more...)` — members added at the front; `start` decrements by
   `len(more)` so existing members keep their positional binding.
-- `Reset(start)` — shift the starting index. No-op when `start` equals
-  the current start.
+- `Reset(start)` — shift the starting index. Returns an equal Sequence
+  when `start` equals the current start.
 
-After any of these, `seq` equals what you'd get by building a fresh
+The result equals what you'd get by building a fresh
 `NewSequence(seed, new_start, all_members...)` — the domain/pod seed is
 preserved.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-import copy
-
 seq = hv.Sequence(hv.Seed128(0, 42), a, b, c)
 
-# Append / Prepend are variadic and mutate in place.
-seq.append(d, e)            # seq now [a, b, c, d, e]
-seq.prepend(x, y)           # seq now [x, y, a, b, c, d, e], start -= 2
-seq.reset(10)               # shift the starting index to 10
-
-# To preserve the original, clone first:
-base = hv.Sequence(hv.Seed128(0, 42), a, b, c)
-s1 = copy.copy(base)
-s1.append(d)                # base is untouched
+# Append / Prepend are variadic and return new Sequences.
+s1 = seq.append(d, e)       # [a, b, c, d, e]; seq unchanged
+s2 = seq.prepend(x, y)      # [x, y, a, b, c], start -= 2; seq unchanged
+s3 = seq.reset(10)          # starting index 10; seq unchanged
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
 seq := hv.NewSequence(hv.NewSeed128(0, 42), 0, a, b, c)
 
-seq.Append(d, e)            // seq now [a, b, c, d, e]
-seq.Prepend(x, y)           // seq now [x, y, a, b, c, d, e], start -= 2
-seq.Reset(10)               // shift the starting index to 10
-
-// To preserve the original, clone first (Clone returns HyperBinary):
-base := hv.NewSequence(hv.NewSeed128(0, 42), 0, a, b, c)
-s1 := base.Clone().(hv.Sequence)
-s1.Append(d)                // base is untouched
+s1 := seq.Append(d, e)      // [a, b, c, d, e]; seq unchanged
+s2 := seq.Prepend(x, y)     // [x, y, a, b, c], start -= 2; seq unchanged
+s3 := seq.Reset(10)         // starting index 10; seq unchanged
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut seq = Sequence::new(Seed128::new(0, 42), 0, vec![a, b, c]);
+let seq = Sequence::new(Seed128::new(0, 42), 0, vec![a, b, c]);
 
-seq.append(vec![d, e]);      // seq now [a, b, c, d, e]
-seq.prepend(vec![x, y]);     // seq now [x, y, a, b, c, d, e], start -= 2
-seq.reset(10);               // shift the starting index to 10
-
-// To preserve the original, clone first:
-let base = Sequence::new(Seed128::new(0, 42), 0, vec![a, b, c]);
-let mut s1 = base.clone();
-s1.append(vec![d]);          // base is untouched
+// Consuming self: clone first when deriving several from one base.
+let s1 = seq.clone().append(vec![d, e]); // [a, b, c, d, e]
+let s2 = seq.clone().prepend(vec![x, y]); // [x, y, a, b, c], start -= 2
+let s3 = seq.reset(10); // starting index 10; consumes seq
 ```
 {{#endtab}}
 {{#endtabs}}
