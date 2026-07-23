@@ -3,6 +3,19 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.8.0 (2026-07-23)
+
+### Breaking changes
+
+- **Knot / Sequence are immutable** — `expand` / `append` / `prepend` / `reset`
+  now return a NEW composite instead of mutating in place (Go/Rust/Python
+  aligned).
+
+### Fixes
+
+- Learner age-overflow divide-by-zero in Fisher-Yates bundling.
+- Identity-safe `Overlap` via batch offsets.
+
 ## v4.7.0 (2026-07-07)
 
 ### Breaking changes
@@ -108,18 +121,3 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 
 ### Docs
 - Docker installation guide in the Python Quick Start: one-liner REPL, reusable image, and JupyterLab container.
-
-## v3.8.10 (2026-04-11)
-
-### New features
-- Constants (MODEL_*, PREWIRED_*, HINT_*, DOMAIN_PREFIX_*) are now native Python `IntEnum` members — iterable, named, and IDE-discoverable via `hv.Model`, `hv.Prewired`, `hv.Hint`, `hv.DomainPrefix`. Fully backward-compatible (IntEnum subclasses int).
-
-### Bug fixes
-- Fix pylisp: update stale `Domain.with_prefix` → `from_prefix_and_name` and `first_picked_chunk` → `first_picked`
-- Fix HV compliance tests: update for Seed128 composite API, remove PREWIRED_OCTOPUS_MARKER (deleted from proto), fix Sequence step domain (d0)
-
-### Docs
-- Document IntEnum constants and enum classes in python_api.md
-- Fix `Domain.with_prefix` → `from_prefix_and_name` in python_api.md
-
-
