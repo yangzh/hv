@@ -104,9 +104,11 @@ def main() -> None:
     report(
         "****er  (6 letters)",
         storage,
-        lambda: memory.nns(
-            memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "e"), 4, WORDS_DOMAIN),
-            memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "r"), 5, WORDS_DOMAIN),
+        lambda: memory.similar_composite(
+            memory.joiner(
+                memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "e"), 4, WORDS_DOMAIN),
+                memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "r"), 5, WORDS_DOMAIN),
+            )
         ),
     )
 
@@ -114,11 +116,13 @@ def main() -> None:
     report(
         "*******tion (11 letters)",
         storage,
-        lambda: memory.nns(
-            *[
-                memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, ch), pos, WORDS_DOMAIN)
-                for pos, ch in [(7, "t"), (8, "i"), (9, "o"), (10, "n")]
-            ]
+        lambda: memory.similar_composite(
+            memory.joiner(
+                *[
+                    memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, ch), pos, WORDS_DOMAIN)
+                    for pos, ch in [(7, "t"), (8, "i"), (9, "o"), (10, "n")]
+                ]
+            )
         ),
     )
 
