@@ -3,6 +3,20 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.9.0 (2026-08-03)
+
+### Breaking changes
+
+- **`semantic_indexing=` → `enable_semantic_indexing=`.** The impress / produce kwarg
+  was renamed across all stores (Embedded, InMemory, Scylla). Update
+  `impress(chunk, semantic_indexing=True)` → `impress(chunk, enable_semantic_indexing=True)`.
+
+### New features
+
+- **`disable_id_indexing=` kwarg** on `impress` / `produce` (all stores). When `True`, the
+  chunk's Id-Sparkle is skipped from the index (item-key-only chunk) — pairs with
+  `enable_semantic_indexing=` for full control over what each write indexes.
+
 ## v4.8.0 (2026-07-23)
 
 ### Breaking changes
@@ -110,14 +124,3 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 
 ### Packaging
 - New `manylinux_2_28_aarch64` wheel for Linux ARM64. `pip install kongming-rs-hv` now works natively inside ARM Linux containers — e.g. `docker run python:3.12-slim` on Apple Silicon no longer needs `--platform=linux/amd64` / Rosetta emulation.
-
-## v3.9.0 (2026-04-16)
-
-### New features
-- `hv.bind_more(knot, *more)` → `Knot` — extend an existing Knot with additional parts without re-binding from scratch. `bind_more(bind(a, b), c)` is equivalent to `bind(a, b, c)`. Returns a new Knot; the original is unchanged. Raises `ValueError` if no additional operands are passed.
-
-### Performance
-- `bind_direct()` short-circuits on a single operand, skipping the bind loop and buffer allocation.
-
-### Docs
-- Docker installation guide in the Python Quick Start: one-liner REPL, reusable image, and JupyterLab container.
