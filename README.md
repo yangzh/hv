@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/kongming-rs-hv)](https://pypi.org/project/kongming-rs-hv/)
 [![License](https://img.shields.io/github/license/yangzh/hv)](LICENSE)
 
-Public release of sparse binary hypervectors and associated learners, powered by the Rust-backed `kongming-rs-hv` package.
+Public release of sparse binary hypervectors and associated learners, powered by the `kongming-rs-hv` package.
 
 ## Installation
 
@@ -24,11 +24,6 @@ Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github
 - [Python Quick Start](https://yangzh.github.io/hv/guides/python/quick-start.html) — installation, examples, and notebooks
 - [Notebook Quick Start](https://yangzh.github.io/hv/guides/notebook/quick-start.html) — cell-by-cell Jupyter walkthrough
 - [PDF download](https://yangzh.github.io/hv/kongming-hv.pdf)
-
-> The published site is deployed from release tags (`v*`) and tracks the
-> latest `kongming-rs-hv` release on PyPI. The `main` branch of this repo is
-> the working head — it may describe APIs or examples that haven't been
-> released yet.
 
 ## Try Online
 
@@ -62,6 +57,4 @@ For private inquiries, use the [contact form](https://docs.google.com/forms/d/e/
 
 ## License
 
-The Python source code, examples, and documentation in this repository are licensed under the [MIT License](LICENSE). 
-
-The underlying engine distributed via PyPI (`kongming-rs-hv`), however, is proprietary.
+The Python source code, examples, and documentation in this repository are licensed under the [MIT License](LICENSE).
