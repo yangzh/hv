@@ -3,6 +3,22 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.10.0 (2026-08-11)
+
+### Breaking changes
+
+- **`HyperBinary.hint()` removed.** The per-vector type-tag accessor (and its
+  `.hint()` Python binding) is gone from every hypervector type — a vector's type
+  is known from how it was constructed. The `hv.HINT_*` constants stay for
+  wire-format work.
+- **Learner & identity serialization changed (persisted-data break).**
+
+### New features
+
+- **Two more RNG backends** — Philox-4×64-10 and xoroshiro128++ join
+  xoshiro256++ (default) and PCG-DXSM, all bit-identical across engines. Select
+  via the `KONGMING_RNG` environment variable.
+
 ## v4.9.0 (2026-08-03)
 
 ### Breaking changes
@@ -119,8 +135,3 @@ Major version bump to signal the underlying PyO3 runtime change — the public P
 
 ### Internal
 - Upgrade pyo3 0.23 → 0.28.3. Migration covers `PyObject` → `Py<PyAny>`, `Python::with_gil` → `Python::attach`, and explicit `from_py_object` opt-in on 15 pyclass types. Smoke tests and three Jupyter notebooks (first, memory, lisp — 79 code cells) pass without regression.
-
-## v3.9.1 (2026-04-18)
-
-### Packaging
-- New `manylinux_2_28_aarch64` wheel for Linux ARM64. `pip install kongming-rs-hv` now works natively inside ARM Linux containers — e.g. `docker run python:3.12-slim` on Apple Silicon no longer needs `--platform=linux/amd64` / Rosetta emulation.
