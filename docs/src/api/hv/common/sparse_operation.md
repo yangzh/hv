@@ -9,16 +9,20 @@ A SparseOperation instance wraps a Model, a random number generator, and potenti
 ```python
 so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
 so1 = hv.SparseOperation(hv.MODEL_1M_10BIT, "domain", "pod")
+
+# Explicit RNG backend (keyword-only; omit for the KONGMING_RNG default, hv.RNG_XOSHIRO_256PP)
+# Constants: hv.RNG_XOSHIRO_256PP, hv.RNG_PCG_DXSM, hv.RNG_PHILOX_4X64, hv.RNG_XOROSHIRO_128PP.
+so2 = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42, rng_hint=hv.RNG_PHILOX_4X64)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-so := hv.NewSparseOperation(api.Model_MODEL_1M_10BIT, 0, 42)
+so := hv.NewSparseOperation(api.Model_MODEL_1M_10BIT, hv.GetGlobalEnv().RngHint, 0, 42)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut so = SparseOp::new(Model::Model1m10bit, 0, 42);
+let mut so = SparseOp::new(Model::Model1m10bit, flag_rng(), 0, 42);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -37,6 +41,8 @@ so.cardinality()  # cardinality for this model
 so.sparsity()     # sparsity for this model
 
 so.uint64()       # next random number
+
+so.rng_hint()     # RNG backend (an hv.RNG_* constant)
 
 ```
 {{#endtab}}
