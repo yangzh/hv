@@ -114,7 +114,10 @@ s0.core()          // SparseSegmented
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-`power(0)` always returns the identity sparkle. `power(-1)` returns the inverse.
+`power(0)` returns the identity vector (serialized in the canonical
+`SparseSegmented` nil-offsets form). Only `Sparkle` and `SparseSegmented`
+support `power(0)` — every other type has no identity-vector concept and
+rejects it. `power(-1)` returns the inverse.
 </div>
 
 ## Pretty-printing

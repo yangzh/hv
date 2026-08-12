@@ -113,7 +113,8 @@ ss := hv.BindDirect(domain, pod, a, b, c)  // SparseSegmented
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let ss = operators::bind_direct(domain, pod, &[a, b, c]);  // SparseSegmented
+let ss = operators::bind(domain, pod, &[a, b, c]);         // SparseSegmented
+let ss0 = operators::bind_direct(&[a, b, c]);              // no seed (default Domain/Pod)
 ```
 {{#endtab}}
 {{#endtabs}}

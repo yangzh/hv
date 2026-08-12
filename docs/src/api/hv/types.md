@@ -10,13 +10,12 @@ Python doesn't have the concept of interface/trait, but all `HyperBinary` derive
 v.model()        # Model enum
 v.width()
 v.cardinality()
-v.hint()
 v.stable_hash()  # int
 v.seed128()
 v.exponent()
 
 v.core()         # SparseSegmented
-v.power(p)       # HyperBinary
+v.power(p)       # HyperBinary; p=0 (identity) only for SparseSegmented/Sparkle
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -25,7 +24,6 @@ type HyperBinary interface {
     Model() api.Model
     Width() uint32
     Cardinality() uint32
-    Hint() api.HyperBinaryProto_Hint
     StableHash() uint64
     Seed128() Seed128
     Exponent() int32
@@ -41,7 +39,6 @@ pub trait HyperBinary: std::fmt::Display {
     fn model(&self) -> Model;
     fn width(&self) -> u32;
     fn cardinality(&self) -> u32;
-    fn hint(&self) -> HyperBinaryHint;
     fn stable_hash(&self) -> u64;
     fn seed128(&self) -> &Seed128;
     fn exponent(&self) -> i32;
