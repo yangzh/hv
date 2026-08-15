@@ -2,8 +2,6 @@
 
 [Introduction](introduction.md)
 
-# Concepts
-
 - [Concepts](concepts/overview.md)
     - [Hypervectors](concepts/hypervectors.md)
     - [Operators](concepts/operators.md)
@@ -30,7 +28,7 @@
         - [Octopus 🐙](api/hv/octopus.md)
         - [Knot 🪢](api/hv/knot.md)
         - [Parcel 🎁](api/hv/parcel.md)
-        - [Pointer 👉](api/hv/pointer.md)
+        - [Dart 🎯](api/hv/dart.md)
     - [Operators](api/hv/operators.md)
     - [Customizing Run-time Behavior](api/hv/runtime.md)
     - [Misc](api/hv/misc.md)
@@ -55,8 +53,6 @@
     - [Installation](guides/python/installation.md)
     - [Quick Example](guides/python/example.md)
     - [Walkthrough](guides/python/walkthrough.md)
-
-# Examples
 
 - [Examples](examples/index.md)
     - [Operators from Scratch](examples/operators/index.md)
