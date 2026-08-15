@@ -4,12 +4,13 @@
 
 # Concepts
 
-- [Hypervectors](concepts/hypervectors.md)
-- [Operators](concepts/operators.md)
-- [Composites](concepts/composites.md)
-- [Near-neighbor search](concepts/near_neighbor_search.md)
-- [Learner](concepts/learner.md)
-- [LearnerPool](concepts/learner_pool.md)
+- [Concepts](concepts/overview.md)
+    - [Hypervectors](concepts/hypervectors.md)
+    - [Operators](concepts/operators.md)
+    - [Composites](concepts/composites.md)
+    - [Near-neighbor search](concepts/near_neighbor_search.md)
+    - [Learner](concepts/learner.md)
+    - [LearnerPool](concepts/learner_pool.md)
 
 # API Reference
 
