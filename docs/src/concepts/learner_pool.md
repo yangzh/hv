@@ -1,42 +1,27 @@
 # LearnerPool
 
-> **DRAFT — placeholder.** Structure only; content to be filled in.
+**LearnerPool** is an aggregate over member [Learners](../api/hv/learner.md) for improved scalability. Instead of dedicating one Learner to each address, a pool holds a fixed roster of member Learners shared by *every* address.
 
-**LearnerPool** is an aggregate over member [Learners](../api/hv/learner.md) for improved scalability.
-
-<!-- TODO: one-paragraph motivation — the per-Learner capacity ceiling, and
-     what pooling members buys (capacity that scales with the roster, not
-     with a single bundle's bandwidth). -->
+In this sense, an address does not own a member, it *addresses* a small access circle of members, which can expand based on actual need. Structurally a classic Learner is the degenerate case where each address simply maps to a single Learner.
 
 ## Why a pool
 
-<!-- TODO: the saturation cliff of a single Learner; hub addresses; why
-     one-Learner-per-address wastes low-fan-out addresses and starves
-     high-fan-out ones. -->
+A single Learner has a hard capacity ceiling: as more distinct patterns are bundled in, each one's recoverable signal shrinks, until — past a few dozen patterns — none can be told apart from noise.
 
-## Access circles
+This is undesirable in various scenarios:
+- high fan-out addresses (hubs) saturate and silently forget;
+- the long tail of low fan-out addresses wastes almost all of its dedicated capacity.
 
-<!-- TODO: address → circle of members; τ and the Poisson(1) overlap model;
-     adaptive, margin-driven circle sizing (one criterion: diversity margin
-     vs 2θ); saturation semantics (a fixed roster refuses writes when every
-     member is full). -->
+A pool solves both issues exactly as its name suggests — by pooling many member Learners together. Most light addresses still get a nearly-private member, while heavy addresses recruit as many members as their content genuinely need, up to the whole pool. When to recruit is decided by each member's [diversity margin](learner.md#diversity-margin), so growth follows diversity rather than repetition.
 
-## Write with signature
+Unlike the typical use case where we need one learner for each entity we need to keep track, LearnerPool uses a fixed amount of resources and entities of various fan-out can be pool together to share resource.
 
-<!-- TODO: addr ⊗ data storage; discriminative vs generative reads;
-     per-member scans and the access-circle read. -->
-
-## Reading from a pool
-
-<!-- TODO: support / noise floor; released members as attractors. -->
+The internal "load balancing" is mathematically sound, stable, and requires no manual intervention. The member Learners organize organically rather than piling up at random: if each Learner is a basic "neuron", a LearnerPool is an organism which behaves coherently toward a common goal.
 
 ## Persistence
 
-<!-- TODO: the self-describing sentinel (kongming.api.v1.LearnerPoolProto),
-     member chunks, memory.load_learner_pool / LoadLearnerPool. -->
+A pool serializes as a small self-describing sentinel — its metadata as a `LearnerPoolProto` — plus one ordinary chunk per trained member; blank members need nothing. Loading is a single call (`memory.load_learner_pool` in Python): the sentinel is read from the substrate, the pool rebuilds itself from its own metadata with no external configuration, and the trained members hydrate in place.
 
-## API at a glance
+## Capacity is fixed
 
-<!-- TODO: table across Go / Rust / Python once the surface settles. -->
-
-Jump to the API reference: *TODO — link once the LearnerPool API page exists.*
+The roster size is set at pool creation and cannot grow afterwards: there is no incremental widening short of a full retrain. When every member a write could reach is full, the pool refuses the write rather than degrade what it already holds. Size pools with headroom for the corpus they are meant to absorb.
