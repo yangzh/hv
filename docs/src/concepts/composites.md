@@ -66,19 +66,19 @@ Use when: you need a superposition of concepts, with optional weights.
 
 Check out [code snippets](../api/hv/parcel.md) from the API reference.
 
-## Pointer
+## Dart
 
 A **one-directional reference** between two hypervectors.
 
 $$P = A \otimes B^{-1}$$
 
-A Pointer encodes a directed link from a source `A` to a destination `B`. Given the pointer and either endpoint, the other endpoint can be recovered: `P ⊗ B` recovers `A`, and `A ⊗ P^{-1}` recovers `B`.
+A Dart encodes a directed link from a source `A` to a destination `B`. Given the Dart and either endpoint, the other endpoint can be recovered: `P ⊗ B` recovers `A`, and `A ⊗ P^{-1}` recovers `B`.
 
-Pointer is the structured wrapper for the [release](../api/hv/operators.md#release) operation — `Release(A, B)` returns a Pointer with `A` as source and `B` as destination.
+Dart is the structured wrapper for the [release](../api/hv/operators.md#release) operation — `Release(A, B)` returns a Dart with `A` as source and `B` as destination.
 
 Use when: you need a reversible directional link (e.g., representing edges, mappings, or "from→to" relations).
 
-Check out [code snippets](../api/hv/pointer.md) from the API reference.
+Check out [code snippets](../api/hv/dart.md) from the API reference.
 
 ## Summary
 
@@ -89,4 +89,4 @@ Check out [code snippets](../api/hv/pointer.md) from the API reference.
 | **Octopus** | Key-bind + bundle | Partial (by key) | Key-value records |
 | **Knot** | Bind (multiply) | No | Reversible associations |
 | **Parcel** | Bundle (add) | No | superpositions, weighted or unweighted |
-| **Pointer** | Bind A with Inv(B) | Directional | One-directional references |
+| **Dart** | Bind A with Inv(B) | Directional | One-directional references |

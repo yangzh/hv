@@ -119,7 +119,7 @@ with storage.new_mutable_view() as view:
 
 ### FromSourceDest
 
-Creates a [Pointer 👉](../hv/pointer.md) chunk — a directional reference from a `source` chunk to a `dest` chunk. Both selectors must resolve to a single chunk; the produced Pointer's bit-level value is `source.id ⊗ Inv(dest.id)`.
+Creates a [Dart 🎯](../hv/dart.md) chunk — a directional reference from a `source` chunk to a `dest` chunk. Both selectors must resolve to a single chunk; the produced Dart's bit-level value is `source.id ⊗ Inv(dest.id)`.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
