@@ -1,13 +1,13 @@
-# Pointer 👉
+# Dart 🎯
 
-A one-directional reference between two hypervectors. A Pointer encodes a directed link from a `source` to a `destination` via `P = source ⊗ Inv(destination)`. Given the pointer and either endpoint, the other endpoint can be recovered. See [Composites: Pointer](../../concepts/composites.md#pointer).
+A one-directional reference between two hypervectors. A Dart encodes a directed link from a `source` to a `destination` via `P = source ⊗ Inv(destination)`. Given the Dart and either endpoint, the other endpoint can be recovered. See [Composites: Dart](../../concepts/composites.md#dart).
 
 ## Constructor
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-p = hv.Pointer(hv.Seed128(0, 42), source, destination)
+p = hv.Dart(hv.Seed128(0, 42), source, destination)
 
 # Or via the release operator:
 p = hv.release(source, destination)
@@ -15,7 +15,7 @@ p = hv.release(source, destination)
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.NewPointer(hv.NewSeed128(0, 42), source, destination)
+p := hv.NewDart(hv.NewSeed128(0, 42), source, destination)
 
 // Or via the Release operator:
 p := hv.Release(source, destination)
@@ -23,7 +23,7 @@ p := hv.Release(source, destination)
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let p = Pointer::new(Seed128::new(0, 42), source, destination);
+let p = Dart::new(Seed128::new(0, 42), source, destination);
 
 // Or via the release operator:
 let p = operators::release(&source, &destination);
@@ -33,7 +33,7 @@ let p = operators::release(&source, &destination);
 
 ## Endpoints
 
-A Pointer retains references to its source (`A`) and destination (`B`).
+A Dart retains references to its source (`A`) and destination (`B`).
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -58,7 +58,7 @@ p.destination()   // &HyperBinaryKind — B
 
 ## Recovering endpoints
 
-Given the pointer and one endpoint, the other can be recovered:
+Given the Dart and one endpoint, the other can be recovered:
 
 - `RDeref(B) = A` — recover the source given the destination, via `P ⊗ B`.
 - `Deref(A) = B` — recover the destination given the source, via `A ⊗ Inv(P)`.
@@ -66,14 +66,14 @@ Given the pointer and one endpoint, the other can be recovered:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-p = hv.Pointer(seed, a, b)
+p = hv.Dart(seed, a, b)
 recovered_a = p.rderef(b)   # ≈ a
 recovered_b = p.deref(a)    # ≈ b
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.NewPointer(seed, a, b)
+p := hv.NewDart(seed, a, b)
 recoveredA := p.RDeref(b)   // ≈ a
 recoveredB := p.Deref(a)    // ≈ b
 ```
@@ -88,6 +88,6 @@ let recovered_b = p.deref(&a);   // ≈ b
 
 ## Anti-commutativity
 
-Pointer (and the `release` operator that constructs it) is anti-commutative:
+Dart (and the `release` operator that constructs it) is anti-commutative:
 
 $$P(A, B) = P(B, A)^{-1}$$
