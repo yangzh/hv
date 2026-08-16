@@ -3,6 +3,31 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.11.0 (2026-08-15)
+
+Headline: `LearnerPool` becomes a first-class Python type, and the resident-pool
+substrate format is finalized.
+
+### Breaking changes
+
+- **`memory.similar_composite` → `memory.similar`.** The composite-similarity
+  search is renamed; `similar_composite` shipped in v4.8 only as a transitional
+  alias and is now removed. Update `memory.similar_composite(...)` →
+  `memory.similar(...)`.
+
+### New features
+
+- **`hv.LearnerPool`.** A Python binding for the resident learner pool:
+  build/size a pool, iterate its members, hydrate it from a substrate's pool
+  sentinel, and read its capacity stats — the read-side counterpart to trained
+  pools.
+- **`Learner.diversity_margin`.** The post-bundle overlap of a learner's last
+  write: a cheap scalar for how much a new write collided with what the learner
+  already holds.
+- **`hv.SparseOperation(rng_hint=…)`.** Keyword-only selection of the RNG backend
+  at the SparseOperation level (parity with Go/Rust), matching the four
+  bit-identical backends from v4.10.
+
 ## v4.10.0 (2026-08-11)
 
 ### Breaking changes
@@ -128,10 +153,3 @@ A meaty release with two themes: a sweep of polymorphic Python ergonomics across
 ### Bug fixes
 
 - **`view.write_chunk` (now removed) used to silently skip the associative-index update**, so chunks written via the batched-view path were findable by exact-key lookup but not by NNS. The fix threaded `Substrate::index_arc()` through `MutableSubstrateView`. The followup API redesign (above) replaces the path entirely with `producer.produce(view)`.
-
-## v4.0.0 (2026-04-21)
-
-Major version bump to signal the underlying PyO3 runtime change — the public Python API is unchanged, but the extension is rebuilt against a new binding layer that's a 5-minor-version jump ahead.
-
-### Internal
-- Upgrade pyo3 0.23 → 0.28.3. Migration covers `PyObject` → `Py<PyAny>`, `Python::with_gil` → `Python::attach`, and explicit `from_py_object` opt-in on 15 pyclass types. Smoke tests and three Jupyter notebooks (first, memory, lisp — 79 code cells) pass without regression.
