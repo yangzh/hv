@@ -32,6 +32,8 @@ The roster size is set at pool creation and cannot grow afterwards: there is cur
 
 Using longer learners (for example, `10bit`, `12bit`, etc) is a complete orthogonal direction for expanding the capacity. However, if you are comfortable with simpler `8bit` learners, adding more members will be quite straightforward to add overall capacity.
 
+Another practical consideration, `8bit` model naturally supports low-level SIMD from all supported platforms, which can boost performance significantly. `10bit`/`12bit`, however, does NOT natively support this level of optimization: so stick with `8bit` if you really care about performance, and fortunately `LearnerPool` can mitigate the capacity limitation.
+
 ## API overview
 
 A `LearnerPool` is conceptually determined only by the total count of member learners.
