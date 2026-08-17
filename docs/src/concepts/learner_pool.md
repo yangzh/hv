@@ -14,23 +14,25 @@ This limitation of capacity (of individual learner) is unsuitable in various sce
 
 A pool solves both issues exactly as its name suggests, by pooling many member Learners together. Most light addresses still get a nearly-private member, while heavy addresses recruit as many members as their content genuinely needs, up to the whole pool. At the end of the day, individual member can serve a mixture of low and high fan-out addresses, computed internally by its own scheduling logic. 
 
-The internal "load balancing" is mathematically sound, stable, and requires no manual intervention. The member Learners organize organically rather than piling up at random: if each Learner is a basic "neuron", a LearnerPool is an organism which behaves coherently toward a common goal.
+The internal "load balancing" is mathematically sound, stable, and requires no manual intervention. The member Learners organize organically rather than piling up naively: if each Learner is a basic "neuron", a LearnerPool is an organism which behaves coherently toward a common goal.
 
-## Diversity vs. repetition
-
-The `LeanerPool` can pick the suitable learner by ensuring the member has enough capacity, and the incoming pattern can be recalled reliably later, among other criteria. Note we examine [diversity margin](learner.md#diversity-margin) of each member, so expansion follows diversity (of experiences) rather than crude repetition.
-
-This also implies the scheduler can always find one suitable member, unless the whole pool is out of capacity, in which case the write will fail: all members can be used as reserve as needed.
-
-## Fixed capacity
+### Fixed capacity
 
 Unlike the typical arrangement of one Learner per tracked entity, a LearnerPool uses a fixed amount of resources: entities of varying fan-out share the same pool.
 
 The roster size is set at pool creation and cannot grow afterwards: there is currently no incremental expansion short of a full retrain. When every member a write could reach is full, the pool refuses the write rather than degrade what it already holds. Size pools with headroom for the corpus they are meant to absorb.
 
-## Using longer learners
+### Diversity vs. repetition
 
-Using longer learners (for example, `10bit`, `12bit`, etc) is a complete orthogonal direction for expanding the capacity. However, if you are comfortable with simpler `8bit` learners, adding more members will be quite straightforward to add overall capacity.
+The `LeanerPool` can pick the suitable learner by ensuring the member has enough capacity, and the incoming pattern can be recalled reliably later, among other criteria. Note we examine [diversity margin](learner.md#diversity-margin) of each member, so expansion follows diversity (of experiences) rather than crude repetition.
+
+This also implies the scheduler can always find one suitable member, unless the whole pool is out of capacity, in which case the write will fail: all members can be used as reserve as needed.
+
+So another way to understand LearnerPool is an address-able collection of infinitely scalable (up to the fixed capacity) learners.
+
+### Using bigger learners
+
+Using bigger learners (for example, `10bit`, `12bit`, etc) is a complete orthogonal direction for expanding the capacity. However, if you are comfortable with simpler `8bit` learners, adding more members will be quite straightforward to add overall capacity.
 
 Another practical consideration, `8bit` model naturally supports low-level SIMD from all supported platforms, which can boost performance significantly. `10bit`/`12bit`, however, does NOT natively support this level of optimization: so stick with `8bit` if you really care about performance, and fortunately `LearnerPool` can mitigate the capacity limitation.
 
