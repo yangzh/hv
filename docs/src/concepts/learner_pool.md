@@ -24,11 +24,11 @@ The roster size is set at pool creation and cannot grow afterwards: there is cur
 
 ### Diversity vs. repetition
 
-The `LeanerPool` can pick the suitable learner by ensuring the member has enough capacity, and the incoming pattern can be recalled reliably later, among other criteria. Note we examine [diversity margin](learner.md#diversity-margin) of each member, so expansion follows diversity (of experiences) rather than crude repetition.
+The `LeanerPool` can pick the suitable learner by ensuring the member has enough capacity, and the incoming pattern can be recalled reliably later, among other criteria. Note expansion follows diversity (of experiences) rather than crude repetition.
 
 This also implies the scheduler can always find one suitable member, unless the whole pool is out of capacity, in which case the write will fail: all members can be used as reserve as needed.
 
-So another way to understand LearnerPool is an address-able collection of infinitely scalable (up to the fixed capacity) learners.
+So another way to understand LearnerPool: it's an address-able collection of infinitely scalable (up to the fixed capacity) learners.
 
 ### Using bigger learners
 

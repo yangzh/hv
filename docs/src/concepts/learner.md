@@ -6,10 +6,8 @@ A **Learner** performs online bundling over a stream of observations, in the sty
 
 The budget is what gives a Learner its character. Because the total signal is conserved, every new distinct pattern dilutes the ones already resident; a Learner is not a container that fills but a distribution that sharpens or flattens. This makes it ideal for learning *distributions* — transition frequencies, co-occurrence statistics, prototypes — and gives it a natural capacity: past a few dozen distinct patterns (at typical sparsities), individual signals sink toward the noise floor. Aggregates like [LearnerPool](learner_pool.md) exist to lift that ceiling.
 
-## Diversity margin
+## Diversity vs repetition
 
-What fills a Learner is *diversity*, not repetition: re-bundling a known pattern re-distributes weight already committed, while each genuinely new pattern dilutes all residents.
-
-Every Learner tracks a **diversity margin**. It acts as a membership test: a repeat of a known pattern lands strong and leaves the margin high, while a novel pattern landing into a crowded Learner lands thin, and the margin reports exactly how thin. A fresh Learner reports the full margin (its first pattern would be recovered perfectly); as distinct patterns accumulate, the margin decays toward the noise level. [LearnerPool](learner_pool.md) reads it to decide when a member is full.
+What fills a Learner is *diversity*, the unique count of experience, instead of simple repetition: re-bundling a known pattern re-distributes weight already committed, while each genuinely new pattern dilutes all residents.
 
 Jump to the API reference for [Learner](../api/hv/learner.md).

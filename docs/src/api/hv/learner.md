@@ -68,7 +68,6 @@ learner.age()             # number of observations seen
 
 learner.affinity(a)          # raw overlap; returns RandomOverlap when age==0
 learner.weight(a)            # implicit weight for a probe vector; 0.0 when age==0
-learner.diversity_margin()   # post-bundle overlap of the last write; full M when age==0
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -77,7 +76,6 @@ learner.Age()             // uint32
 
 learner.Affinity(a)          // uint32; returns RandomOverlap when age==0
 learner.Weight(a)            // float64; 0.0 when age==0
-learner.DiversityMargin()    // uint32; full M when age==0
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -86,7 +84,6 @@ learner.age()             // u32
 
 learner.affinity(&a)         // u32; returns RandomOverlap when age==0
 learner.weight(&a)           // f64; 0.0 when age==0
-learner.diversity_margin()   // u32; full M when age==0
 ```
 {{#endtab}}
 {{#endtabs}}
