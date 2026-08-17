@@ -3,6 +3,28 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v4.12.0 (2026-08-17)
+
+Headline: LearnerPool write path reworked.
+
+### Breaking changes
+
+- **`UniformSet.inner_prod()` / `WeightedSet.inner_prod()` removed.** The
+  set-vs-vector inner product is gone from the set types; the frame helpers
+  (`frame_inner_product`, `frame_coefficient`, …) fold it over the members
+  internally.
+
+### New features
+
+- **`hv.LearnerPool.unique_estimated()`.** Estimated unique-item count across the
+  whole pool (Σ 1/diversity_margin over the written members).
+
+### Performance
+
+- Overlap uses portable SIMD (`wide`) for the byte-aligned models (8-/16-bit).
+- NNS candidate tally switched to a fast integer hasher, and `CircleReadResult`
+  reuses a read-session bind buffer — both trim decode CPU.
+
 ## v4.11.0 (2026-08-15)
 
 Headline: `LearnerPool` becomes a first-class Python type, and the resident-pool
@@ -21,9 +43,6 @@ substrate format is finalized.
   build/size a pool, iterate its members, hydrate it from a substrate's pool
   sentinel, and read its capacity stats — the read-side counterpart to trained
   pools.
-- **`Learner.diversity_margin`.** The post-bundle overlap of a learner's last
-  write: a cheap scalar for how much a new write collided with what the learner
-  already holds.
 - **`hv.SparseOperation(rng_hint=…)`.** Keyword-only selection of the RNG backend
   at the SparseOperation level (parity with Go/Rust), matching the four
   bit-identical backends from v4.10.
@@ -129,27 +148,3 @@ project's docstring spec, with a structural lint to gate regressions.
   (`--no-strict` for warning mode). Filters to items defined in the target
   module; ready to drop into CI.
 
-## v4.1.0 (2026-04-26)
-
-A meaty release with two themes: a sweep of polymorphic Python ergonomics across the Domain / Pod / Seed128 / Selector surface, plus full producer-API parity with Go/Rust including a new `producer.produce(view)` batched-write entry point.
-
-### New features
-
-- **Polymorphic Domain / Pod / Seed128 inputs**. Anywhere a `Domain` is expected: `Domain | str | int | (DomainPrefix, str)` tuple. Anywhere a `Pod`: `Pod | Prewired enum | str | int`. Anywhere a `Seed128`: `Seed128 | (domain, pod)` tuple — and the tuple composes (so a prefixed Domain inside a Seed128 tuple Just Works). Drops the `hv.Domain.from_name(...)` / `hv.Pod.from_word(...)` / `hv.Seed128(...)` wrap at every call site. See `docs/api/hv/common/domain_pod.md` and `docs/api/hv/common/seed128.md` for the full table.
-- **`producer.produce(view)`**. Run a producer against an open `MutableSubstrateView`, mirroring internal API. The recommended path for batched producer-driven writes; cheaper than `storage.mem_set(producer)` (which opens its own one-shot view).
-- **`semantic_indexing` + `extra` kwargs on producer factories**. `from_set_members`, `from_sequence_members`, `from_key_values` now accept `semantic_indexing=False` (impresses the composite's *code* in addition to the id-Sparkle, needed for `set_members` / `tentacle` / `sequence_attractor` queries) and `extra=None` (proto Any payload).
-- **`memory.lazy_selector_iter(view, selector)`**. Streaming iterator mirroring Go's `SelectorIter` — yields `(Chunk, SelectorExtra)` pairs lazily. Use when you need NNS scores or want to early-terminate without materializing the full result set.
-- **`Sequence.append(*more)` / `prepend(*more)` / `reset(start)`**. In-place mutation methods on Sequence (mirrors `Knot.expand`). `__copy__` / `__deepcopy__` added so `copy.copy(seq)` works for the clone-before-mutate pattern.
-- **`Set.member(i)` / `Sequence.member(i)` / `Octopus.value_by_key(k)`** accessors for inspecting composite members after retrieval.
-- **`hv.bind_direct(*operands, domain=None, pod=None)`**. Returns a raw `SparseSegmented` (no Knot tracking) — cheaper for intermediate computations.
-
-### API changes
-
-- **`storage.put(chunk, semantic_indexing=False)`** now takes a `memory.Chunk` instead of a bare HyperBinary. Wrap with `memory.Chunk(hv)` (or `memory.Chunk(hv, note="...")`). Always indexes the chunk's id-Sparkle; `semantic_indexing=True` additionally indexes the code (mirrors the producer convention).
-- **Removed `storage.store_chunk`** — `storage.put(memory.Chunk(...))` covers the same ground.
-- **Removed `view.write_chunk`** — use the producer-API path (`producer.produce(view)`) for batched writes against a mutable view.
-- **`hv.bind_more(...)` removed** in favor of in-place `Knot.expand(*more)` (the v3.9.0 free function went away when the refactor made the in-place mutation cleaner).
-
-### Bug fixes
-
-- **`view.write_chunk` (now removed) used to silently skip the associative-index update**, so chunks written via the batched-view path were findable by exact-key lookup but not by NNS. The fix threaded `Substrate::index_arc()` through `MutableSubstrateView`. The followup API redesign (above) replaces the path entirely with `producer.produce(view)`.
