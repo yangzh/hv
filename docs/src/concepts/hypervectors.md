@@ -87,6 +87,8 @@ Larger models provide more orthogonal space (lower collision probability) at the
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-The storage per hypervector estimation only applies to **SparseSegmented** (and a few other types) where raw offsets are needed. For certain scenarions, optimization can be employed to dramatically reduce storage requirements. **Sparkle**, for example, only stores the random seeds so that the offsets can be recovered on-the-fly at serialization time. Composite types (such as **Set**, **Sequence**) typically contain references to member **Sparkle** instances, and typically cost much less storage than a single **SparseSegmented** instance.
+The storage estimate above applies to **SparseSegmented**, the one type defined by its raw offsets. Every other type is defined by a **recipe** — a seed, or a seed plus members — and carries only that. **Sparkle** stores its seed and derives its offsets on demand; composites such as **Set** and **Sequence** hold references to their members, so they cost far less than a materialized vector both in memory and on the wire.
+
+The bits are computed on first observation and cached, then released again on `compact()`. Constructing a vector you never observe therefore costs almost nothing — see [lazy materialization](../api/hv/types.md#lazy-materialization).
 
 </div>
