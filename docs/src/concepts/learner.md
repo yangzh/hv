@@ -10,4 +10,20 @@ The budget is what gives a Learner its character. Because the total signal is co
 
 What fills a Learner is *diversity*, the unique count of experience, instead of simple repetition: re-bundling a known pattern re-distributes weight already committed, while each genuinely new pattern dilutes all residents.
 
+## Cached observations
+
+A Learner does not commit to its fixed budget on the first observation. While it
+holds only a handful of distinct patterns it caches the observations themselves —
+the vectors and their weights — and composes the superposition on demand. Past a
+per-model capacity it materializes the budget once and behaves exactly as
+described above.
+
+This makes the diversity-versus-repetition distinction structural rather than
+statistical. A repeated pattern is recognized as one the Learner already holds
+and simply gains weight: nothing is re-bundled, nothing is diluted, and a
+Learner fed one pattern a thousand times still holds exactly one. While
+observations are cached the unique count is therefore exact, not estimated —
+and young Learners, which is most of them in a large substrate, cost a fraction
+of a materialized vector to hold and to store.
+
 Jump to the API reference for [Learner](../api/hv/learner.md).
