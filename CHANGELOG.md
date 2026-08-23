@@ -3,6 +3,44 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v5.0.0 (2026-08-22)
+
+Headline: hypervectors become lazy — content is computed on first use.
+
+### Breaking changes
+
+- **Stored substrates from v4.x cannot be read.** Three independent format /
+  content changes land together, so a substrate written by an older release
+  will not round-trip. Retrain, or pin the old wheel:
+  - **Philox-4×64 is now the default RNG** (was xoshiro256++). Every seeded
+    vector generates different offsets, so *all* stored content differs.
+    `KONGMING_RNG=xoshiro++` restores the previous generator.
+  - **`Dart` storage and content changed.** A Dart is now `Inv(tail) ⊗ head`
+    with compact member storage.
+  - **The `Learner` wire form changed.**
+- **`Learner.support()` is noise-subtracted now: the chance floor moved into member reads, so values saturate at 0 rather than starting at chance.
+- **`KONGMING_REPR_FORMAT` is gone.** `repr()` always renders YAML.
+
+### New features
+
+- **`compact()` on every hypervector.** Releases cached content, recursively
+  through members; the next observation recomputes exactly the same bits.
+- **`equal_lazy()` and `equal()`.** Two levels of content equality:
+  `equal_lazy` compares recipes and already-known hashes without ever
+  materializing (a `False` may mean "not provable cheaply"), while `equal` is
+  exact and materializes only when it must.
+- **`Learner.has_cached_data()` / `Learner.cached_data()`.** Inspect the
+  observations a young learner is still holding verbatim.
+- **`Learner.age()` accepts and reports values beyond 2^32** (widened to u64).
+
+### Performance
+
+- **Lazy materialization.** Vectors are recipes until observed, so constructing
+  candidates you never look at is nearly free. Measured on the decode
+  benchmark: resident memory −45%, and stored substrates shrink ~39%.
+- **Cheaper training.** The pool's member-open check no longer divides
+  per member: full-corpus training −5%.
+
 ## v4.12.0 (2026-08-17)
 
 Headline: LearnerPool write path reworked.
@@ -133,18 +171,3 @@ Headline: new **`LearnerPool`** SDM-style aggregator over N Learners, plus cross
 ### Build / deps
 - **`Cargo.lock` is now tracked** for reproducible Rust builds.
 - **`fjall`** pinned to 3.1.4.
-
-## v4.1.1 (2026-04-27)
-
-Docstring polish: every PyO3-emitted item in `kongming_rs` now conforms to the
-project's docstring spec, with a structural lint to gate regressions.
-
-### Docs
-- All **442** user-facing items across `hv` (332), `memory` (~75), and `lisp` carry
-  one-line summaries plus Args / Returns / Raises / Postconditions / Examples
-  sections per `docs/python_docstring_spec.md`. `help(...)` output and IDE
-  tooltips across the API are now uniform and self-contained.
-- New `scripts/lint_pydocstrings.py` — structural checker, **strict by default**
-  (`--no-strict` for warning mode). Filters to items defined in the target
-  module; ready to drop into CI.
-
