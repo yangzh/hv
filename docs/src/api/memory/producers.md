@@ -17,9 +17,9 @@ Producer options are additional information supplied to producer constructor to 
 # `note` indiciates additional note for the new terminal chunk.
 memory.new_terminal("d", "p", note="annotation")
 
-# `semantic_indexing` indicates we need to index the semantic code 
+# `enable_semantic_indexing` indicates we need to index the semantic code 
 # (on top of the id vector).
-memory.from_set_members("d", "p", members, semantic_indexing=True)
+memory.from_set_members("d", "p", members, enable_semantic_indexing=True)
 ```
 {{#endtab}}
 {{#endtabs}}

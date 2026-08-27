@@ -118,28 +118,35 @@ model = hv.MODEL_64K_8BIT
 store = memory.InMemory(model)
 
 keys = ["capital", "currency", "country_code"]
+FILLER_DOMAIN = 0
 
-# Store individual fillers — NNS needs them as searchable items
-fillers = {}
-for word in ["dc", "USD", "USA", "mexicoCity", "MXN", "MEX",
-             "stockholm", "SEK", "SWE"]:
-    s = hv.Sparkle.from_word(model, 0, word)
-    store.put(s)
-    fillers[word] = s
+countries = {
+    "USA": ["dc", "USD", "USA"],
+    "MEX": ["mexicoCity", "MXN", "MEX"],
+    "SWE": ["stockholm", "SEK", "SWE"],
+}
 
-# Store country records as Octopus composites
-store.put(hv.Octopus(
-    hv.Seed128("country", "USA"), keys,
-    fillers["dc"], fillers["USD"], fillers["USA"],
-))
-store.put(hv.Octopus(
-    hv.Seed128("country", "MEX"), keys,
-    fillers["mexicoCity"], fillers["MXN"], fillers["MEX"],
-))
-store.put(hv.Octopus(
-    hv.Seed128("country", "SWE"), keys,
-    fillers["stockholm"], fillers["SEK"], fillers["SWE"],
-))
+# Producers stage chunks against a batched mutable view (the Go/Rust idiom):
+# terminals for the fillers — NNS needs them as searchable items — then one
+# Octopus record per country, its key-aligned values picked by item key.
+with store.new_mutable_view() as view:
+    for values in countries.values():
+        for word in values:
+            memory.new_terminal(FILLER_DOMAIN, word).produce(view)
+    for name, values in countries.items():
+        memory.from_key_values(
+            "country", name, keys,
+            memory.joiner(*[memory.by_item_key(FILLER_DOMAIN, w)
+                            for w in values]),
+            note=name,
+        ).produce(view)
+    # auto-commits on __exit__
+
+# Feature probes for the queries (same identities the terminals carry).
+fillers = {
+    w: hv.Sparkle.from_word(model, FILLER_DOMAIN, w)
+    for values in countries.values() for w in values
+}
 
 # Retrieve stored records
 us_code  = store.get("country", "USA").code

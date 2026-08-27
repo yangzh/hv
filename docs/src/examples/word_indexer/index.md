@@ -52,10 +52,10 @@ with storage.new_mutable_view() as view:
 with storage.new_mutable_view() as view:
     for i, w in enumerate(words, start=1):
         members = memory.joiner(*[memory.by_item_key("letters", ch) for ch in w])
-        # semantic_indexing=True: index the Sequence's code so suffix
+        # enable_semantic_indexing=True: index the Sequence's code so suffix
         # queries (sequence_attractor) can find words by structure.
         memory.from_sequence_members(
-            "words", w, members, note=w, semantic_indexing=True,
+            "words", w, members, note=w, enable_semantic_indexing=True,
         ).produce(view)
         if i % BATCH_SIZE == 0:
             view.commit()
@@ -132,11 +132,11 @@ Approximate timings on an Apple Silicon laptop with the `InMemory` backend:
 | Multi-attractor NNS (2 attractors, e.g. `*****er`) | ~200 ms |
 | Multi-attractor NNS (4 attractors, e.g. `*******tion`) | ~460 ms |
 
-## A note on `semantic_indexing`
+## A note on `enable_semantic_indexing`
 
 For NNS by composite structure (i.e. "find Sequences whose member at
 position N matches X"), each word's producer is constructed with
-`semantic_indexing=True`. This impresses the Sequence's *code* into the
+`enable_semantic_indexing=True`. This impresses the Sequence's *code* into the
 associative index alongside the chunk's id-Sparkle (which is always
 indexed). Without the flag, only the id is indexed and
 `sequence_attractor` queries return zero hits.

@@ -25,7 +25,7 @@ with storage.new_view() as view:
 with storage.new_mutable_view() as view:
     memory.new_terminal("words", "hi").produce(view)
     memory.from_sequence_members("words", "greet", members,
-                                  semantic_indexing=True).produce(view)
+                                  enable_semantic_indexing=True).produce(view)
     # commits automatically
 ```
 {{#endtab}}

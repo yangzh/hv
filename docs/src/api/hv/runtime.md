@@ -10,38 +10,18 @@ Selects the pseudo-random number generator backend used for hypervector generati
 
 | Value | Description |
 |-------|-------------|
-| **`xoshiro++`** (default) | xoshiro256++ — simple, fast, cross-language deterministic |
-| `pcg` | PCG-DXSM — classic/compat mode (matches pre-v3.7.5 behavior) |
+| **`philox`** (default) | Philox-4×64 (Random123) |
+| `xoshiro++` | xoshiro256++: simple, fast |
+| `pcg` | PCG-DXSM: classic/compat mode |
+| `xoroshiro++` | xoroshiro128++ |
 
-Changing this affects all generated vectors: Sparkle offsets, Learner bundling, Cyclone patterns. Vectors generated with different backends are **not** comparable.
+All four are bit-parity across the Go and Rust engines. Any unrecognized
+value falls back to `philox`.
 
-### `KONGMING_REPR_FORMAT`
-
-Controls `__repr__()` / `Repr()` output format.
-
-| Value | Description |
-|-------|-------------|
-| **`YAML`** (default) | Multi-line YAML dump |
-| `PROTO` | Multi-line protobuf debug string |
-
-### `KONGMING_LEARNER_SAMPLING`
-
-Controls the bundling strategy used by [Learner](types.md#learner).
-
-| Value | Description |
-|-------|-------------|
-| **`FISHER_YATES`** (default) | Fisher-Yates shuffle — selects exactly the right number of segments per round |
-| `CLASSIC` | Per-segment probabilistic sampling — each segment is independently sampled with a fixed probability |
+Changing this affects all generated vectors: Sparkle offsets, Learner bundling, Cyclone patterns. Vectors generated with different backends are **not** compatible.
 
 ```bash
-# Example: use PCG for backward compatibility with pre-v3.7.5 vectors
-export KONGMING_RNG=pcg
-
-# Example: switch repr to protobuf debug format
-export KONGMING_REPR_FORMAT=PROTO
-
-# Example: use classic sampling in Learner
-export KONGMING_LEARNER_SAMPLING=CLASSIC
+export KONGMING_RNG=xoshiro++
 ```
 
 ## Querying the Current Environment
@@ -50,7 +30,5 @@ Use `global_env()` to inspect all active settings at runtime. Returns a `GlobalE
 
 ```python
 >>> hv.global_env()
-rng_hint: XOSHIRO256PP
-learner_sampling: FISHER_YATES
-repr_format: YAML
+rng_hint: 3   # PHILOX_4X64 (the default)
 ```

@@ -16,20 +16,18 @@ The only low-level API used:
 This script does NOT call hv.bind() or hv.bundle() for computation — it
 reimplements them to show how they work.
 
-IMPORTANT: To verify bundle correctness, set the environment variable:
-    KONGMING_LEARNER_SAMPLING=classic
-This forces the library to use the classic sampling algorithm that matches
-the pure Python implementation below. The default (fisher_yates) uses a
-different shuffling strategy that produces statistically equivalent (but different)
-output.
+NOTE on bundle verification: the library's bundle is a Learner underneath —
+inputs fold in sequentially, each replacing a weight-proportional random
+subset of segments. The per-segment SELECTION FREQUENCIES match the classic
+per-segment draw implemented below, but the exact segment choices come from
+internal state that is not part of the public contract. Bind/release verify
+bit-for-bit; bundle verifies statistically.
 
 Usage:
-    KONGMING_LEARNER_SAMPLING=classic python operators.py
+    python operators.py
 
 See docs: https://yangzh.github.io/hv/examples/operators/index.html
 """
-
-import os
 
 from kongming import hv
 
@@ -92,7 +90,7 @@ def pure_python_bundle(model, so, vectors, weights=None):
         vectors: list of hypervectors to bundle.
         weights: list of floats (one per vector). Default: equal weights.
 
-    Algorithm (classic sampling):
+    Algorithm (per-segment draw):
       1. Compute cumulative weights, normalized to [0, 65535] (anchors)
       2. For each segment, draw a 16-bit random number from the PRNG
       3. Pick the input whose anchor range contains the random number
@@ -202,32 +200,29 @@ def main():
     print("BUNDLE: PRNG-based random selection among inputs")
     print("=" * 60)
 
-    classic = os.environ.get("KONGMING_LEARNER_SAMPLING", "").lower() == "classic"
-    if not classic:
-        print("  NOTE: Set KONGMING_LEARNER_SAMPLING=classic to verify exact match.")
-        print("        Running with default (fisher_yates) — overlap will be similar but not exact.")
-        print()
-
-    # Use matching seeds: bundle uses Seed128 to create its PRNG.
+    # The library's bundle folds inputs into a Learner sequentially,
+    # each replacing a weight-proportional random subset of segments;
+    # the exact segment choices are internal state, so the check here
+    # is STATISTICAL instead of bit-identical:
+    # every segment must come from one input, and each input's share must
+    # sit within ~6σ of its weight (Binomial(cardinality, w)).
     bundle_seed = hv.Seed128(0, 99)
     bundle_so = hv.SparseOperation(model, bundle_seed.high(), bundle_seed.low())
 
-    # Equal weights
     our_bundle = pure_python_bundle(model, bundle_so, [a, b, c])
     lib_bundle = hv.bundle(bundle_seed, a, b, c)
 
-    overlap = hv.overlap(our_bundle, lib_bundle)
-    print("  Equal weights [1, 1, 1]:")
-    print(f"    overlap(ours, library) = {overlap}/{cardinality}")
-    print(f"    overlap(ours, a) = {hv.overlap(our_bundle, a):3d}  (expected ~{cardinality // 3})")
-    print(f"    overlap(ours, b) = {hv.overlap(our_bundle, b):3d}  (expected ~{cardinality // 3})")
-    print(f"    overlap(ours, c) = {hv.overlap(our_bundle, c):3d}  (expected ~{cardinality // 3})")
-
-    if classic:
-        assert overlap == cardinality, "bundle mismatch with classic sampling!"
-        print("    PASS: matches library exactly (classic sampling)")
-    else:
-        print(f"    {overlap}/{cardinality} segments match")
+    third = cardinality // 3
+    tol = 6 * int((cardinality * (1 / 3) * (2 / 3)) ** 0.5)
+    print(f"  Equal weights [1, 1, 1]  (expected ~{third} ± {tol} per input):")
+    for name, v in (("ours", our_bundle), ("library", lib_bundle)):
+        shares = [hv.overlap(v, x) for x in (a, b, c)]
+        print(f"    {name:7s} overlap with a/b/c = {shares[0]:3d}/{shares[1]:3d}/{shares[2]:3d}")
+        # Segment-offset collisions between inputs (~1/seg_size each) can
+        # double-count a few segments, so the sum may slightly exceed.
+        assert cardinality <= sum(shares) <= cardinality + 16, "segments must come from the inputs"
+        assert all(abs(s - third) <= tol for s in shares), "selection frequencies off"
+    print("    PASS: both draw each input equally (statistically)")
     print()
 
     # Weighted bundle: a gets 60% weight, b and c 20% each
@@ -236,9 +231,12 @@ def main():
 
     our_weighted = pure_python_bundle(model, bundle_so2, [a, b, c], weights=[0.6, 0.2, 0.2])
     print("  Weighted [0.6, 0.2, 0.2]:")
-    print(f"    overlap(ours, a) = {hv.overlap(our_weighted, a):3d}  (expected ~{int(cardinality * 0.6)})")
-    print(f"    overlap(ours, b) = {hv.overlap(our_weighted, b):3d}  (expected ~{int(cardinality * 0.2)})")
-    print(f"    overlap(ours, c) = {hv.overlap(our_weighted, c):3d}  (expected ~{int(cardinality * 0.2)})")
+    for x, w in ((a, 0.6), (b, 0.2), (c, 0.2)):
+        o = hv.overlap(our_weighted, x)
+        sd = (cardinality * w * (1 - w)) ** 0.5
+        print(f"    overlap(ours, {'abc'[[a, b, c].index(x)]}) = {o:3d}  (expected ~{int(cardinality * w)})")
+        assert abs(o - cardinality * w) <= 6 * sd, "weighted share off"
+    print("    PASS: weighted shares match (statistically)")
     print()
 
     print("All checks passed.")

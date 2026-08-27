@@ -60,14 +60,14 @@ def ingest(storage, words: list[str]) -> None:
     with storage.new_mutable_view() as view:
         for i, w in enumerate(words, start=1):
             members = memory.joiner(*[memory.by_item_key(LETTER_DOMAIN, ch) for ch in w])
-            # semantic_indexing=True: index the Sequence's code so suffix
-            # queries (sequence_attractor) can find words by structure.
+            # enable_semantic_indexing=True: index the Sequence's code so
+            # suffix queries (sequence_attractor) can find words by structure.
             memory.from_sequence_members(
                 WORDS_DOMAIN,
                 w,
                 members,
                 note=w,
-                semantic_indexing=True,
+                enable_semantic_indexing=True,
             ).produce(view)
             if i % BATCH_SIZE == 0:
                 view.commit()
@@ -104,7 +104,7 @@ def main() -> None:
     report(
         "****er  (6 letters)",
         storage,
-        lambda: memory.similar_composite(
+        lambda: memory.similar(
             memory.joiner(
                 memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "e"), 4, WORDS_DOMAIN),
                 memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, "r"), 5, WORDS_DOMAIN),
@@ -116,7 +116,7 @@ def main() -> None:
     report(
         "*******tion (11 letters)",
         storage,
-        lambda: memory.similar_composite(
+        lambda: memory.similar(
             memory.joiner(
                 *[
                     memory.sequence_attractor(memory.by_item_key(LETTER_DOMAIN, ch), pos, WORDS_DOMAIN)

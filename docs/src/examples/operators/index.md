@@ -61,17 +61,16 @@ Properties:
 - Result is similar to all inputs (overlap ≈ weight × cardinality)
 - Not reversible — information is lost
 
-**Note**: The library supports two bundling strategies: `classic` (shown above) and `fisher_yates` (default). To verify exact match with the pure Python implementation, set:
-
-```bash
-KONGMING_LEARNER_SAMPLING=classic python operators.py
-```
+**Note**: The library's bundle folds inputs into a Learner sequentially,
+each replacing a weight-proportional random subset of segments. The
+per-segment selection *frequencies* match the classic draw shown above, but
+the exact segment choices are internal state, not public contract — so the
+script verifies bind/release bit-for-bit and bundle statistically.
 
 ## Running
 
 ```bash
 pip install kongming-rs-hv
 
-# Classic sampling — all operators match exactly
-KONGMING_LEARNER_SAMPLING=classic python operators.py
+python operators.py
 ```

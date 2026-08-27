@@ -21,7 +21,7 @@ Every script imports `from kongming import hv`.
 python examples/mexican_dollar/mexican_dollar.py          # also: mexican_dollar_memory.py
 python examples/word_indexer/word_indexer.py
 python examples/bulk_storage/bulk_storage.py -n 10000     # --backend embedded, --model, ...
-KONGMING_LEARNER_SAMPLING=classic python examples/operators/operators.py
+python examples/operators/operators.py
 pytest examples/pylisp/                                    # LISP interpreter tests; see pylisp/README.md
 ```
 

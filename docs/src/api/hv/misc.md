@@ -14,7 +14,7 @@ All HyperBinary types have a compact, emoji-prefixed string representation for q
 ✨:🌐0x..c862,🫛0x..80e4
 ```
 
-**`__repr__`** (triggered by evaluating a variable in the shell or notebook) returns a detailed, developer-friendly YAML representation, controlled by the `KONGMING_REPR_FORMAT` environment variable:
+**`__repr__`** (triggered by evaluating a variable in the shell or notebook) returns a detailed, developer-friendly YAML representation:
 
 ```python
 >>> a
@@ -26,8 +26,6 @@ domain:
 pod:
   seed: 12345
 ```
-
-Set `KONGMING_REPR_FORMAT=PROTO` for protobuf debug output instead of the default YAML. See [Environment Variables](runtime.md#environment-variables) for all supported variables.
 
 ### Go / Rust Display
 
@@ -43,7 +41,7 @@ repr(sparkle)       # detailed YAML/proto form via __repr__
 // Compact emoji form
 fmt.Println(sparkle)          // ✨:🌐0x..c862,🫛0x..80e4
 
-// Detailed YAML/proto form (controlled by KONGMING_REPR_FORMAT env)
+// Detailed YAML form
 fmt.Println(sparkle.Repr())
 ```
 {{#endtab}}
