@@ -16,7 +16,7 @@ This limitation of capacity (of classic learner) is unsuitable in various scenar
 
 A pool solves both issues exactly as its name suggests, by pooling many member Learners together. Most light addresses still get a nearly-private member, while heavy addresses recruit as many members as their content genuinely needs, up to the whole pool. At the end of the day, individual member can serve a mixture of low and high fan-out addresses, orchestrated internally by its own scheduling logic. 
 
-The internal "orchestration" is mathematically sound, stable, and requires no manual intervention. The member Learners organize organically rather than piling up naively: if each Learner was a basic "neuron", a LearnerPool is then an organism which behaves intelligently and coherently toward a common goal.
+The internal "orchestration" (or rewiring) is mathematically sound, stable, and requires no manual intervention. The member Learners organize organically rather than piling up naively: if each Learner was a basic "neuron", a LearnerPool is then an organism which behaves intelligently and coherently toward a common goal.
 
 ### Fixed resource consumption
 

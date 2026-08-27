@@ -61,10 +61,9 @@
     - [Word Indexer](examples/word_indexer/index.md)
     - [LISP Interpreter](examples/pylisp/index.md)
 
-- [Language parser](nlp/index.md)
-    - [Background](nlp/background.md)
+- [Dependency parser](nlp/index.md)
     - [Introduction](nlp/intro.md)
-    - [Encoding](nlp/encoding.md)
+    - [Training](nlp/training.md)
     - [Decoding](nlp/decoding.md)
+    - [Evaluations](nlp/evaluations.md)
     - [Discussions](nlp/discussions.md)
-    - [Future directions](nlp/future.md)
