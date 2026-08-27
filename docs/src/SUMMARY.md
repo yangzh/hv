@@ -53,9 +53,18 @@
     - [Installation](guides/python/installation.md)
     - [Quick Example](guides/python/example.md)
     - [Walkthrough](guides/python/walkthrough.md)
+
 - [Examples](examples/index.md)
     - [Operators from Scratch](examples/operators/index.md)
     - [Mexican Dollar](examples/mexican_dollar/index.md)
     - [Bulk Storage Benchmark](examples/bulk_storage/index.md)
     - [Word Indexer](examples/word_indexer/index.md)
     - [LISP Interpreter](examples/pylisp/index.md)
+
+- [Language parser](nlp/index.md)
+    - [Background](nlp/background.md)
+    - [Introduction](nlp/intro.md)
+    - [Encoding](nlp/encoding.md)
+    - [Decoding](nlp/decoding.md)
+    - [Discussions](nlp/discussions.md)
+    - [Future directions](nlp/future.md)
