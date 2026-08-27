@@ -30,5 +30,5 @@ Use `global_env()` to inspect all active settings at runtime. Returns a `GlobalE
 
 ```python
 >>> hv.global_env()
-rng_hint: 3   # PHILOX_4X64 (the default)
+rng_hint: PHILOX_4X64
 ```
