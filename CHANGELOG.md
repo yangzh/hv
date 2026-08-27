@@ -3,6 +3,41 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v5.1.0 (2026-08-28)
+
+### Breaking changes
+
+- **Stored substrates from v5.0.0 cannot be read.** Three wire-format
+  changes land together.
+- **`LearnerPool(model, member_domain, total)`** — the two trailing seed
+  arguments (ignored since the write seed was dropped) are removed.
+- **`Learner.full()` removed** (reconstruction stays engine-side);
+  `HyperBinarySet` is retired — `Parcel` answers the member queries.
+- **The train subsystem is removed** (`Train*` producers and carriages).
+
+### New features
+
+- **zh corpus 995 → 4231 sentences** (parity with en); combined substrate
+  retrained.
+- **`Learner.blank()`** in Python; pool `load()` / `unique_estimated()`
+  are tracked incrementally.
+- `lazy_selector_iter` raises on truncation instead of silently clipping.
+
+### Performance
+
+- Serialization: Parquet row groups 1K → 16K and reader batching — much
+  faster substrate load; footers stamp pre-compression size.
+- Learner hot path: support reads borrow offsets (no per-probe copies),
+  deferred lists replay into recycled scratch, identity hashes memoized.
+
+### Fixes
+
+- The Dart producer's documented formula matched its inverse; corrected to
+  `Inv(tail) ⊗ head` (Go, Rust, Python docstrings).
+- `Revitalize` rescales correctly in list mode; blank-learner age/weights
+  stay in sync.
+- Empty-prefix scans work again (the reject guard had broken export).
+
 ## v5.0.0 (2026-08-22)
 
 Headline: hypervectors become lazy — content is computed on first use.
@@ -158,16 +193,3 @@ Headline: new **`weights=`** kwarg on `hv.Parcel` plus several Python API tighte
 
 - **`hv.Sparkle(model, domain, pod)`** — simplified signature.
 - **`hv.Learner(model, seed, initial=None)`** — `initial` is now an optional kwarg defaulting to `None`.
-
-## v4.4.0 (2026-05-14)
-
-Headline: new **`LearnerPool`** SDM-style aggregator over N Learners, plus cross-language property/parity test infrastructure and a hardened memory-substrate contract.
-
-### New features
-- **`LearnerPool`** — SDM-style (Sparse Distributed Memory) aggregator that distributes writes across N Learners by access-circle.
-- **Cross-language parity oracle** — Rust now runs against Go-generated goldens (`testdata/hv/goldens.yaml`) so any Go↔Rust drift trips a test.
-- **Algebraic property tests** — 10 property tests covering Bind / Release / Bundle / Cyclone semantics, in Go (`rapid`) and mirrored in Rust (`proptest`). See `hv/parity.md`.
-
-### Build / deps
-- **`Cargo.lock` is now tracked** for reproducible Rust builds.
-- **`fjall`** pinned to 3.1.4.
