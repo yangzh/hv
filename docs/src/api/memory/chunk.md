@@ -1,8 +1,6 @@
 # Chunk
 
-The fundamental storage unit in the memory system. A Chunk carries a **semantic code** (any HyperBinary type) along with its **derived identity** (a Sparkle as implied from the code's domain/pod).
-
-The identity determines the storage key and drives compositionality — a chunk is either present or absent. The code is potentially learnable, offering opportunities to adapt over time, just like weights from traditional neural nets.
+The fundamental storage unit in the memory system. A Chunk mostly carries a **semantic code** (any `HyperBinary` type) along with various diagnostic information.
 
 ## Structure
 
@@ -15,17 +13,17 @@ The identity determines the storage key and drives compositionality — a chunk 
 
 ## Inspection
 
-Chunks are typically created via producers (see [Producers](../memory/producers.md)), but can be inspected after retrieval (see [Selectors](../memory/selectors.md)).
+Chunks are typically created via producers (see [Producers](../memory/producers.md)) — or directly from a code (`memory.Chunk(code, note="", extra=msg)`; the id derives from the code's domain/pod) — and inspected after retrieval (see [Selectors](../memory/selectors.md)).
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# chunk = memory.first_picked_chunk(view, memory.by_item_key("animals", "cat"))
+chunk = memory.first_picked(view, memory.by_item_key("animals", "cat"))
 
-chunk.id        # Sparkle
-chunk.code      # HyperBinary
-chunk.note      # str
-chunk.extra     # Optional[bytes]
+chunk.id               # Sparkle
+chunk.code             # HyperBinary
+chunk.note             # str
+chunk.extra_message()  # deserialized protobuf message, or None
 ```
 {{#endtab}}
 {{#endtabs}}

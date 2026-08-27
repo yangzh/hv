@@ -7,7 +7,7 @@ Returns the first chunk matching the selector. Returns an error if nothing is fo
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# Returns the first matching Chunk (with .id, .code, .note, .extra)
+# Returns the first matching Chunk (with .id, .code, .note, .extra_message())
 chunk = memory.first_picked(view, selector)
 print(chunk.id, chunk.code, chunk.note)
 ```

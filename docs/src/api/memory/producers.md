@@ -34,7 +34,7 @@ Creates a chunk whose code equals its identity (a bare Sparkle). Useful for regi
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(view, memory.new_terminal("fruits", "apple", note="an apple"))
+    memory.new_terminal("fruits", "apple", note="an apple").produce(view)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -47,7 +47,7 @@ Creates a fresh Learner chunk for online learning.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(view, memory.new_learner("learners", "my_learner", note="a learner"))
+    memory.new_learner("learners", "my_learner", note="a learner").produce(view)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -60,13 +60,11 @@ Creates a Set from stored members.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(
-        view, 
-        memory.from_set_members(
-            "sets",
-            "fruit_set", 
-            memory.by_item_domain("fruits"),
-        ))
+    memory.from_set_members(
+        "sets",
+        "fruit_set",
+        memory.by_item_domain("fruits"),
+    ).produce(view)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -79,17 +77,15 @@ Creates a Sequence from stored members with positional encoding.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(
-        view, 
-        memory.from_sequence_members(
-            "seqs",
-            "greeting", 
-            memory.joiner(
-                memory.by_item_key("words", "hello"),
-                memory.by_item_key("words", "world"),
-            ),
-            start=0),
-    )
+    memory.from_sequence_members(
+        "seqs",
+        "greeting",
+        memory.joiner(
+            memory.by_item_key("words", "hello"),
+            memory.by_item_key("words", "world"),
+        ),
+        start=0,
+    ).produce(view)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -102,41 +98,37 @@ Creates an Octopus (key-value composite) from keys and value selectors.
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(
-        view, 
-        memory.from_key_values(
-            "records",
-            "obj1", 
-            keys=["color", "shape"], 
-            values=memory.joiner(
-                memory.by_item_key("colors", "red"),
-                memory.by_item_key("shapes", "circle"),
-            ),
-        ))
+    memory.from_key_values(
+        "records",
+        "obj1",
+        keys=["color", "shape"],
+        values=memory.joiner(
+            memory.by_item_key("colors", "red"),
+            memory.by_item_key("shapes", "circle"),
+        ),
+    ).produce(view)
 ```
 {{#endtab}}
 {{#endtabs}}
 
-### FromSourceDest
+### NewDart
 
-Creates a [Dart 🎯](../hv/dart.md) chunk — a directional reference from a `source` chunk to a `dest` chunk. Both selectors must resolve to a single chunk; the produced Dart's bit-level value is `source.id ⊗ Inv(dest.id)`.
+Creates a [Dart 🎯](../hv/dart.md) chunk — thrown from a `tail` chunk to a `head` chunk. Both selectors must resolve to a single chunk; the produced Dart's bit-level value is `Inv(tail.id) ⊗ head.id`.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
 with storage.new_mutable_view() as view:
-    memory.mem_set(
-        view,
-        memory.from_source_dest(
-            "edges", "earth_to_moon",
-            memory.by_item_key("planets", "earth"),
-            memory.by_item_key("planets", "moon"),
-        ))
+    memory.new_dart(
+        "edges", "earth_to_moon",
+        memory.by_item_key("planets", "earth"),
+        memory.by_item_key("planets", "moon"),
+    ).produce(view)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-memory.FromSourceDest(
+memory.NewDart(
     hv.NewDomain("edges"), hv.NewPodFromWord("earth_to_moon"),
     memory.WithChunks(earth),
     memory.WithChunks(moon),
@@ -145,7 +137,7 @@ memory.FromSourceDest(
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let producer = producers::from_source_dest(
+let producer = producers::new_dart(
     Domain::from_name("edges"),
     Pod::from_word("earth_to_moon"),
     Box::new(selector_impls::with_chunks(vec![earth])),
@@ -165,12 +157,11 @@ Feeds an observed chunk into an existing Learner, updating its accumulated code 
 ```python
 with storage.new_mutable_view() as view:
     # With explicit multiplier:
-    memory.mem_set(view,
-        memory.cluster_updater(
-            learner=memory.by_item_key("learners", "my_learner"),
-            observed=memory.by_item_key("fruits", "apple"),
-            multiple=3,
-        ))
+    memory.cluster_updater(
+        learner=memory.by_item_key("learners", "my_learner"),
+        observed=memory.by_item_key("fruits", "apple"),
+        multiple=3,
+    ).produce(view)
 ```
 {{#endtab}}
 {{#endtabs}}
