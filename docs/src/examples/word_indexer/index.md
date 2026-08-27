@@ -9,7 +9,7 @@ It demonstrates four ideas together:
 - Using [`Sparkle`](../../api/hv/sparkle.md) as a stable per-symbol code (one Sparkle per `a`–`z`).
 - Using [`Sequence`](../../api/hv/sequence.md) with a `Pod`-derived seed so chunks are addressable both by word (exact) and by structure (positional).
 - The **ChunkProducer API** (`new_terminal`, `from_sequence_members`, `joiner`) staged through a batched `SubstrateMutableView` via `producer.produce(view)`.
-- Multi-attractor [`nns`](../../api/memory/selectors/near_neighbor.md) over [`SequenceAttractor`](../../api/memory/selectors/attractors.md#reverse-attractors) for positional conjunctive queries.
+- Multi-attractor [`similar`](../../api/memory/selectors/near_neighbor.md) search over [`SequenceAttractor`](../../api/memory/selectors/attractors.md#reverse-attractors)s for positional conjunctive queries.
 
 ## The general idea
 
@@ -68,14 +68,16 @@ See [Substrate & Views](../../api/memory/substrate.md) for the full view API.
 
 A [`sequence_attractor(member_selector, pos, domain)`](../../api/memory/selectors/attractors.md#reverse-attractors) is a positional constraint: "Sequences in `domain` whose member at `pos` overlaps with `member_selector`". Position is **0-based**.
 
-`nns(*attractors)` evaluates all attractors and ranks Sequences by combined overlap. With multiple attractors, the result is a conjunction — a chunk must satisfy each positional constraint to score well.
+`similar(joiner(...))` evaluates all attractors and ranks Sequences by combined overlap. With multiple attractors, the result is a conjunction — a chunk must satisfy each positional constraint to score well.
 
 For "six-letter words ending in `er`":
 
 ```python
-memory.nns(
-    memory.sequence_attractor(memory.by_item_key("letters", "e"), 4, WORDS_DOMAIN),
-    memory.sequence_attractor(memory.by_item_key("letters", "r"), 5, WORDS_DOMAIN),
+memory.similar(
+    memory.joiner(
+        memory.sequence_attractor(memory.by_item_key("letters", "e"), 4, WORDS_DOMAIN),
+        memory.sequence_attractor(memory.by_item_key("letters", "r"), 5, WORDS_DOMAIN),
+    )
 )
 ```
 
@@ -106,20 +108,20 @@ python examples/word_indexer/word_indexer.py
 Expected output shape:
 
 ```
-Ingested 4982 words in 8.4s.
+Ingested 4982 words in 40s.
 
-by word 'the': 1 match(es) [0.3 ms]
+by word 'the': 1 match(es) [0.9 ms]
    1. the
 
-by word 'people': 1 match(es) [0.3 ms]
+by word 'people': 1 match(es) [0.1 ms]
    1. people
 
-****er  (6 letters): N match(es) [~190 ms]
-   1. <some six-letter -er word>
+****er  (6 letters): 712 match(es) [~30 ms]
+   1. closer
    ...
 
-*******tion (11 letters): M match(es) [~480 ms]
-   1. <some eleven-letter -tion word>
+*******tion (11 letters): 847 match(es) [~25 ms]
+   1. information
    ...
 ```
 
@@ -127,10 +129,10 @@ Approximate timings on an Apple Silicon laptop with the `InMemory` backend:
 
 | Operation | Time |
 |-----------|------|
-| Ingest ~5,000 words via producer API | ~9 s |
+| Ingest ~5,000 words via producer API | ~40 s |
 | Exact lookup via `by_item_key` | <1 ms |
-| Multi-attractor NNS (2 attractors, e.g. `*****er`) | ~200 ms |
-| Multi-attractor NNS (4 attractors, e.g. `*******tion`) | ~460 ms |
+| Multi-attractor search (2 attractors, e.g. `*****er`) | ~30 ms |
+| Multi-attractor search (4 attractors, e.g. `*******tion`) | ~25 ms |
 
 ## A note on `enable_semantic_indexing`
 

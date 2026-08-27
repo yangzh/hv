@@ -47,149 +47,33 @@ $$\text{result} = \text{dollar} \otimes T_{\text{US} \to \text{Sweden}} \approx 
 
 ## Code (Manual)
 
-The algebraic approach — compute the transfer vector directly:
+Full script: [`mexican_dollar.py`](https://github.com/yangzh/hv/blob/main/examples/mexican_dollar/mexican_dollar.py). The essence — each country is a bundle of role ⊗ filler pairs, and one release + one bind answers the analogy:
 
 ```python
-from kongming import hv
-
-model = hv.MODEL_64K_8BIT
-so = hv.SparseOperation(model, "knowledge", 0)
-
-# Create role markers
-country_code = hv.Sparkle.from_word(model, "role", "country_code")
-capital      = hv.Sparkle.from_word(model, "role", "capital")
-currency     = hv.Sparkle.from_word(model, "role", "currency")
-
-# Create fillers
-usa         = hv.Sparkle.from_word(model, "country", "usa")
-mex         = hv.Sparkle.from_word(model, "country", "mex")
-swe         = hv.Sparkle.from_word(model, "country", "swe")
-dc          = hv.Sparkle.from_word(model, "capital", "dc")
-mexico_city = hv.Sparkle.from_word(model, "capital", "mexico_city")
-stockholm   = hv.Sparkle.from_word(model, "capital", "stockholm")
-dollar      = hv.Sparkle.from_word(model, "currency", "dollar")
-peso        = hv.Sparkle.from_word(model, "currency", "peso")
-krona       = hv.Sparkle.from_word(model, "currency", "krona")
-
-# Encode each country as role-filler bundles
 us_record = hv.bundle(hv.Seed128.random(so),
-    hv.bind(country_code, usa),
-    hv.bind(capital, dc),
-    hv.bind(currency, dollar),
-)
-mexico_record = hv.bundle(hv.Seed128.random(so),
-    hv.bind(country_code, mex),
-    hv.bind(capital, mexico_city),
-    hv.bind(currency, peso),
-)
-sweden_record = hv.bundle(hv.Seed128.random(so),
-    hv.bind(country_code, swe),
-    hv.bind(capital, stockholm),
-    hv.bind(currency, krona),
-)
+    hv.bind(country_code, usa), hv.bind(capital, dc), hv.bind(currency, dollar))
+# ... mexico_record, sweden_record likewise ...
 
-# Transfer vector: Mexico / US
 transfer_to_mexico = hv.release(mexico_record, us_record)
-
-# "What's the Dollar of Mexico?"
 mexican_dollar = hv.bind(dollar, transfer_to_mexico)
-print(f"peso overlap:  {hv.overlap(mexican_dollar, peso)}")    # high!
-print(f"dollar overlap: {hv.overlap(mexican_dollar, dollar)}")  # ~1 (noise)
-print(f"krona overlap:  {hv.overlap(mexican_dollar, krona)}")   # ~1 (noise)
 
-# "What's the Washington DC of Mexico?"
-mexican_dc = hv.bind(dc, transfer_to_mexico)
-print(f"mexico_city overlap: {hv.overlap(mexican_dc, mexico_city)}")  # high!
-
-# Transfer to Sweden works the same way
-transfer_to_sweden = hv.release(sweden_record, us_record)
-swedish_dollar = hv.bind(dollar, transfer_to_sweden)
-print(f"krona overlap: {hv.overlap(swedish_dollar, krona)}")  # high!
+hv.overlap(mexican_dollar, peso)    # 32/32 — the answer
+hv.overlap(mexican_dollar, dollar)  #  2    — noise
+hv.overlap(mexican_dollar, krona)   #  0    — noise
 ```
+
+The same transfer answers "the Washington DC of Mexico?" (→ mexico_city, 29/32) and, via `release(sweden_record, us_record)`, "the Dollar of Sweden?" (→ krona, 26/32).
 
 ## Code (with AnalogicalReasoner)
 
-When records are stored in memory (as [Octopus](../../api/hv/octopus.md) composites), `analogical_reasoner` handles the transfer:
+Full script: [`mexican_dollar_memory.py`](https://github.com/yangzh/hv/blob/main/examples/mexican_dollar/mexican_dollar_memory.py). When the country records live in storage — filler terminals plus one [Octopus](../../api/hv/octopus.md) per country, staged via the producer API — `analogical_reasoner` does the transfer for you:
 
 ```python
-from kongming import hv, memory
-
-model = hv.MODEL_64K_8BIT
-store = memory.InMemory(model)
-
-keys = ["capital", "currency", "country_code"]
-FILLER_DOMAIN = 0
-
-countries = {
-    "USA": ["dc", "USD", "USA"],
-    "MEX": ["mexicoCity", "MXN", "MEX"],
-    "SWE": ["stockholm", "SEK", "SWE"],
-}
-
-# Producers stage chunks against a batched mutable view (the Go/Rust idiom):
-# terminals for the fillers — NNS needs them as searchable items — then one
-# Octopus record per country, its key-aligned values picked by item key.
-with store.new_mutable_view() as view:
-    for values in countries.values():
-        for word in values:
-            memory.new_terminal(FILLER_DOMAIN, word).produce(view)
-    for name, values in countries.items():
-        memory.from_key_values(
-            "country", name, keys,
-            memory.joiner(*[memory.by_item_key(FILLER_DOMAIN, w)
-                            for w in values]),
-            note=name,
-        ).produce(view)
-    # auto-commits on __exit__
-
-# Feature probes for the queries (same identities the terminals carry).
-fillers = {
-    w: hv.Sparkle.from_word(model, FILLER_DOMAIN, w)
-    for values in countries.values() for w in values
-}
-
-# Retrieve stored records
-us_code  = store.get("country", "USA").code
-mex_code = store.get("country", "MEX").code
-swe_code = store.get("country", "SWE").code
-
-view = store.new_view()
-
-# "What is the USD of Mexico?"
 result = memory.first_picked(view,
     memory.nns(
         memory.analogical_reasoner(
-            memory.with_code(mex_code),
-            us_code,
-            fillers["USD"],
-        )
-    )
-)
+            memory.with_code(mex_code), src=us_code, feature=fillers["USD"])))
 print(result.id)  # → ✨:🌱MXN
-
-# "What is the Washington DC of Mexico?"
-result = memory.first_picked(view,
-    memory.nns(
-        memory.analogical_reasoner(
-            memory.with_code(mex_code),
-            us_code,
-            fillers["dc"],
-        )
-    )
-)
-print(result.id)  # → ✨:🌱mexicoCity
-
-# "What is the Dollar of Sweden?"
-result = memory.first_picked(view,
-    memory.nns(
-        memory.analogical_reasoner(
-            memory.with_code(swe_code),
-            us_code,
-            fillers["USD"],
-        )
-    )
-)
-print(result.id)  # → ✨:🌱SEK
 ```
 
 `analogical_reasoner` computes the transfer vector `feature ⊗ inverse(src)` internally and uses [near-neighbor search](../../concepts/near_neighbor_search.md) to find the best match in memory — no manual algebra needed.

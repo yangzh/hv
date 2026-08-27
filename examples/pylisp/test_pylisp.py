@@ -7,7 +7,7 @@ import tempfile
 
 import pytest
 
-from kongming.lisp import LispEnv
+from kongming.pylisp import LispEnv
 
 # ── Parse / display ──────────────────────────────────────────────────
 
