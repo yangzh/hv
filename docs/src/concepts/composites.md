@@ -89,14 +89,14 @@ Check out [code snippets](../api/hv/parcel.md) from the API reference.
 
 A **one-directional reference** between two hypervectors.
 
-$$P = A \otimes B^{-1} = A \oslash B$$
+$$P = T^{-1} \otimes H = H \oslash T$$
 
-A Dart 🎯 encodes a directed link from a source `A` to a destination `B` — the direction is semantic (*from → to*), while algebraically the link is recoverable from either end. Dart 🎯 is the structured wrapper for the [release](operators.md#release).
+A Dart 🎯 is "thrown" from a tail `T` to a head `H` — the direction is semantic (*from → to*), while algebraically the link is recoverable from either end. Dart 🎯 is the structured wrapper for the [release](operators.md#release).
 
 Given the Dart 🎯 of $P$:
 
-$$ A = P \otimes B $$ 
-$$ B = P^{-1} \otimes A $$
+$$ H = P \otimes T $$ 
+$$ T = P^{-1} \otimes H $$
 
 Use when: you need a directed link — edges, mappings, "from→to" relations — where either endpoint can still be recovered given the other.
 

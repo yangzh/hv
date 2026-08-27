@@ -1,11 +1,8 @@
 # Sparkle ✨
 
+Sparkles are the atomic building block for higher-level constructs. Domain is a logical namespace that groups related Sparkle instances. Pod acts as the secondary identifier for a Sparkle instance.
 
-Sparkles are the atomic building block for higher-level constructs: essentially [SparseSegmented](sparse_segmented.md) annotated with domain and pod. 
-
-Domain is a logical namespace that groups related Sparkle instances. Pod acts as the secondary identifier for a Sparkle instance.
-
-Sparkle is **deterministic**: the same (domain, pod) pair always produces the same offsets. For this reason, the (model, pod) pair uniquely identifies a Sparkle.
+Sparkle is **deterministic**: the same (domain, pod) pair always produces the same offsets, across all sessions and engines. For this reason, the (model, domain, pod) triple uniquely identifies a Sparkle, and we store the triple rather than the raw offsets for huge space saving.
 
 ## Sparkle Constructors
 
@@ -25,8 +22,11 @@ s2 = hv.Sparkle.from_prewired(model, "animals", hv.PREWIRED_SET_MARKER)
 s3 = hv.Sparkle.identity(model)
 
 # Random (from SparseOperation)
-so=hv.SparseOperation(hv.MODEL_1M_10BIT, "domain", "pod")
+so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
 s4 = hv.Sparkle.random("animals", so)
+
+# From domain + pod directly — primary constructor
+s5 = hv.Sparkle(model, "animals", pod)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -79,7 +79,7 @@ let s5 = Sparkle::new(model, domain, pod);
 {{#tab name="Python"}}
 ```python
 s0.model()         # Model enum
-s0.stable_hash()   # Deterministic hash
+s0.stable_hash()   # Deterministic and unique hash
 s0.exponent()      # Current exponent (1 for base vector)
 
 s0_square=s0.power(2)     # Returns p-th power (new Sparkle)
@@ -163,6 +163,6 @@ During pretty-printing of Sparkle instances, you may notice special emoji for do
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-The underlying offsets are lazily generated from a seeded PRNG. Only the seeds are stored in serialization, which is a significant storage saving; offsets are recomputed during de-serialization.
+The underlying offsets are lazily generated from a seeded PRNG. Only the seeds are stored in serialization, which is a significant storage saving.
 
 </div>

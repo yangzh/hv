@@ -1,8 +1,8 @@
 # Learner 💫
 
-Learners are designed to perform online bundling for a stream of observations, in the form of Hebbian-style learning.
+Learners are designed to perform online bundling for a stream of observations, in the form of Hebbian learning.
 
-The total storage / processing budget is fixed — what matters is the distribution of weights among observed vectors.
+The representational budget is fixed — what matters is the distribution of weights among observed vectors.
 
 ## Constructors
 
@@ -10,6 +10,9 @@ The total storage / processing budget is fixed — what matters is the distribut
 {{#tab name="Python"}}
 ```python
 learner = hv.Learner(model, hv.Seed128(0, 42))
+
+# age-1 learner that starts having seen `obs`.
+learner = hv.Learner(model, hv.Seed128(0, 42), initial=obs)
 
 # a randomly-initialized learner.
 learner = hv.Learner.random(so)
@@ -19,6 +22,9 @@ learner = hv.Learner.random(so)
 ```go
 learner := hv.NewLearner(model, hv.NewSeed128(0, 42), nil)
 
+// age-1 learner that starts having seen `obs`.
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42), obs)
+
 // a randomly-initialized learner.
 learner := hv.NewRandomLearner(so)
 ```
@@ -26,6 +32,9 @@ learner := hv.NewRandomLearner(so)
 {{#tab name="Rust"}}
 ```rust
 let mut learner = Learner::new(model, Seed128::new(0, 42), None);
+
+// age-1 learner that starts having seen `obs`.
+let mut learner = Learner::new(model, Seed128::new(0, 42), Some(obs.kind()));
 
 // a randomly-initialized learner.
 let mut learner = Learner::random(&mut so);
@@ -65,13 +74,15 @@ learner.bundle_multiple(&b, 3)?;  // with weight multiplier
 {{#tab name="Python"}}
 ```python
 learner.age()                # total observed weight (int)
+learner.blank()              # bool: nothing observed yet
+
+learner.model()              # identity accessors: model / domain / pod
+learner.domain()
+learner.pod()
 
 learner.support(a)           # overlap above the chance baseline, saturating at 0
 learner.weight(a)            # support, normalized to [0.0, 1.0]
 learner.unique_estimated()   # distinct patterns held
-
-learner.stable_hash()        # content hash
-learner.core()               # SparseSegmented snapshot of the content
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -82,9 +93,6 @@ learner.Blank()              // bool: nothing observed yet
 learner.Support(a)           // uint32: overlap above chance, saturating at 0
 learner.Weight(a)            // float64 in [0, 1]
 learner.UniqueEstimated()    // float64: distinct patterns held
-
-learner.StableHash()         // uint64
-learner.Core()               // SparseSegmented
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -95,9 +103,6 @@ learner.blank()              // bool: nothing observed yet
 learner.support(&a)          // u32: overlap above chance, saturating at 0
 learner.weight(&a)           // f64 in [0, 1]
 learner.unique_estimated()   // f64: distinct patterns held
-
-learner.stable_hash()        // u64
-learner.core()               // SparseSegmented
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -116,7 +121,7 @@ blank learner.
 
 A young Learner does not build its working buffer immediately. It **caches the
 observations themselves** — a small list of (vector, weight) pairs — and only
-materializes the buffer once the list outgrows its per-model capacity. A cached
+materializes the buffer once keeping the list holds no advantage. A cached
 observation is a recipe, typically far smaller than a full offsets buffer, so
 young learners cost a fraction of what they used to in memory and on the wire.
 
@@ -126,8 +131,7 @@ Two behaviors follow directly:
   entry's weight instead of re-bundling it. A learner that sees the same pattern
   a thousand times still holds one entry, and never materializes at all.
 - **The unique count is exact** while observations stay cached:
-  `unique_estimated()` reports the distinct entry count rather than an overlap
-  proxy.
+  `unique_estimated()` reports the distinct entry count rather than an estimate.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -140,36 +144,19 @@ for entry in learner.cached_data():
 learner.compact()            # drop cached materializations (content unchanged)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-learner.HasCachedData()      // bool
-
-for i, entry := range learner.CachedData() {
-    fmt.Println(i, entry)    // the cached observations, in arrival order
-}
-
-learner.Compact()            // drop cached materializations (content unchanged)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-learner.has_cached_data();   // bool
-
-for (i, entry) in learner.cached_data() {
-    println!("{i} {entry}"); // the cached observations, in arrival order
-}
-
-learner.compact();           // drop cached materializations (content unchanged)
-```
-{{#endtab}}
 {{#endtabs}}
 
 <div class="callout callout-note">
 <div class="callout-title">Materialization is invisible</div>
 
 Whether a learner is still caching observations or has already materialized its
-buffer changes nothing observable: `core()`, `stable_hash()`, `support()` and
-serialization all return the same answers either way. The distinction is purely
-about when the work is done — see
+buffer changes nothing observable. The distinction is purely internal: refer to
 [lazy materialization](types.md#lazy-materialization).
 </div>
+
+## See also
+
+- [Learner concepts](../../concepts/learner.md) — the fixed budget,
+  diversity vs. repetition.
+- [LearnerPool](learner_pool.md) — pooled Learners behind address-keyed
+  access circles.

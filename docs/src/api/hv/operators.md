@@ -35,8 +35,6 @@ let eq = hyper_binary::equal(&a, &b);                       // bool
 
 Extracts one component from a binding: $A \oslash B = A \otimes B^{-1}$
 
-`release` returns a [Dart](dart.md) — a directional reference from `composite` to `role` that retains both endpoints for inspection and serialization. The bit-level value is identical to `bind(composite, inverse(role))`.
-
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
@@ -86,35 +84,6 @@ let k2 = k.expand(vec![c.clone()]); // equivalent to bind_hb(vec![a, b, c]); con
 // Deriving several Knots from one base: clone first.
 let base = operators::bind_hb(vec![a.clone(), b.clone()]);
 let k1 = base.clone().expand(vec![c]); // base still usable
-```
-{{#endtab}}
-{{#endtabs}}
-
-### BindDirect
-
-Like `Bind`, but returns a raw [SparseSegmented](sparse_segmented.md) instead of a
-[Knot](knot.md) — no operand tracking. Cheaper for intermediate computations
-where you don't need to reverse the bind or inspect the operand list.
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-# domain/pod default to the zero Domain/Pod
-ss = hv.bind_direct(a, b, c)
-
-# Or supply an explicit seed (annotates the resulting SparseSegmented):
-ss = hv.bind_direct(a, b, domain=d, pod=p)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-ss := hv.BindDirect(domain, pod, a, b, c)  // SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let ss = operators::bind(domain, pod, &[a, b, c]);         // SparseSegmented
-let ss0 = operators::bind_direct(&[a, b, c]);              // no seed (default Domain/Pod)
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -1,87 +1,83 @@
 # Dart 🎯
 
-A one-directional reference between two hypervectors. A Dart encodes a directed link from a `source` to a `destination` via `P = source ⊗ Inv(destination)`. Given the Dart and either endpoint, the other endpoint can be recovered. See [Composites: Dart](../../concepts/composites.md#dart).
+A one-directional reference between two hypervectors. A Dart is "thrown" from a `tail` to a `head`: 
+$$ P = H \otimes T^{-1} = H \oslash T $$ 
+
+See [Composites: Dart](../../concepts/composites.md#dart).
 
 ## Constructor
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-p = hv.Dart(hv.Seed128(0, 42), source, destination)
-
-# Or via the release operator:
-p = hv.release(source, destination)
+# Or via the release operator (note the order: release(head, tail)):
+p = hv.release(head, tail)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.NewDart(hv.NewSeed128(0, 42), source, destination)
+p := hv.NewDart(hv.NewSeed128(0, 42), tail, head)
 
-// Or via the Release operator:
-p := hv.Release(source, destination)
+// Or via the Release operator (note the order):
+p := hv.Release(head, tail)
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let p = Dart::new(Seed128::new(0, 42), source, destination);
+let p = Dart::new(Seed128::new(0, 42), tail, head);
 
-// Or via the release operator:
-let p = operators::release(&source, &destination);
+// Or via the release operator (note the order):
+let p = operators::release(&head, &tail);
 ```
 {{#endtab}}
 {{#endtabs}}
 
 ## Endpoints
 
-A Dart retains references to its source (`A`) and destination (`B`).
+A Dart retains references to its endpoints.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-p.source()        # → A
-p.destination()   # → B
+p.tail()          # thrown from ...
+p.head()          # ... to
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p.Source()        // HyperBinary — A
-p.Destination()   // HyperBinary — B
+p.Tail()          // HyperBinary
+p.Head()          // HyperBinary
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-p.source()        // &HyperBinaryKind — A
-p.destination()   // &HyperBinaryKind — B
+p.tail()          // &HyperBinaryKind
+p.head()          // &HyperBinaryKind
 ```
 {{#endtab}}
 {{#endtabs}}
 
 ## Recovering endpoints
 
-Given the Dart and one endpoint, the other can be recovered:
-
-- `RDeref(B) = A` — recover the source given the destination, via `P ⊗ B`.
-- `Deref(A) = B` — recover the destination given the source, via `A ⊗ Inv(P)`.
-
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-p = hv.Dart(seed, a, b)
-recovered_a = p.rderef(b)   # ≈ a
-recovered_b = p.deref(a)    # ≈ b
+p = hv.release(h, t)                    # the Dart thrown t → h
+recovered_h = hv.bind(p, t)             # ≈ h
+recovered_t = hv.bind(p.power(-1), h)   # ≈ t
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-p := hv.NewDart(seed, a, b)
-recoveredA := p.RDeref(b)   // ≈ a
-recoveredB := p.Deref(a)    // ≈ b
+p := hv.Release(h, t)                   // the Dart thrown t → h
+recoveredH := hv.Bind(p, t)             // ≈ h
+recoveredT := hv.Bind(p.Power(-1), h)   // ≈ t
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let recovered_a = p.rderef(&b);  // ≈ a
-let recovered_b = p.deref(&a);   // ≈ b
+let recovered_h = operators::bind_hb(vec![p.clone_hb(), t.clone()]);
+let recovered_t = operators::bind_hb(vec![p.power(-1), h.clone()]);
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -90,4 +86,4 @@ let recovered_b = p.deref(&a);   // ≈ b
 
 Dart (and the `release` operator that constructs it) is anti-commutative:
 
-$$P(A, B) = P(B, A)^{-1}$$
+$$\text{Dart}(T, H) = \text{Dart}(H, T)^{-1}$$
