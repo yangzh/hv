@@ -2,17 +2,17 @@
 
 [![PDF](https://img.shields.io/badge/PDF-download-red)](kongming-hv.pdf)
 
-Kongming is a hyperdimensional computing library implementing sparse binary hypervectors for cognitive computing applications.
+`kongming` is a library implementing operations on sparse binary hypervectors for cognitive computing applications.
 
-The core engine is implemented in **Rust** for maximum efficiency, while ergonomic APIs are open-sourced in **Python** for better usability.
+While ergonomic APIs are accessible via Python module of `kongming` for better usability, the core engine is implemented in **Rust** for maximum efficiency.
 
-See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and the sparse binary representation.
+See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and, more relevant to this package, the sparse binary representation and computation.
 
 ## License
 
 The Python source code, examples, and documentation in this repository are licensed under the [MIT License](https://github.com/yangzh/hv/blob/main/LICENSE). 
 
-The compiled engine distributed via PyPI (`kongming-rs-hv`) is proprietary.
+The core engine distributed via PyPI (`kongming-rs-hv`) is proprietary.
 
 ## Install
 
@@ -43,14 +43,11 @@ This documentation covers code snippets in multiple languages (if available) sid
 
 ## Docs versioning
 
-The documentation on **[yangzh.github.io/hv](https://yangzh.github.io/hv/)** is
-deployed from release tags (`v*`) and stays in lockstep with the latest
-`kongming-rs-hv` release on PyPI. Whatever you read there matches what
-`pip install kongming-rs-hv` gives you.
+The documentation on **[yangzh.github.io/hv](https://yangzh.github.io/hv/)** stays in lockstep with the latest `kongming-rs-hv` release on PyPI. Whatever you read there matches what `pip install kongming-rs-hv` gives you.
 
 The [`main` branch](https://github.com/yangzh/hv/tree/main/docs/src) of this
 repository is the working head — it may describe APIs or examples that haven't
-been released yet. If you browse the raw markdown on GitHub, expect it to
+been released yet: if you browse the raw markdown on GitHub, expect it to
 occasionally be ahead of the published site.
 
 ## Reference

@@ -23,6 +23,7 @@
         - [SparseSegmented 🍡](api/hv/sparse_segmented.md)
         - [Sparkle ✨](api/hv/sparkle.md)
         - [Learner 💫](api/hv/learner.md)
+        - [LearnerPool 🎱](api/hv/learner_pool.md)
         - [Set 🫧](api/hv/set.md)
         - [Sequence 📿](api/hv/sequence.md)
         - [Octopus 🐙](api/hv/octopus.md)
@@ -43,7 +44,7 @@
     - [Producers](api/memory/producers.md)
     - [Train](api/memory/train.md)
 
-# Guides
+# Guides & Examples
 
 - [Notebook Quick Start](guides/notebook/quick-start.md)
     - [Notebook Platforms](guides/notebook/platforms.md)
@@ -53,7 +54,6 @@
     - [Installation](guides/python/installation.md)
     - [Quick Example](guides/python/example.md)
     - [Walkthrough](guides/python/walkthrough.md)
-
 - [Examples](examples/index.md)
     - [Operators from Scratch](examples/operators/index.md)
     - [Mexican Dollar](examples/mexican_dollar/index.md)

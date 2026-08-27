@@ -1,10 +1,10 @@
 # Operators
 
-Kongming provides two core algebraic operations on hypervectors.
+`kongming` provides two core algebraic operations on sparse binary hypervectors.
 
 ## Bind
 
-**Binding** ($\otimes$) combines two vectors into a result that is dissimilar to both inputs. It is the multiplicative operation in the HDC algebra.
+**Binding** ($\otimes$) combines two vectors into a result that is dissimilar to both inputs. It is the multiplicative operation in the VSA algebra.
 
 **Mathematically**
 
@@ -18,13 +18,15 @@ $$A \otimes A^{-1} = I \quad \text{(inverse)}$$
 
 $$O(A \otimes B, A) \approx O(A \otimes B, B) \approx \text{noise} \quad \text{(dissimilarity)}$$
 
-**Implementation**: segment-wise offset addition modulo segment size: check out [original paper](../introduction.md#reference) for details.
+**Implementation**: segment-wise offset addition modulo segment size.
+
+Check out [original paper](../introduction.md#reference) for details.
 
 Check out [code snippets](../api/hv/operators.md#bind) from the API reference.
 
 ### Release
 
-Occasionally we use **release**, which is derived from **bind**, as the equivalent of division, as opposed to multiplication.
+Occasionally we use **release**, as the equivalent of division.
 
 $$ A \oslash B = A \otimes B^{-1} $$
 
@@ -35,11 +37,11 @@ Check out [code snippets](../api/hv/operators.md#release) from the API reference
 
 ## Bundle
 
-**Bundling** ($\oplus$) creates a superposition of vectors — the result is similar to all inputs. It is the additive operation within VSA algebra.
-
-**Mathematically**
+**Bundling** ($\oplus$) creates a superposition of vectors, which is similar to all inputs. It is the additive operation in the VSA algebra.
 
 $$S = \sum_{i, \oplus} A_i$$
+
+**Mathematically**
 
 $$O(S, A_i) \gg O_{\text{random}} \quad \text{(similarity to each member)}$$
 
