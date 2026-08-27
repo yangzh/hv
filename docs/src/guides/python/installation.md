@@ -18,7 +18,7 @@ pip install kongming-rs-hv
 
 ```python
 import kongming
-print(kongming.__version__)  # e.g. should be "3.6.5", as of Apr. 2026. Yours should be newer. 
+print(kongming.__version__)  # e.g. "5.0.0", as of Aug. 2026. Yours should be newer.
 
 from kongming import hv
 print(hv.MODEL_64K_8BIT)  # should print 1

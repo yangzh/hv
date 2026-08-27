@@ -93,14 +93,14 @@ Output:
 
 | word | overlap |
 |------|---------|
-| cat  |    ~75  |
-| dog  |    ~30  |
-| bird |    ~30  |
-| fish |     ~1  |
-| tree |     ~1  |
+| cat  |   ~150  |
+| dog  |    ~55  |
+| bird |    ~50  |
+| fish |     ~5  |
+| tree |     ~3  |
 | rock |     ~1  |
 
-"cat" has the highest overlap (seen 3x). "dog" and "bird" (seen 1x each) have moderate overlap. Unseen words are at noise level (~1).
+"cat" has the highest overlap — roughly its weight share of the cardinality (3/5 × 256 ≈ 154). "dog" and "bird" (seen 1x each) sit near 1/5 × 256 ≈ 51. Unseen words stay at noise level.
 
 ## Binding: Role-Filler Pairs
 
@@ -116,12 +116,12 @@ cat = vectors["cat"]
 
 # Bind role with filler, then bundle the pairs
 learner2 = hv.Learner(model, hv.Seed128(0, so.uint64()))
-learner2.bundle(hv.Sparkle.bind(color_role, red))
-learner2.bundle(hv.Sparkle.bind(animal_role, cat))
+learner2.bundle(hv.bind(color_role, red))
+learner2.bundle(hv.bind(animal_role, cat))
 
-# Probe: "what color?"
-query = hv.Sparkle.bind(learner2, color_role.power(-1))
-print(f"red overlap:  {hv.overlap(query, red)}")   # high
+# Probe: "what color?" — release the role from the learned bundle
+query = hv.release(learner2, color_role)
+print(f"red overlap:  {hv.overlap(query, red)}")    # high (~128, its bundle share)
 print(f"blue overlap: {hv.overlap(query, blue)}")   # ~1
 print(f"cat overlap:  {hv.overlap(query, cat)}")    # ~1
 ```
