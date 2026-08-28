@@ -1,10 +1,12 @@
 # Decoding
 
-Decoding inverts training: tokens arrive one at a time, and the linguistic parser must recover the most likely sequence of states that could have emitted them, then convert that sequence back into a dependency tree. The engine is a Viterbi beam over the hierarchical state space, and this page walks one token's journey through each step.
+Decoding inverts training: tokens arrive one at a time, and the linguistic parser must recover the most likely sequence of states that could have emitted them, then eventually convert that sequence back into a dependency tree.
+
+The engine is a Viterbi beam over the hierarchical state space, and this page walks one token's journey through each step.
 
 ## What the decoder carries
 
-Between tokens, the decoder maintains a **beam**: the $K$ best hypotheses so far. Each surviving state itself is a spine, the hierarchical path of the *previous* token, plus its accumulated Viterbi score $\alpha$. True to form, the beam slice itself is stored as a superposition of all surviving state vectors, weighted by their confidence, plus a parallel bundle of **backpointers** recording where each state came from.
+Between tokens, the decoder maintains a **beam**: the $K$ best hypotheses so far. Each surviving state itself is a spine, outlining the hierarchical path for the *previous* token, plus its accumulated Viterbi score $\alpha$. True to form, the beam slice itself is stored as a superposition of all surviving state vectors, weighted by their confidence, plus a parallel superposition of **backpointers** recording where each state came from.
 
 At the start of a sentence the beam holds a single seed state anchored at
 `BEGIN`, and each primed language contributes its own seed — the beam
@@ -12,10 +14,9 @@ arbitrates between languages on evidence alone, with no explicit language switch
 
 ## Decoding cycle
 
-### 1. Start as a candidate leaf
+### 1. Start as candidate leaves
 
-The surface text is hashed into its observation identity, and the *obs*
-family answers: *which leaf edges may have emitted/realized this word?* Each answer is a candidate leaf, already weighted by observation frequency.
+The *obs* family answers: *which leaf edges may have emitted this word?* Each answer is a candidate leaf, already weighted by observation frequency.
 
 ### 2. Climb
 
@@ -25,13 +26,10 @@ frequency-weighted. The result is a set of extended **candidate spines**, each c
 
 ### 3. Graft and score
 
-Each candidate spine may attach to each beam state at any layer of that state's spine. For every (prev_state, layer, candidate) triple, admission is a single question to the *out* family: *does the candidate's top edge follow the prev_state's edge at this layer?* The answer becomes the transition confidence. Two structural rules apply:
+Each candidate spine may attach to each of the beam's previous states at any layer of that state's spine. For every (prev_state, layer, candidate) triple, admission is a single fitness test to the *out* family: *does the candidate's top edge fit the prev_state's edge at this layer?* The answer becomes the transition confidence. Two structural rules apply:
 
-- **The root gate.** Layer zero hosts only root edges; a mid-tree edge
-  proposing itself as a new root is structurally illegal and is dropped
-  without a read. Genuine root openings get a uniform prior instead — this is the flip side of `BEGIN` being untrained (see
-  [Training](training.md#the-sentinels-begin-and-end)).
-- **The conclusion discount.** Grafting at layer L implicitly closes every existing layer below L: each close-pending level pays its *measured* END cost. An expected closing costs almost nothing, a surprising one costs considerably more. This is how the decoder balances "attach deep, continue the phrase" against "attach high, close the clause" with statistics instead of heuristics.
+- **The root gate.** Layer zero hosts only root edges; a mid-tree edge proposing itself as a new root is structurally illegal and is dropped without a read. Genuine root openings get a uniform prior instead — this is the flip side of `BEGIN` being untrained (see [Training](training.md#the-sentinels-begin-and-end)).
+- **The conclusion discount.** Grafting at layer L implicitly closes every existing layer below L for the previous state: each close-pending level pays its *measured* END cost. An expected closing costs almost nothing, a surprising one costs considerably more. This is how the decoder balances "attach deep, continue the phrase" against "attach high, close the clause" with statistics instead of heuristics.
 
 The candidate's score is then the classic Viterbi:
 
@@ -39,13 +37,13 @@ $$ \alpha = \alpha_{prev} \times P_{transition} \times P_{observation}$$
 
 ### 4. Ghosts
 
-If *no* real placement survived anywhere in the beam — an out-of-vocabulary word, or a simple typo — the decoder asks each beam state's leaf edge for its *predictions* without observations. The best few become **ghost** candidates, priced at the noise floor, participating in continuing the beam.
+If *no* real candidate survived the placement for the current beam, that might be the case for an out-of-vocabulary word, or a simple typo. The decoder asks each beam state's leaf edge for its *predictions* without observations. The best few become **ghost** candidates, priced low but non-zero, while participating in continuing the beam.
 
 One guard applies: a ghost is purely prediction, not an observation, so any named-entity claim it carries is checked against the actual input text and stripped on mismatch — no phantom entities.
 
 ### 5. Select
 
-All admitted hypotheses, real and ghost, are ranked together by $\alpha$ and only the top $K$ survive. The new states are bundled with their backpointers and the cycle begins.
+All admitted hypotheses, real and ghost, are ranked together by confidence $\alpha$ and only the top $K$ survive. The new states are superposed, along with their backpointers, and the cycle begins.
 
 ## Backtrace
 
@@ -55,7 +53,9 @@ the state space, given everything observed so far.
 
 ### Reassembly
 
-The spine sequence is folded back into a dependency tree: tokens are bucketed by their parent edge, the `is_head` marker identifies exactly the head member of each subtree, to which all other members attach. Along the way each token's lemma is recovered from its trained token record, and entity spans are re-emitted from the carried annotations. The output is the same artifact the teacher produced: a full dependency parse.
+The spine sequence is folded back into a dependency tree: tokens are bucketed by their parent edge, the `is_head` marker identifies exactly the head member of each subtree, to which all other members attach.
+
+Along the way each token's lemma is recovered from its trained token record, and entity spans are re-emitted from the carried annotations. The output is the same artifact the teacher produced: a full dependency parse.
 
 ## Properties worth noticing
 
