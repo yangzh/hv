@@ -15,11 +15,18 @@ pip install kongming-rs-hv
 
 Supports Linux, macOS, and Windows on Python 3.10–3.14.
 
+## Featured: the Dependency Parser
+
+The library's flagship application: a **multilingual dependency parser** (English + Chinese) in which the entire language model *is* a hypervector substrate — **19 MB on disk** for both languages, trained in a single pass, in minutes, on a laptop, with no GPUs and no gradients. Decoding is Viterbi retrieval over superposed states, and every decision along the way is an integer you can print and inspect.
+
+Start with the [Overview](https://yangzh.github.io/hv/nlp/index.html), then [Training](https://yangzh.github.io/hv/nlp/training.html), [Decoding](https://yangzh.github.io/hv/nlp/decoding.html), and the measured [Evaluations](https://yangzh.github.io/hv/nlp/evaluations.html).
+
 ## Documentation
 
 Full documentation is available at **[yangzh.github.io/hv](https://yangzh.github.io/hv/)**, including:
 
 - [Concepts](https://yangzh.github.io/hv/concepts/hypervectors.html) — hypervectors, models, composites, operators, constant-time near-neighbor search
+- [Dependency Parser](https://yangzh.github.io/hv/nlp/index.html) — a multilingual parser whose language model is a 19 MB hypervector substrate
 - [API Reference](https://yangzh.github.io/hv/api/sparkle.html) — Python, Go, and Rust side by side
 - [Python Quick Start](https://yangzh.github.io/hv/guides/python/quick-start.html) — installation, examples, and notebooks
 - [Notebook Quick Start](https://yangzh.github.io/hv/guides/notebook/quick-start.html) — cell-by-cell Jupyter walkthrough
