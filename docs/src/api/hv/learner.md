@@ -82,7 +82,6 @@ learner.pod()
 
 learner.support(a)           # overlap above the chance baseline, saturating at 0
 learner.weight(a)            # support, normalized to [0.0, 1.0]
-learner.unique_estimated()   # distinct patterns held
 ```
 {{#endtab}}
 {{#tab name="Go"}}
@@ -92,7 +91,6 @@ learner.Blank()              // bool: nothing observed yet
 
 learner.Support(a)           // uint32: overlap above chance, saturating at 0
 learner.Weight(a)            // float64 in [0, 1]
-learner.UniqueEstimated()    // float64: distinct patterns held
 ```
 {{#endtab}}
 {{#tab name="Rust"}}
@@ -102,7 +100,6 @@ learner.blank()              // bool: nothing observed yet
 
 learner.support(&a)          // u32: overlap above chance, saturating at 0
 learner.weight(&a)           // f64 in [0, 1]
-learner.unique_estimated()   // f64: distinct patterns held
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -125,13 +122,11 @@ materializes the buffer once keeping the list holds no advantage. A cached
 observation is a recipe, typically far smaller than a full offsets buffer, so
 young learners cost a fraction of what they used to in memory and on the wire.
 
-Two behaviors follow directly:
+This also implies:
 
 - **Repeats are free.** Bundling a pattern the learner already holds bumps that
   entry's weight instead of re-bundling it. A learner that sees the same pattern
   a thousand times still holds one entry, and never materializes at all.
-- **The unique count is exact** while observations stay cached:
-  `unique_estimated()` reports the distinct entry count rather than an estimate.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
