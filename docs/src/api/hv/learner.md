@@ -110,8 +110,7 @@ learner.weight(&a)           // f64 in [0, 1]
 `Support` and `Weight` require content to probe against: calling either on a
 blank learner (`age == 0`) is a contract violation and panics (a
 `PanicException` in Python). Check `age()` first when a learner may be
-untrained. `UniqueEstimated` is defined everywhere and returns `0` for a
-blank learner.
+untrained.
 </div>
 
 ## Cached Observations
