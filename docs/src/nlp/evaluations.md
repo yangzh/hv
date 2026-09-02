@@ -1,15 +1,37 @@
 # Evaluations
 
+## Setup
+
 > **Note**: the numbers below were measured on the **Rust engine** over the full held-out validation tier (the Go and Rust engines are kept at bit-parity and decode identically).
 
-**Setup**: combined corpus of 4231 English + 4231 Chinese sentences,
-`MODEL_64K_8BIT`, a unified LearnerPool per language. The entire trained model — every transition statistic and open-class inventory for both languages — is a **19 MB** substrate on disk.
+Combined corpus of 4231 English + 4231 Chinese sentences for training, mostly a unified LearnerPool (`MODEL_64K_8BIT`) per language. 
 
 **Validation tier**: 950 held-out sentences — 484 English (5.8K tokens) and 466 Chinese (5.1K tokens), never seen in training.
 
+## Substrate stats
+
+The entire trained model — every transition statistic and open-class inventory for English and Chinese — is a **17 MB** substrate on disk.
+
+The trained substrate: 336,564 chunks, with Payload types:
+- 192,731 SPARKLE;
+- 58,129 OCTOPUS;
+- 85,704 LEARNER, that made up 2 LearnerPools;
+
+Pool health, per 65,536-member language pool:
+
+| | en | zh |
+|-|---------|---------|
+| trained members | 46,339 | 39,365 |
+| open / closed | 42,643 / 3,696 | 35,036 / 4,329 |
+| total load (Σ age) | 401,792 | 457,194 |
+| mean member age | 8.7 | 11.6 |
+| diversity margin p10 / p50 / p90 | 51 / 128 / 256 | 45 / 128 / 256 |
+
 ## Held-out parse quality
 
-Production configuration (coarse tier on), per language and combined:
+Production configuration (coarse tier on), per language and combined
+(full-tier run on the pre-redesign substrate; the sampled tables below are
+current):
 
 | metric | English | Chinese | mixed |
 |--------|---------|---------|-------|
@@ -27,43 +49,18 @@ entities and the surfaced ones, over parsed sentences.
 ## Training corpus vs held-out
 
 The same sweep per language over sampled tiers (English at 10%, Chinese at
-5%): the combined (training) corpus bounds what the substrate retained; the
-held-out gap is the generalization cost.
+5%), on the consolidated substrate: the training corpus bounds
+what the substrate retained; the held-out gap is the generalization cost.
 
-| metric | en combined (422) | en val (65) | zh combined (215) | zh val (24) |
+| metric | en training (422) | en val (65) | zh training (215) | zh val (24) |
 |--------|-------------------|-------------|-------------------|-------------|
-| full-parse | 99.1% | 100% | 96.7% | 100% |
-| head attachment | 81.5% | 76.5% | 64.6% | 55.8% |
-| upos | 97.1% | 93.3% | 90.2% | 87.2% |
-| deprel | 88.2% | 78.2% | 74.9% | 62.6% |
-| lemma | 96.6% | 91.3% | 97.0% | 92.1% |
-| entity recall | 75.4% | 59.5% | 64.6% | 72.7% |
-| entity precision | 76.3% | 67.0% | 71.9% | 80.0% |
-
-The 24-sentence Chinese validation slice is small — its entity numbers
-(above the training tier's) are sampling noise, not signal. The pattern
-that holds across slices: English retains and generalizes several points
-above Chinese on structure (head/deprel), while lemma recovery is
-language-neutral.
-
-## Sampling stability
-
-Held-out metrics at three scales — 2.5% and 10% per-language samples
-against the full tier (the full run predates the expectation-based pool
-reads; the sampled columns include them):
-
-| metric | 2.5% (30) | 10% (108) | full (950) |
-|--------|-----------|-----------|------------|
-| head attachment | 67.8% | 69.5% | 66.5% |
-| upos | 90.3% | 91.0% | 91.8% |
-| deprel | 72.0% | 72.1% | 71.3% |
-| lemma | 89.4% | 91.4% | 92.5% |
-| entity recall | 62.3% | 61.5% | 59.2% |
-| entity precision | 66.7% | 69.7% | 68.1% |
-
-The 30-sentence sample wobbles a couple of points; the 10% sample tracks
-the full tier within ~1–3, with the head and entity gains carried by the
-newer per-entry pool reads.
+| full-parse | 98.6% | 96.9% | 98.6% | 100% |
+| head attachment | 81.9% | 71.1% | 70.1% | 58.5% |
+| upos | 97.5% | 93.5% | 91.8% | 85.3% |
+| deprel | 89.8% | 77.3% | 78.2% | 63.8% |
+| lemma | 96.6% | 91.3% | 97.4% | 91.7% |
+| entity recall | 77.3% | 62.9% | 76.6% | 72.7% |
+| entity precision | 80.1% | 75.3% | 78.3% | 78.0% |
 
 ## The coarse tier's contribution
 
@@ -82,30 +79,14 @@ fine-grained statistics never saw — not from structural guessing.
 ## Decode throughput
 
 Single decoder, sequential decode, on the same MacBook Air that trains the
-model in under ten minutes:
+model in under ten minutes (sampled tiers, consolidated substrate):
 
-| | tokens/s |
-|-|----------|
-| English | 19.1 |
-| Chinese | 5.2 |
+| | combined tokens/s | val tokens/s |
+|-|-------------------|--------------|
+| English | 21.9 | 20.8 |
+| Chinese | 4.1 | 4.7 |
 
-The coarse backoff buys its accuracy with extra pool reads: with the tier
-off, throughput rises to 24.8 (en) / 7.3 (zh) tokens/s.
-
-## Substrate stats
-
-The trained substrate: 343,772 chunks in a 19.0 MB archive, with Payload types:
-- 192,731 SPARKLE;
-- 58,129 OCTOPUS;
-- 92,912 LEARNER, that made up 2 LearnerPools;
-
-Pool health, per 65,536-member language pool:
-
-| | en | zh |
-|-|---------|---------|
-| trained members | 49,087 | 43,825 |
-| open / closed | 40,816 / 8,271 | 32,894 / 10,931 |
-| total load (Σ age) | 401,792 | 457,194 |
-| mean member age | 8.2 | 10.4 |
-| diversity margin p10 / p50 / p90 | 11 / 128 / 256 | 10 / 128 / 256 |
-
+The width-addressed dense posting index (no hashing on the decode-side
+Collect/Add) added ~10 ms/token in both languages on top of the pool
+consolidation: +23% for English; Chinese remains dominated by pool-read
+volume from beam churn, not per-probe cost.
