@@ -14,6 +14,8 @@ Unlike traditional NLP with heavy reliance on explicit frequency tables, and unl
 
 Wernicke’s area in the brain is widely hypothesized to host the generic neural circuitry for language understanding: the solution I hope to present here will be the computational counterpart of it. 
 
+For readers new to this topic (or to this project), the best starting point is my paper, [*Cognitive modeling and learning with sparse binary hypervectors*](https://arxiv.org/abs/2310.18316) (full citation in the [introduction](../introduction.md#reference)): it lays the foundation — sparse binary hypervectors and their operators — that everything in this chapter builds on.
+
 The project is divided into the following pages:
 
 | Section | Description |
