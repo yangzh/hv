@@ -1,6 +1,6 @@
 # HyperBinary Types
 
-All vector types conform to a common interface: in Go this is the `HyperBinary` interface; and in Rust it is the `HyperBinary` trait. The two implementations are kept at **feature parity**.
+All vector types conform to a common `HyperBinary` interface, kept at **feature parity** across the underlying engines.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
@@ -37,7 +37,7 @@ Two levels are available, differing only in how hard they work:
   correct, while a `False` answer may mean "not provable this cheaply" — two
   vectors of different concrete types, for example, or a coincidence that only
   the actual offsets would reveal.
-- **`equal`** (Go: `hv.Equal`, Rust: `HyperBinaryKind::equal`) starts with the
+- **`equal`** starts with the
   lazy check and falls back to comparing content hashes, materializing if it
   must. Use it when the answer must be exact.
 

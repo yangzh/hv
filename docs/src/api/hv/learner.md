@@ -21,30 +21,6 @@ learner = hv.Learner(model, hv.Seed128(0, 42), rng_hint=hv.RNG_PHILOX_4X64)
 learner = hv.Learner.random(so)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-// rngHint 0 falls back to the process default.
-learner := hv.NewLearner(model, hv.NewSeed128(0, 42), 0, nil)
-
-// age-1 learner that starts having seen `obs`.
-learner := hv.NewLearner(model, hv.NewSeed128(0, 42), 0, obs)
-
-// a randomly-initialized learner.
-learner := hv.NewRandomLearner(so)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-// rng_hint None falls back to the process default.
-let mut learner = Learner::new(model, Seed128::new(0, 42), None, None);
-
-// age-1 learner that starts having seen `obs`.
-let mut learner = Learner::new(model, Seed128::new(0, 42), None, Some(obs.kind()));
-
-// a randomly-initialized learner.
-let mut learner = Learner::random(&mut so);
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Feeding Observations
@@ -55,20 +31,6 @@ let mut learner = Learner::random(&mut so);
 learner.bundle(a)                 # single observation
 
 learner.bundle_multiple(b, 3)     # with weight multiplier
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-learner.Bundle(a)                 // single observation
-
-learner.BundleMultiple(b, 3)      // with weight multiplier
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-learner.bundle(&a)?;              // single observation
-
-learner.bundle_multiple(&b, 3)?;  // with weight multiplier
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -87,24 +49,6 @@ learner.pod()
 
 learner.support(a)           # overlap above the chance baseline, saturating at 0
 learner.weight(a)            # support, normalized to [0.0, 1.0]
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-learner.Age()                // uint64
-learner.Blank()              // bool: nothing observed yet
-
-learner.Support(a)           // uint32: overlap above chance, saturating at 0
-learner.Weight(a)            // float64 in [0, 1]
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-learner.age()                // u64
-learner.blank()              // bool: nothing observed yet
-
-learner.support(&a)          // u32: overlap above chance, saturating at 0
-learner.weight(&a)           // f64 in [0, 1]
 ```
 {{#endtab}}
 {{#endtabs}}

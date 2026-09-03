@@ -28,19 +28,6 @@ seed.high()                                        # u64 (domain id)
 seed.low()                                         # u64 (pod seed)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-seed := hv.NewSeed128(0, 42)          // from raw uint64 values
-seedZero := hv.Seed128Zero()          // zero seed
-seed1 := hv.NewSeed128FromDP(hv.NewDomain("domain"), hv.NewPod("pod"))
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let seed = Seed128::new(0, 42);     // from raw u64 values
-let seedZero = Seed128::zero();         // zero seed
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Usage
@@ -54,22 +41,6 @@ seed = hv.Seed128("fruits", "fruit_set")
 
 s = hv.Set(seed, a, b, c)
 seq = hv.Sequence(seed, a, b, c)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-seed := hv.NewSeed128(0, 42)
-
-s := hv.NewSet(seed, a, b, c)
-seq := hv.NewSequence(seed, 0, a, b, c)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let seed = Seed128::new(0, 42);
-
-let s = Set::new(seed, vec![a, b, c]);
-let seq = Sequence::new(seed, 0, vec![a, b, c]);
 ```
 {{#endtab}}
 {{#endtabs}}

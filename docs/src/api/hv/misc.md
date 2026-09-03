@@ -27,32 +27,6 @@ pod:
   seed: 12345
 ```
 
-### Go / Rust Display
-
-{{#tabs global="lang"}}
-{{#tab name="Python"}}
-```python
-print(sparkle)      # compact emoji form via __str__
-repr(sparkle)       # detailed YAML form via __repr__
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-// Compact emoji form
-fmt.Println(sparkle)          // ✨:🌐0x..c862,🫛0x..80e4
-
-// Detailed YAML form
-fmt.Println(sparkle.Repr())
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-// Compact emoji form (via Display trait)
-println!("{}", sparkle);      // ✨:🌐0x..c862,🫛0x..80e4
-```
-{{#endtab}}
-{{#endtabs}}
-
 ## Serialization
 
 {{#tabs global="lang"}}
@@ -69,24 +43,6 @@ obj = hv.from_proto_bytes(data)
 
 # proto bytes → YAML string (for debugging)
 hv.format_to_yaml(data)
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-// HyperBinary → proto
-pb, err := sparkle.ToProto(ctx)
-
-// YAML formatting
-yaml := hv.FormatToYaml(protoMsg)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-// HyperBinary → proto
-let pb = sparkle.to_proto();
-
-// proto → HyperBinary
-let sparkle = Sparkle::from_proto(&pb)?;
 ```
 {{#endtab}}
 {{#endtabs}}

@@ -27,17 +27,4 @@ k = hv.bind(a, b)
 k2 = k.expand(c)  # k2 is equivalent to hv.bind(a, b, c); k is unchanged
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-k := hv.Bind(a, b)
-k2 := k.Expand(c) // k2 is equivalent to hv.Bind(a, b, c); k is unchanged
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let k = operators::bind_hb(vec![a.clone(), b.clone()]);
-let k2 = k.expand(vec![c]); // equivalent to bind_hb(vec![a, b, c]); consumes k
-// To keep the original: k.clone().expand(vec![c])
-```
-{{#endtab}}
 {{#endtabs}}

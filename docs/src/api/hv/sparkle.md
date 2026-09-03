@@ -29,48 +29,6 @@ s4 = hv.Sparkle.random("animals", so)
 s5 = hv.Sparkle(model, "animals", pod)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-// From a word string
-s0 := hv.NewSparkleFromWord(model, domain, "cat")
-
-// From a numeric seed
-s1 := hv.NewSparkleFromSeed(model, domain, 42)
-
-// From a prewired enum
-s2 := hv.NewSparkleFromPrewired(model, domain, api.Prewired_SET_MARKER)
-
-// Identity vector
-s3 := hv.NewSparkleIdentity(model)
-
-// Random (from SparseOperation)
-s4 := hv.NewRandomSparkle(domain, so)
-
-// From domain + pod directly — primary constructor
-s5 := hv.NewSparkle(model, domain, pod)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-// From a word string
-let s0 = Sparkle::from_word(model, domain, "cat");
-
-// From a numeric seed
-let s1 = Sparkle::from_seed(model, domain, 42);
-
-// From a prewired enum
-let s2 = Sparkle::from_prewired(model, domain, Prewired::SetMarker);
-
-// Identity vector
-let s3 = Sparkle::identity(model);
-
-// Random (from SparseOperation)
-let s4 = Sparkle::from_random(domain, &mut so);
-
-// From domain + pod directly — primary constructor
-let s5 = Sparkle::new(model, domain, pod);
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Key Methods
@@ -87,26 +45,6 @@ hv.equal(s0, s0_square)   # s0_square = s0^2, different from original s0.
        
 core0=s0.core()     # Returns underlying SparseSegmented
 core0.offsets()    # The raw offsets for each segment.
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-s0.Model()         // api.Model
-s0.StableHash()    // uint64
-s0.Exponent()      // int32
-
-s0Square := s0.Power(2)  // HyperBinary (cast to Sparkle)
-s0Square.Core()          // SparseSegmented
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-s0.model()         // Model
-s0.stable_hash()   // u64
-s0.exponent()      // i32
-
-let s0_square = s0.power(2)        // Sparkle
-s0.core()          // SparseSegmented
 ```
 {{#endtab}}
 {{#endtabs}}

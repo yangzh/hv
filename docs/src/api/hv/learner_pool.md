@@ -17,20 +17,6 @@ pool = hv.LearnerPool(hv.MODEL_64K_8BIT, "pool", 65536)
 pool.init()          # fill the still-empty roster with fresh Learners
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-model := api.Model_MODEL_64K_8BIT
-pool := hv.NewLearnerPool(model, domainPool, hv.GetGlobalEnv().RngHint, 65536)
-pool.Init()
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let model = Model::Model64k8bit;
-let mut pool = LearnerPool::new(model, domain_pool, flag_rng(), 65536);
-pool.init();
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Writing
@@ -43,16 +29,6 @@ auto-associatively.
 ```python
 pool.bundle(data, addr=addr)            # hetero-associative write
 pool.bundle(data, addr=addr, multiple=3)  # with weight
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-pool.Bundle(addr, data, 1)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-pool.bundle(Some(&addr.core()), &data.core(), 1)?;
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -75,19 +51,6 @@ s = pool.support(addr, probe)      # scalar evidence
 
 for attractor in pool.read_members(addr):
     ...                            # feed into NNS / overlap checks
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-s := pool.Read(addr).Support(probe)
-
-// selector form, composing with the memory query machinery:
-memory.AccessCircleRead(pool, addr, nil)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let s = pool.read(&addr).support(probe);
 ```
 {{#endtab}}
 {{#endtabs}}

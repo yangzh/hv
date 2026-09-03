@@ -27,26 +27,6 @@ d.domain_prefix()   # int (0 = UNKNOWN if no prefix was set)
 d.is_default()      # True if id == 0
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-// Polymorphic — dispatches by argument type:
-d := hv.NewDomain("animals")               // string → name-based
-d := hv.NewDomain(uint64(0x1234567890abcdef)) // uint64 → id-based
-d := hv.NewDomain(api.DomainPrefix_NLP)    // enum → prefix-based (no name)
-
-// Explicit forms (equivalent, zero overhead, compile-time safe):
-d := hv.NewDomainFromName("animals")
-d := hv.NewDomainFromID(0x1234567890abcdef)
-d := hv.NewDomainFromPrefix(api.DomainPrefix_NLP, "concept")
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let d = Domain::from_name("animals");
-let d = Domain::from_id(0x1234567890abcdef);
-let d = Domain::from_prefix(DomainPrefix::Nlp, "concept");
-```
-{{#endtab}}
 {{#endtabs}}
 
 ### Domain Prefix Constants
@@ -83,26 +63,6 @@ p.seed()       # u64
 p.word()       # str (empty if constructed from seed or prewired)
 p.prewired()   # int (0 if not prewired)
 p.is_default() # True if seed == 0
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-// Polymorphic — dispatches by argument type:
-p := hv.NewPod("cat")                   // string → word pod
-p := hv.NewPod(uint64(42))              // uint64 → seed pod
-p := hv.NewPod(api.Prewired_SET_MARKER) // enum → prewired pod
-
-// Explicit forms (equivalent, zero overhead, compile-time safe):
-p := hv.NewPodFromWord("cat")
-p := hv.NewPodFromSeed(42)
-p := hv.NewPodFromPrewired(api.Prewired_SET_MARKER)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let p = Pod::from_word("cat");
-let p = Pod::from_seed(42);
-let p = Pod::from_prewired(Prewired::SetMarker);
 ```
 {{#endtab}}
 {{#endtabs}}

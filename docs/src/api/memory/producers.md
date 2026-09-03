@@ -126,26 +126,6 @@ with storage.new_mutable_view() as view:
     ).produce(view)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-memory.NewDart(
-    hv.NewDomain("edges"), hv.NewPodFromWord("earth_to_moon"),
-    memory.WithChunks(earth),
-    memory.WithChunks(moon),
-).Produce(ctx, view)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let producer = producers::new_dart(
-    Domain::from_name("edges"),
-    Pod::from_word("earth_to_moon"),
-    Box::new(selector_impls::with_chunks(vec![earth])),
-    Box::new(selector_impls::with_chunks(vec![moon])),
-    args,
-);
-```
-{{#endtab}}
 {{#endtabs}}
 
 ### ClusterUpdater

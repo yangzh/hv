@@ -11,16 +11,6 @@ An ordered collection of hypervectors with positional encoding. See [Composites:
 seq = hv.Sequence(hv.Seed128(0, 42), first, second, third, start=1)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-seq := hv.NewSequence(hv.NewSeed128(0, 42), 1, first, second, third)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let seq = Sequence::new(Seed128::new(0, 42), 1, members);
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Derived Sequences: Append / Prepend / Reset
@@ -47,25 +37,6 @@ seq = hv.Sequence(hv.Seed128(0, 42), a, b, c)
 s1 = seq.append(d, e)       # [a, b, c, d, e]; seq unchanged
 s2 = seq.prepend(x, y)      # [x, y, a, b, c], start -= 2; seq unchanged
 s3 = seq.reset(10)          # starting index 10; seq unchanged
-```
-{{#endtab}}
-{{#tab name="Go"}}
-```go
-seq := hv.NewSequence(hv.NewSeed128(0, 42), 0, a, b, c)
-
-s1 := seq.Append(d, e)      // [a, b, c, d, e]; seq unchanged
-s2 := seq.Prepend(x, y)     // [x, y, a, b, c], start -= 2; seq unchanged
-s3 := seq.Reset(10)         // starting index 10; seq unchanged
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let seq = Sequence::new(Seed128::new(0, 42), 0, vec![a, b, c]);
-
-// Consuming self: clone first when deriving several from one base.
-let s1 = seq.clone().append(vec![d, e]); // [a, b, c, d, e]
-let s2 = seq.clone().prepend(vec![x, y]); // [x, y, a, b, c], start -= 2
-let s3 = seq.reset(10); // starting index 10; consumes seq
 ```
 {{#endtab}}
 {{#endtabs}}

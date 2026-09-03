@@ -10,20 +10,9 @@ An unordered collection of hypervectors. See [Composites: Set](../../concepts/co
 s = hv.Set(hv.Seed128(0, 42), first, second, third)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-s := hv.NewSet(hv.NewSeed128(0, 42), first, second, third)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let s = Set::new(Seed128::new(0, 42), members);
-```
-{{#endtab}}
 {{#endtabs}}
 
 ## Notable methods
-
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}

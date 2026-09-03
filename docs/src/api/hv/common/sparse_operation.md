@@ -46,16 +46,4 @@ so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
 sparkle = hv.Sparkle.random(hv.Domain("domain"), so)
 ```
 {{#endtab}}
-{{#tab name="Go"}}
-```go
-so := hv.NewSparseOperation(api.Model_MODEL_1M_10BIT, 0, 42)
-sparkle := hv.NewRandomSparkle(domain, so)
-```
-{{#endtab}}
-{{#tab name="Rust"}}
-```rust
-let mut so = SparseOp::new(Model::Model1m10bit, 0, 42);
-let sparkle = Sparkle::random(&domain, &mut so);
-```
-{{#endtab}}
 {{#endtabs}}
