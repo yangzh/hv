@@ -3,6 +3,40 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v5.2.0 (2026-09-03)
+
+### Breaking changes
+
+- **`Learner.has_cached_data()` / `cached_data()` renamed** to
+  `has_deferred_data()` / `deferred_data()` (wire fields likewise
+  `deferred_*`; wire-compatible by field number).
+- **Misuse now panics instead of erroring**: bundling or reading an
+  uninitialized pool, and constructing a zero-member pool, raise
+  `PanicException` (they were errors or silent before).
+- Deferred-mode `support()` reads are noise-corrected estimates and can
+  read ~1 lower than the spilled path for the same content.
+
+### New features
+
+- **`Learner(model, seed, initial=None, *, rng_hint=None)`** — pin the RNG
+  backend per learner (`hv.RNG_*`); pools, the deserializer, and producers
+  thread their own hints instead of falling back to the process default.
+- Multi-attractor NNS: one pushed-down scan over the access-circle union.
+
+### Performance
+
+- Learner reads retain the multi-entry mixture fill (computed once, reused
+  across reads, dropped on writes); pool member reads are one lazy Bind.
+
+### Fixes
+
+- A failed `hydrate()` no longer leaves the pool half-initialized — the
+  loader can be corrected and retried.
+- Learner snapshot/exposure holes closed: escaped views stay stable across
+  later writes (copy-on-write), `Power(1)` included.
+- Knot parts are canonically ordered; composite `Power(0)` returns the
+  typed identity; exponents fold into member recipes (exp-1 shells).
+
 ## v5.1.0 (2026-08-28)
 
 ### Breaking changes
@@ -181,15 +215,3 @@ Headline: a **maintenance / internal** release — the Python bindings are rebui
 
 - **Index keyspace redesign.** The substrate's on-disk key layout changed;
 
-## v4.5.0 (2026-05-28)
-
-Headline: new **`weights=`** kwarg on `hv.Parcel` plus several Python API tightenings that catch up to upstream Rust/Go drifts. Internally, a large NLP push lands OOV-token recovery and multi-token entity decoding (not Python-facing yet).
-
-### New features
-
-- **`hv.Parcel(seed, *pearls, weights=[...])`** — single Pythonic constructor that collapses Go's `NewParcel` / `NewWeightedParcel` / `NewParcelFromParts`. Omit `weights=` for uniform bundling (existing behavior); supply a list to bundle with per-pearl weights. Length mismatch raises `ValueError`.
-
-### API changes
-
-- **`hv.Sparkle(model, domain, pod)`** — simplified signature.
-- **`hv.Learner(model, seed, initial=None)`** — `initial` is now an optional kwarg defaulting to `None`.
