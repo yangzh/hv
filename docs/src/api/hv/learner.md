@@ -2,7 +2,7 @@
 
 Learners are designed to perform online bundling for a stream of observations, in the form of Hebbian learning.
 
-The representational budget is fixed — what matters is the distribution of weights among observed vectors.
+The representational budget is fixed, in the form of segment count $M$ from a single hypervector: what matters is the distribution of weights among observed vectors.
 
 ## Constructors
 
@@ -14,16 +14,20 @@ learner = hv.Learner(model, hv.Seed128(0, 42))
 # age-1 learner that starts having seen `obs`.
 learner = hv.Learner(model, hv.Seed128(0, 42), initial=obs)
 
+# optional keyword-only rng_hint pins the RNG backend (default: process-wide).
+learner = hv.Learner(model, hv.Seed128(0, 42), rng_hint=hv.RNG_PHILOX_4X64)
+
 # a randomly-initialized learner.
 learner = hv.Learner.random(so)
 ```
 {{#endtab}}
 {{#tab name="Go"}}
 ```go
-learner := hv.NewLearner(model, hv.NewSeed128(0, 42), nil)
+// rngHint 0 falls back to the process default.
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42), 0, nil)
 
 // age-1 learner that starts having seen `obs`.
-learner := hv.NewLearner(model, hv.NewSeed128(0, 42), obs)
+learner := hv.NewLearner(model, hv.NewSeed128(0, 42), 0, obs)
 
 // a randomly-initialized learner.
 learner := hv.NewRandomLearner(so)
@@ -31,10 +35,11 @@ learner := hv.NewRandomLearner(so)
 {{#endtab}}
 {{#tab name="Rust"}}
 ```rust
-let mut learner = Learner::new(model, Seed128::new(0, 42), None);
+// rng_hint None falls back to the process default.
+let mut learner = Learner::new(model, Seed128::new(0, 42), None, None);
 
 // age-1 learner that starts having seen `obs`.
-let mut learner = Learner::new(model, Seed128::new(0, 42), Some(obs.kind()));
+let mut learner = Learner::new(model, Seed128::new(0, 42), None, Some(obs.kind()));
 
 // a randomly-initialized learner.
 let mut learner = Learner::random(&mut so);
@@ -74,7 +79,7 @@ learner.bundle_multiple(&b, 3)?;  // with weight multiplier
 {{#tab name="Python"}}
 ```python
 learner.age()                # total observed weight (int)
-learner.blank()              # bool: nothing observed yet
+learner.blank()              # bool: whether this learner is blank (nothing observed yet)
 
 learner.model()              # identity accessors: model / domain / pod
 learner.domain()
@@ -108,43 +113,35 @@ learner.weight(&a)           // f64 in [0, 1]
 <div class="callout-title">Probing an untrained learner</div>
 
 `Support` and `Weight` require content to probe against: calling either on a
-blank learner (`age == 0`) is a contract violation and panics (a
-`PanicException` in Python). Check `age()` first when a learner may be
-untrained.
+blank learner is a contract violation and panics (a
+`PanicException` in Python); check `blank()` first.
 </div>
 
-## Cached Observations
+## Deferred Observations
 
-A young Learner does not build its working buffer immediately. It **caches the
-observations themselves** — a small list of (vector, weight) pairs — and only
-materializes the buffer once keeping the list holds no advantage. A cached
-observation is a recipe, typically far smaller than a full offsets buffer, so
-young learners cost a fraction of what they used to in memory and on the wire.
+A young Learner does not need to build its raw buffer immediately: instead it **defers** the observations themselves as a small list of (vector, weight) pairs, and only materializes the buffer once keeping the list no longer pays. A deferred observation is a recipe, typically far smaller than a full offsets buffer, so young learners cost a fraction of a materialized buffer, in memory and on the wire.
 
 This also implies:
 
-- **Repeats are free.** Bundling a pattern the learner already holds bumps that
-  entry's weight instead of re-bundling it. A learner that sees the same pattern
-  a thousand times still holds one entry, and never materializes at all.
+- **Repeats are free.** Bundling a pattern the learner already holds bumps that entry's weight when the recipes match lazily (`EqualLazy`); a repeat arriving in a different representation may land as a fresh entry. A learner that sees the same pattern a thousand times still holds one entry, and never materializes at all.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-learner.has_cached_data()    # True while observations are still cached
+learner.has_deferred_data()  # True while observations are still deferred
 
-for entry in learner.cached_data():
-    print(entry)             # the cached observations, in arrival order
+for entry in learner.deferred_data():
+    print(entry)             # the deferred observations, in arrival order
 
-learner.compact()            # drop cached materializations (content unchanged)
+learner.compact()            # drop incidental materializations (content unchanged)
 ```
 {{#endtab}}
 {{#endtabs}}
 
 <div class="callout callout-note">
-<div class="callout-title">Materialization is invisible</div>
+<div class="callout-title">Materialization is transparent</div>
 
-Whether a learner is still caching observations or has already materialized its
-buffer changes nothing observable. The distinction is purely internal: refer to
+Whether a learner is still deferring observations or has already materialized its buffer changes nothing observable. The distinction is purely internal: refer to
 [lazy materialization](types.md#lazy-materialization).
 </div>
 

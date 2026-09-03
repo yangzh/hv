@@ -4,7 +4,7 @@
 
 > **Note**: the numbers below were measured on the **Rust engine** over the full held-out validation tier (the Go and Rust engines are kept at bit-parity and decode identically).
 
-Combined corpus of 4231 English + 4231 Chinese sentences for training, mostly a unified LearnerPool (`MODEL_64K_8BIT`) per language. 
+Combined corpus of 4231 English + 4231 Chinese sentences for training; the statistics live in a unified LearnerPool (`MODEL_64K_8BIT`) per language. 
 
 **Validation tier**: 950 held-out sentences — 484 English (5.8K tokens) and 466 Chinese (5.1K tokens), never seen in training.
 
@@ -79,7 +79,7 @@ fine-grained statistics never saw — not from structural guessing.
 ## Decode throughput
 
 Single decoder, sequential decode, on the same MacBook Air that trains the
-model in under ten minutes (sampled tiers, consolidated substrate):
+model in ~12 minutes (sampled tiers, consolidated substrate):
 
 | | combined tokens/s | val tokens/s |
 |-|-------------------|--------------|
@@ -87,6 +87,6 @@ model in under ten minutes (sampled tiers, consolidated substrate):
 | Chinese | 4.1 | 4.7 |
 
 The width-addressed dense posting index (no hashing on the decode-side
-Collect/Add) added ~10 ms/token in both languages on top of the pool
+Collect/Add) shaved ~10 ms/token off both languages on top of the pool
 consolidation: +23% for English; Chinese remains dominated by pool-read
 volume from beam churn, not per-probe cost.
