@@ -44,6 +44,12 @@ jobs:
         run: mdbook build docs
       - name: Copy PDF into HTML site
         run: cp docs/book/pdf/output.pdf docs/book/html/kongming-hv.pdf
+      - name: Include demos
+        run: |
+          if [ -d demo ]; then
+            mkdir -p docs/book/html/demo
+            cp -r demo/. docs/book/html/demo/
+          fi
       - uses: actions/upload-pages-artifact@v5
         with:
           path: docs/book/html

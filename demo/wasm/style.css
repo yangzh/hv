@@ -1,0 +1,125 @@
+:root {
+  --fg: #1a1d23;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --ok: #16a34a;
+  --bad: #dc2626;
+  --line: #d1d5db;
+  --bg: #ffffff;
+  --panel: #f6f7f9;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #60a5fa;
+    --ok: #4ade80;
+    --bad: #f87171;
+    --line: #374151;
+    --bg: #0f1115;
+    --panel: #171a21;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 system-ui, sans-serif;
+}
+main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+h1 { margin: 0 0 0.25rem; font-size: 1.9rem; }
+.tagline { color: var(--muted); margin: 0 0 0.75rem; }
+
+.langs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+.lang {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  border-radius: 999px;
+  padding: 0.25rem 0.9rem;
+  font-size: 0.9rem;
+}
+.lang.active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.lang[disabled] { color: var(--muted); }
+
+#stages { list-style: none; padding: 0; margin: 0 0 1rem; }
+#stages li { padding: 0.35rem 0; color: var(--muted); }
+#stages .dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--line);
+  margin-right: 0.55rem;
+}
+#stages li.active { color: var(--fg); }
+#stages li.active .dot { background: var(--accent); animation: pulse 1s infinite alternate; }
+#stages li.done { color: var(--fg); }
+#stages li.done .dot { background: var(--ok); }
+#stages li.failed { color: var(--bad); }
+#stages li.failed .dot { background: var(--bad); }
+@keyframes pulse { from { opacity: 1; } to { opacity: 0.4; } }
+.detail { color: var(--muted); font-size: 0.85rem; margin-left: 0.4rem; }
+#stages progress { display: block; width: 260px; height: 6px; margin: 0.3rem 0 0 1.2rem; }
+#loadlog { font: 12px ui-monospace, monospace; color: var(--muted); margin-left: 1.2rem; }
+
+.inputrow { display: flex; gap: 0.5rem; }
+#text {
+  flex: 1;
+  font: 16px ui-monospace, monospace;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--fg);
+}
+#go {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+#status { color: var(--muted); font-size: 0.85rem; margin: 0.5rem 0 1rem; min-height: 1.2em; }
+
+/* The dependency SVG keeps brat's white card in both themes. */
+.depcard {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.75rem 0.5rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+.depcard:empty { display: none; }
+.depcard svg { display: block; }
+
+#arcs {
+  overflow-x: auto;
+  font: 14px/1.15 ui-monospace, monospace;
+  color: var(--fg);
+  padding: 0.5rem 0.25rem;
+}
+
+#table { overflow-x: auto; }
+#table table { border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
+#table td, #table th { border: 1px solid var(--line); padding: 0.25rem 0.7rem; text-align: left; }
+
+#raw { margin-top: 1rem; color: var(--muted); }
+#pretty {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font: 12px ui-monospace, monospace;
+  overflow-x: auto;
+  color: var(--fg);
+}
+
+footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.8rem; }
+footer .links a { color: var(--accent); text-decoration: none; }
+footer .links a:hover { text-decoration: underline; }

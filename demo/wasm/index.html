@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kongming — parse in your browser</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Kongming</h1>
+    <p class="tagline">Hyperdimensional dependency parsing — decoded entirely in your browser.
+      The model (a sparse binary hypervector substrate) downloads once; sentences never leave this page.</p>
+    <div class="langs">
+      <button class="lang active" data-lang="en">English</button>
+      <button class="lang" disabled title="Chinese needs its lattice segmenter — coming soon">中文 · soon</button>
+    </div>
+  </header>
+
+  <section id="loader">
+    <ol id="stages">
+      <li id="st-wasm"><span class="dot"></span> Decoder engine <span class="detail"></span>
+        <progress id="pg-wasm" max="100" value="0" hidden></progress></li>
+      <li id="st-sub"><span class="dot"></span> Language model <span class="detail"></span>
+        <progress id="pg-sub" max="100" value="0" hidden></progress></li>
+      <li id="st-load"><span class="dot"></span> Building the substrate <span class="detail"></span>
+        <div id="loadlog"></div></li>
+    </ol>
+  </section>
+
+  <section id="workbench" hidden>
+    <div class="inputrow">
+      <input id="text" type="text" spellcheck="false"
+             placeholder="Type an English sentence and press Enter…"
+             value="The rising sun can be seen from the east every morning.">
+      <button id="go">Parse</button>
+    </div>
+    <div id="status"></div>
+    <div id="svg" class="depcard"></div>
+    <div id="table"></div>
+    <details><summary>text view</summary><pre id="arcs"></pre></details>
+    <details id="raw"><summary>decoded SentenceProto (pretty)</summary><pre id="pretty"></pre></details>
+  </section>
+
+  <footer>
+    <p>Integer-only compute over 64K-bit sparse hypervectors; Viterbi beam over a trained substrate.
+       No server, no telemetry — check the network tab.</p>
+    <p class="links">
+      <a href="https://arxiv.org/abs/2310.18316">the paper</a> ·
+      <a href="https://github.com/yangzh/hv">github.com/yangzh/hv</a>
+    </p>
+  </footer>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

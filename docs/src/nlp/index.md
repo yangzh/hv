@@ -20,6 +20,7 @@ The project is divided into the following pages:
 
 | Section | Description |
 |---------|-------------|
+| [Live demo](https://yangzh.github.io/hv/demo/wasm/) | Parse a sentence in your browser — the decoder compiled to WebAssembly |
 | [Introduction](intro.md) | This project at a glance |
 | [Training](training.md) | Building language models |
 | [Decoding](decoding.md) | Viterbi retrieval under a beam |
