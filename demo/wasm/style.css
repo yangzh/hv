@@ -29,8 +29,29 @@ body {
   font: 16px/1.5 system-ui, sans-serif;
 }
 main { max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
 h1 { margin: 0 0 0.25rem; font-size: 1.9rem; }
 .tagline { color: var(--muted); margin: 0 0 0.75rem; }
+
+.header-links {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+.header-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+.header-links a:hover { color: var(--fg); text-decoration: underline; }
 
 .langs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
 .lang {
@@ -98,28 +119,8 @@ h1 { margin: 0 0 0.25rem; font-size: 1.9rem; }
 .depcard:empty { display: none; }
 .depcard svg { display: block; }
 
-#arcs {
-  overflow-x: auto;
-  font: 14px/1.15 ui-monospace, monospace;
-  color: var(--fg);
-  padding: 0.5rem 0.25rem;
-}
-
 #table { overflow-x: auto; }
 #table table { border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
 #table td, #table th { border: 1px solid var(--line); padding: 0.25rem 0.7rem; text-align: left; }
 
-#raw { margin-top: 1rem; color: var(--muted); }
-#pretty {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.75rem;
-  font: 12px ui-monospace, monospace;
-  overflow-x: auto;
-  color: var(--fg);
-}
-
 footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.8rem; }
-footer .links a { color: var(--accent); text-decoration: none; }
-footer .links a:hover { text-decoration: underline; }

@@ -75,7 +75,7 @@ async function boot() {
 
     stage("st-sub", "active", "downloading…");
     const sub = await fetchWithProgress(
-      "substrate.en.parquet.zst",
+      "substrate.en.kms.zst",
       $("pg-sub"),
       (d) => stage("st-sub", "active", d),
     );
@@ -111,9 +111,7 @@ function parse() {
     const why = { "-2": "not valid text", "-3": "no parse found", "-4": "nothing to parse" }[r] ?? r;
     $("status").textContent = `✗ ${why}`;
     $("svg").replaceChildren();
-    $("arcs").textContent = "";
     $("table").replaceChildren();
-    $("pretty").textContent = "";
     return;
   }
   const json = new TextDecoder().decode(
@@ -127,72 +125,7 @@ function parse() {
     sv > 0
       ? new TextDecoder().decode(new Uint8Array(mem.buffer, exportsRef.km_result_ptr() >>> 0, sv))
       : "";
-  $("arcs").textContent = renderArcText(sent);
   renderTable(sent);
-  $("pretty").textContent = JSON.stringify(sent, null, 2);
-}
-
-// Text arc diagram: box-drawing arcs above a monospace token row.
-// Shorter arcs sit lower; deprel labels ride their arc; ▾ marks the
-// dependent end; the root token is flagged in the upos row.
-function renderArcText(sent) {
-  const toks = sent.tokens;
-  let col = 0;
-  const centers = [];
-  const cells = [];
-  for (const t of toks) {
-    const w = Math.max([...t.text].length, [...t.upos].length);
-    centers.push(col + Math.floor(w / 2));
-    cells.push({ at: col, w });
-    col += w + 2;
-  }
-  const width = col;
-
-  const arcs = toks
-    .map((t, i) => ({ dep: i, head: t.head - 1, label: t.deprel }))
-    .filter((a) => a.head >= 0)
-    .sort((a, b) => Math.abs(a.dep - a.head) - Math.abs(b.dep - b.head));
-  const level = arcs.map(() => 1);
-  for (let i = 0; i < arcs.length; i++)
-    for (let j = 0; j < i; j++) {
-      const [al, ar] = [Math.min(arcs[i].dep, arcs[i].head), Math.max(arcs[i].dep, arcs[i].head)];
-      const [bl, br] = [Math.min(arcs[j].dep, arcs[j].head), Math.max(arcs[j].dep, arcs[j].head)];
-      if (bl >= al && br <= ar && level[j] >= level[i]) level[i] = level[j] + 1;
-    }
-  const maxL = Math.max(1, ...level);
-  const grid = Array.from({ length: maxL }, () => new Array(width).fill(" "));
-  const rowOf = (l) => maxL - l; // level 1 = bottom row
-
-  // Highest arcs first so lower spans + verticals compose with ┼.
-  const order = arcs.map((_, i) => i).sort((a, b) => level[b] - level[a]);
-  for (const i of order) {
-    const a = arcs[i];
-    const r = rowOf(level[i]);
-    const [c1, c2] = [centers[a.dep], centers[a.head]].sort((x, y) => x - y);
-    for (let c = c1 + 1; c < c2; c++)
-      grid[r][c] = grid[r][c] === "│" ? "┼" : "─";
-    // Corners; two arcs meeting at a shared head column form ┬.
-    grid[r][c1] = grid[r][c1] === "╮" ? "┬" : "╭";
-    grid[r][c2] = grid[r][c2] === "╭" ? "┬" : "╮";
-    for (let rr = r + 1; rr < maxL; rr++)
-      for (const c of [c1, c2])
-        grid[rr][c] = grid[rr][c] === "─" ? "┼" : grid[rr][c] === " " ? "│" : grid[rr][c];
-    // Label centered on the run, clamped inside the corners.
-    const label = a.label;
-    if (c2 - c1 - 1 >= label.length + 2) {
-      const at = Math.max(c1 + 2, Math.floor((c1 + c2) / 2 - label.length / 2));
-      for (let k = 0; k < label.length && at + k < c2 - 1; k++) grid[r][at + k] = label[k];
-    }
-  }
-  // Arrowheads last: the dependent's foot, always visible.
-  for (const a of arcs) grid[maxL - 1][centers[a.dep]] = "▾";
-
-  const pad = (s, w) => s + " ".repeat(Math.max(0, w - [...s].length));
-  const tokRow = toks.map((t, i) => pad(t.text, cells[i].w)).join("  ");
-  const uposRow = toks
-    .map((t, i) => pad(t.head === 0 ? t.upos + "*" : t.upos, cells[i].w))
-    .join("  ");
-  return [...grid.map((r) => r.join("").replace(/\s+$/, "")), tokRow, uposRow].join("\n");
 }
 
 function renderTable(sent) {

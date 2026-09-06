@@ -9,7 +9,13 @@
 <body>
 <main>
   <header>
-    <h1>Kongming</h1>
+    <div class="header-top">
+      <h1>Kongming</h1>
+      <nav class="header-links">
+        <a href="https://arxiv.org/abs/2310.18316">Paper</a>
+        <a href="https://github.com/yangzh/hv">GitHub</a>
+      </nav>
+    </div>
     <p class="tagline">Hyperdimensional dependency parsing — decoded entirely in your browser.
       The model (a sparse binary hypervector substrate) downloads once; sentences never leave this page.</p>
     <div class="langs">
@@ -39,17 +45,11 @@
     <div id="status"></div>
     <div id="svg" class="depcard"></div>
     <div id="table"></div>
-    <details><summary>text view</summary><pre id="arcs"></pre></details>
-    <details id="raw"><summary>decoded SentenceProto (pretty)</summary><pre id="pretty"></pre></details>
   </section>
 
   <footer>
     <p>Integer-only compute over 64K-bit sparse hypervectors; Viterbi beam over a trained substrate.
        No server, no telemetry — check the network tab.</p>
-    <p class="links">
-      <a href="https://arxiv.org/abs/2310.18316">the paper</a> ·
-      <a href="https://github.com/yangzh/hv">github.com/yangzh/hv</a>
-    </p>
   </footer>
 </main>
 <script type="module" src="app.js"></script>
