@@ -3,51 +3,6 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
-## v5.3.0 (2026-09-24)
-
-### Breaking changes
-
-- **Stored substrates from v5.2.0 and earlier must be regenerated, and the
-  break is SILENT.** The `exponent` field (number 5) changed from a `sint32`
-  to an `Exponent` message, which changes its wire type. Old payloads still
-  parse — the field is skipped as unknown and the exponent reads back as 1
-  rather than its stored value. There is no format-version gate to catch
-  this, so a stale substrate degrades quietly instead of failing. Regenerate
-  rather than upgrade in place.
-- **`exponent()` returns `(numerator, denominator)`**, not an integer:
-  `s.power(3).exponent()` is now `(3, 1)`, and a base vector reports `(1, 1)`.
-- **Pretty-printing marks the exponent with 💪**, previously `^`, matching the
-  reference engine: `✨:🔗pos,🌱step,💪1/2`. The separator changed with it —
-  emitted only after a domain, and never for `Parcel`.
-- **`Learner.unique_estimated()` is removed**, along with the learner's
-  diversity margin.
-
-### New features
-
-- **Fractional powers** — `power(numerator, denominator=1, denominator_ls=0)`.
-  `power(1, 2)` is the square root of the permutation; `denominator_ls` spells
-  the denominator as `2 ** ls` and takes an integer scaling path instead of
-  float arithmetic. Exponents are kept in lowest terms with the sign on the
-  numerator, so `power(6, 2)` *is* the integer `power(3)`.
-  Fractional scaling truncates toward zero, so it is lossy once a vector is
-  materialized; on a lazy vector the exponents compose first and
-  `power(1, 2).power(2, 1)` is exact.
-
-### Performance
-
-- `overlap` short-circuits on matching stable hashes, and proves identity
-  lazily before any fill.
-- `Dart.bind` cancels provable tails; `Knot.bind` no longer scans its parts.
-- `equal` is recipe-first, and `bind` stays lazy across composites.
-- Access-circle expansion is a two-scan over the tallied members.
-
-### Fixes
-
-- `AssociativeIndex` is `Send + Sync`, unblocking downstream Rust consumers.
-- Set-member reads ignore hits at the NNS noise floor.
-- Bundled notebooks regenerated; their outputs had been stale for several
-  releases.
-
 ## v5.2.0 (2026-09-03)
 
 ### Breaking changes
