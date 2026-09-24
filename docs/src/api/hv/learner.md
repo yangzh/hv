@@ -47,7 +47,7 @@ learner.model()              # identity accessors: model / domain / pod
 learner.domain()
 learner.pod()
 
-learner.support(a)           # overlap above the chance baseline, saturating at 0
+learner.support(a)           # overlap above the chance baseline
 learner.weight(a)            # support, normalized to [0.0, 1.0]
 ```
 {{#endtab}}

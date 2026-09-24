@@ -12,7 +12,7 @@ v.width()
 v.cardinality()
 v.stable_hash()  # unique hash for this vector
 v.seed128()
-v.exponent()
+v.exponent()     # (numerator, denominator), in lowest terms
 ```
 {{#endtab}}
 {{#endtabs}}

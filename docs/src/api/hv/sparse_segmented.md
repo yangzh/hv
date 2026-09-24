@@ -34,6 +34,7 @@ ss.is_identity()  # True if identity vector
 
 ss2 = ss.power(2)
 inv = ss.power(-1)
+half = ss.power(1, 2)   # fractional: ss^(1/2)
 
 # Similarity
 hv.overlap(a, b)   # Count of matching ON bits
@@ -45,4 +46,14 @@ ss.offset(seg) # the ON offset within one segment
 ```
 {{#endtab}}
 {{#endtabs}}
+
+<div class="callout callout-warning">
+<div class="callout-title">Fractional powers truncate here</div>
+
+`SparseSegmented` is materialized, so `power()` rewrites the offsets
+immediately. A fractional power truncates toward zero and the loss is
+permanent — `ss.power(1, 2).power(2, 1)` does **not** recover `ss`. On a lazy
+`Sparkle` the same pair of calls cancels in the exponent before computing, and
+is exact. See [Sparkle](sparkle.md#fractional-powers).
+</div>
 
