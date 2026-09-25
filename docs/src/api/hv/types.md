@@ -28,6 +28,11 @@ This is invisible to callers: the vector holds the same semantic content wheneve
 
 `compact()` releases the cached content again, recursively through members. The recipe is retained, so the next observation recomputes exactly the same bits.
 
+`core()` is the explicit crossing from recipe to bits: it computes the offsets
+with any pending exponent folded in, and hands back a `SparseSegmented`, which
+by construction reports `exponent() == (1, 1)`. See
+[SparseSegmented](sparse_segmented.md#the-exponent-is-always-1).
+
 ## The tale of two equalities
 
 Two levels are available, differing only in how hard they work:

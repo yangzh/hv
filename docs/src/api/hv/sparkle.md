@@ -120,6 +120,10 @@ the round trip is exact. `SparseSegmented` is materialized, so each `power()`
 rewrites the offsets immediately and the truncation is permanent.
 
 Prefer composing exponents on a lazy vector and materializing once at the end.
+
+Note that `core()` is that materialization step: it computes the offsets with
+every pending exponent folded in, so the result reports `exponent() == (1, 1)`.
+See [the exponent is always 1](sparse_segmented.md#the-exponent-is-always-1).
 </div>
 
 ## Pretty-printing
