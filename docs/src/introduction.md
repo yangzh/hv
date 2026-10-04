@@ -4,15 +4,15 @@
 
 `kongming` is a library implementing operations on sparse binary hypervectors for cognitive computing applications.
 
-While ergonomic APIs are accessible via Python module of `kongming` for better usability, the core engine is implemented in **Rust** for maximum efficiency.
+While ergonomic APIs are accessible via Python module of `kongming` for better usability, the core engine is explored in **Go** for flexibility before being ported to **Rust** for maximum efficiency.
 
-See [Hypervectors](concepts/hypervectors.md) for an introduction to hyperdimensional computing and, more relevant to this package, the sparse binary representation and computation.
+See [Concepts](concepts/overview.md) for an introduction to hyperdimensional computing and, more relevant to this package, the sparse binary representation and computation.
 
 ## License
 
 The Python source code, examples, and documentation in this repository are licensed under the [MIT License](https://github.com/yangzh/hv/blob/main/LICENSE). 
 
-The core engine distributed via PyPI (`kongming-rs-hv`) is proprietary.
+However, the core engine distributed via PyPI (`kongming-rs-hv`) is proprietary, [talk to me](#feedback) if you have further questions.
 
 ## Install
 
@@ -45,14 +45,11 @@ This documentation covers code snippets in multiple languages (if available) sid
 
 The documentation on **[yangzh.github.io/hv](https://yangzh.github.io/hv/)** stays in lockstep with the latest `kongming-rs-hv` release on PyPI. Whatever you read there matches what `pip install kongming-rs-hv` gives you.
 
-The [`main` branch](https://github.com/yangzh/hv/tree/main/docs/src) of this
-repository is the working head — it may describe APIs or examples that haven't
-been released yet: if you browse the raw markdown on GitHub, expect it to
-occasionally be ahead of the published site.
+The [`main` branch](https://github.com/yangzh/hv/tree/main/docs/src) of this repository, however, is the working head: it may describe APIs or examples that haven't been released yet: if you browse the raw markdown on GitHub, expect it to occasionally be ahead of the published site.
 
 ## Reference
 
-The work was initially outlined in [this arxiv paper](https://arxiv.org/abs/2310.18316), built on top of the work from many others, and here is the citation:
+The work was initially outlined in [this arxiv paper](https://arxiv.org/abs/2310.18316), built on top of the work from many other authors. Here is the citation:
 
 > Yang, Zhonghao (2023). Cognitive modeling and learning with sparse binary hypervectors. arXiv:2310.18316v1 [cs.AI]
 

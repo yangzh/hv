@@ -1,7 +1,8 @@
 # Dart 🎯
 
-A one-directional reference between two hypervectors. A Dart is "thrown" from a `tail` to a `head`: 
-$$ P = H \otimes T^{-1} = H \oslash T $$ 
+A one-directional reference between two hypervectors. A Dart is "thrown" from a `tail` to a `head`:
+
+$$ P = H \otimes T^{-1} = H \oslash T $$
 
 See [Composites: Dart](../../concepts/composites.md#dart).
 

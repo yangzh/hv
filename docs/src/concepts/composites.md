@@ -6,11 +6,11 @@ All composites follow the same contract (interface in Go and traits in Rust) and
 
 ## Sparkle ✨: the primitive
 
-Before any composite, there is the **Sparkle** ✨ — the atomic, *named* hypervector everything below is built upon. A raw [SparseSegmented 🍡](../api/hv/sparse_segmented.md) is just a bit pattern, and a Sparkle ✨ is that pattern with an identity:
+Before any composite, there is the **Sparkle** ✨: the atomic, *seeded* hypervector everything below is built upon. A raw [SparseSegmented 🍡](../api/hv/sparse_segmented.md) is just a bit pattern, and a Sparkle ✨ is a deterministic hypervector with the given seed:
 
 $$S = \text{expand}(D, P)$$
 
-where $D$ (the **Domain**) is a semantic namespace — "animals", "role", "country" — and $P$ (the **Pod**) names the individual within it: a word, a numeric seed, a prewired constant.
+where $D$ (the **Domain**) is a semantic namespace, such as "animals", "role", "country", and $P$ (the **Pod**) names the individual within it: a word, a numeric seed, or a constant pre-defined by the package.
 
 The (Domain, Pod) seed deterministically expands into the vector, so the same triple (model, domain, pod) yields the same Sparkle ✨ in every run and every engine — Go, Rust, and Python are bit-identical. 
 
@@ -18,10 +18,11 @@ For this reason, only domain and pod are needed, instead of the raw per-segment 
 
 Two properties that carry the most weight:
 
+- (Domain, Pod) can be treated as the **unique identity** for the Sparkle ✨;
 - Distinct Sparkles ✨ are always **quasi-orthogonal**, without any central orchestration. They can be safely used as bricks for high-level construction;
 - The markers and keys in the formulas below — $S_{marker}$, $S_{step}$, $K_i$ — are themselves Sparkles. The whole composite algebra bootstraps from this one primitive type.
 
-Use when: you need a stable, deterministic identity for an atomic concept — a word, a role, an entity — as a leaf for the composites below.
+Use when: you need a stable, deterministic identity for an atomic concept, like a word, a role, an entity, or as a leaf for the composites below.
 
 Check out [code snippets](../api/hv/sparkle.md) from the API reference.
 
@@ -31,7 +32,7 @@ An **unordered** collection of concepts.
 
 $$S = S_{marker} \otimes (\sum_{i,\oplus} M_i)$$
 
-where $S_{marker}$ is a special marker to distinguish the set itself from its individual members.
+where $S_{marker}$ is a special marker (predefined Sparkle ✨) to distinguish the set itself from its individual members.
 
 Use when: you need to represent "these things together" without order.
 
@@ -43,7 +44,7 @@ An **ordered** collection.
 
 $$S = S_{marker} \otimes (\sum_{i,\oplus} M_i \otimes S_{step}^{i})$$
 
-where $S_{step}$ is a generic hypervector for positional encoding.
+where $S_{step}$ is a special marker (predefined Sparkle ✨) for positional encoding.
 
 $S_{marker}$ is a special marker to distinguish a sequence from its individual members.
 
@@ -91,11 +92,12 @@ A **one-directional reference** between two hypervectors.
 
 $$P = T^{-1} \otimes H = H \oslash T$$
 
-A Dart 🎯 is "thrown" from a tail `T` to a head `H` — the direction is semantic (*from → to*), while algebraically the link is recoverable from either end. Dart 🎯 is the structured wrapper for the [release](operators.md#release).
+A Dart 🎯 is "thrown" from a tail `T` to a head `H` — the direction is semantic (*`T` → `H`*), while algebraically the link is recoverable from either end. Dart 🎯 is the structured wrapper for the [release](operators.md#release).
 
 Given the Dart 🎯 of $P$:
 
-$$ H = P \otimes T $$ 
+$$ H = P \otimes T $$
+
 $$ T = P^{-1} \otimes H $$
 
 Use when: you need a directed link — edges, mappings, "from→to" relations — where either endpoint can still be recovered given the other.

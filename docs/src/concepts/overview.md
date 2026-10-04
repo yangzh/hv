@@ -11,7 +11,7 @@ Hyperdimensional Computing (HDC) and **Vector Symbolic Architectures (VSA)** are
 
 | Concept | Description |
 |---------|-------------|
-| [Hypervectors](hypervectors.md) | High-dimensional vectors, similarity, and distance |
+| [Hypervectors](hypervectors.md) | High-dimensional vectors, similarity and distance |
 | [Operators](operators.md) | Bind and bundle: the algebra of composition |
 | [Composites](composites.md) | Structures built from the primitives |
 | [Near-neighbor search](near_neighbor_search.md) | Highly efficient retrieval of relevant entries |
