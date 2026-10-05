@@ -25,7 +25,6 @@ Pool health, per 65,536-member language pool:
 | open / closed | 42,643 / 3,696 | 35,036 / 4,329 |
 | total load (Σ age) | 401,792 | 457,194 |
 | mean member age | 8.7 | 11.6 |
-| diversity margin p10 / p50 / p90 | 51 / 128 / 256 | 45 / 128 / 256 |
 
 ## Held-out parse quality
 

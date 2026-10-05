@@ -8,9 +8,9 @@ This chapter serves that purpose: a **dependency parser** in which the entire la
 Unlike traditional NLP with heavy reliance on explicit frequency tables, and unlike neural networks where gradients are computed via backpropagation, our training/inference features:
 
 - A transparent representation of the underlying language models that encourages inspection and enables incremental improvements;
-- The language models are generic in the sense that new languages can be added without idiosyncrasy or much tweaking;
 - An efficient representation far more compact than existing models, see [Evaluations](evaluations.md);
-- An efficient computation with mostly binary operations, no need for floating-point computations or expensive GPUs.
+- An efficient computation with mostly binary operations, no need for floating-point computations or expensive GPUs;
+- The language models are generic in the sense that new languages can be added without language-specific idiosyncrasy or much tweaking.
 
 Wernicke’s area in the brain is widely hypothesized to host the generic neural circuitry for language understanding: the solution I hope to present here will be the computational counterpart of it. 
 

@@ -24,13 +24,13 @@ Unlike the naive arrangement of one Learner per learning task which can grow unb
 
 The roster size is set at pool creation and won't grow afterwards: there is currently no incremental expansion short of a full retrain. When every member a write could reach is full, the pool refuses the write rather than degrade what it already holds.
 
-So another way to understand LearnerPool: it's an addressable collection of elastically scalable (up to the fixed pool capacity) Learners.
+So another way to understand LearnerPool: it's an addressable collection of elastically scalable (up to the fixed pool capacity) Learners, built upon a fixed grid of classic Learners.
 
 ### Recruiting member Learners
 
 The `LearnerPool` recruits a suitable member Learner by ensuring the incoming pattern can be recalled reliably later.
 
-This also implies the pool's scheduler can always find one suitable member, unless the whole pool is out of capacity, in which case the write will fail: all members can be used as reserves as needed.
+The pool's scheduler always tries to locate one suitable member, unless the whole pool is out of capacity, in which case the write will fail. In the extreme case, all members can be used as reserves as needed.
 
 ### Using bigger learners
 

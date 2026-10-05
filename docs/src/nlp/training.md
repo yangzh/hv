@@ -6,7 +6,7 @@ This page walks the training pipeline conceptually: from raw text to what, exact
 
 ## Preparing the corpus
 
-For reference, we used 4231 English and 4231 Chinese sentences from the public Wikipedia corpus for training. The training itself can be done on a single MacBook Air in ~12 minutes.
+For reference, we used ~4000 English and ~4000 Chinese sentences from the public Wikipedia corpus for training. The training itself can be done on a single MacBook Air M2 in ~10 minutes.
 
 ### Preparing the text
 
@@ -18,15 +18,15 @@ The text is split into individual sentences up front, and each sentence is hande
 
 ![Stanford's stanza](images/stanza_snapshot.png)
 
-A teacher parser (i.e., stanza) annotates each incoming sentence: tokens, part of speech, lemma, morphological features, named-entity spans, and the head arc that makes the dependency tree. The annotated sentences are stored as compact per-language archives: training doesn't need the live parser or the raw text, for efficiency reasons.
+A teacher parser (i.e., stanza) annotates each incoming sentence: tokens, part of speech, lemma, morphological features, named-entity spans, and the head arc that makes the dependency tree. The annotated sentences are stored as compact per-language archives, which can be loaded when needed: development or production of the training pipeline doesn't need the live parser or the raw text, for efficiency reasons.
 
-Beyond various annotations, the training pipeline further constructs a dependency tree per sentence. The tree has a single ROOT, with each leaf node mapping to a surface token and each arc annotated with its dependency relation, following the Universal Dependencies conventions.
+Beyond various annotations, the training pipeline further re-constructs a dependency tree per sentence. The tree has a single ROOT, with each leaf node mapping to a surface token and each arc annotated with its dependency relation, following the Universal Dependencies conventions.
 
 ## From trees to spines
 
 The local grammar and syntactic dependency are captured by the **nodes** and **edges** of the dependency tree.
 
-A **feats** captures a unique combination of rich linguistic features, such as part-of-speech, lemma, incoming dependency label, and structural markers such as `is_head` (indicating whether this token is the head among its siblings, under their common parent). An **edge**, on the other hand, is the *parent and child feats pair*, as a deterministic [Sparkle](../concepts/composites.md#sparkle--the-primitive) instance.
+A **feats** captures a unique combination of rich linguistic features, such as part-of-speech, lemma, and morphological features. An **edge**, on the other hand, is the *parent and child feats*, annotated with the incoming dependency label, as a deterministic [Sparkle](../concepts/composites.md#sparkle--the-primitive) instance.
 
 Each surface token is ultimately emitted by its **spine**, the hierarchy of interlocked **edges** from the root down. Siblings under a subtree share **edges** up to the subtree root, before diverging into their unique edges. 
 
@@ -34,14 +34,13 @@ Within the [state-space](intro.md#state-space-models-generally) setup, the **lat
 
 Three properties make this state space feasible where classical HMMs can choke: 
 
-- **Representation of states:** the space of possible spines is combinatorially vast, which hypervectors have no problem handling. A state, at its core, is conceptually just another hypervector, sharing the same shape as any other state, with a potentially different length. Practically, thanks to [lazy materialization](../api/hv/types.md#lazy-materialization), composing a state on the fly reduces to simple 
-bookkeeping, with very little extra cost;
+- **Representation of states:** the space of possible spines is combinatorially vast, which hypervectors have no problem handling. A state, at its core, is conceptually just another hypervector, sharing the same shape as any other state, though of a potentially different length. Practically, thanks to [lazy materialization](../api/hv/types.md#lazy-materialization), composing a state on the fly reduces to simple bookkeeping, with very little extra cost;
 - **No tabulation:** instead of highly sparse frequency tables, a learner is a far more natural representation for encoding probabilities, only at cells where transitions do happen. Furthermore, [LearnerPool](../concepts/learner_pool.md) offers an elegant solution for the high dynamic range of fan-outs;
 - **Content-addressable by construction:** two surface tokens emitted by the same grammatical path share the same state, by construction: that identity is what lets transition statistics pool.
 
 The downstream inference task, naturally, is to recover the most likely sequence of states/spines, before reconstructing the dependency tree.
 
-Looking back, hierarchical inference over such a state space is a generic problem, applicable well beyond linguistic parsing: anywhere the potential state space is too immense to tabulate. A robust training/inference pipeline that accommodates a vast and rich state space is a valuable by-product of this project in its own right. 
+Stepping back from a broader perspective, hierarchical inference over such a state space is a generic problem, applicable well beyond linguistic parsing: anywhere the potential state space is too immense to tabulate. A robust training/inference pipeline that accommodates a vast and rich state space is a valuable by-product of this project in its own right. 
 
 ## What is learned
 
@@ -50,7 +49,7 @@ Two kinds of learning/writes happen, side by side.
 **The inventory** — ordinary chunks, written once (create-if-missing, idempotent across repeats):
 
 - every distinct **feats**: the collection of all known combinations of linguistic features in a language;
-- every distinct **edge**: its parent-and-child pair of **feats**;
+- every distinct **edge**: its parent-and-child pair of **feats**, acts as the skeleton of the language;
 - every distinct **token** — an [Octopus](../concepts/composites.md#octopus-🐙) containing feats, lemma, and surface text (this is where the lemma can be recovered from the surface token at decode time);
 - every **named entity** (see below).
 
@@ -59,7 +58,7 @@ Two kinds of learning/writes happen, side by side.
 
 | family | address → content | answers at decode time |
 |--------|-------------------|------------------------|
-| **out** | sibling edge → next sibling edge | "after this edge, what comes next at this level?" |
+| **out** | sibling edge → next sibling edge | "after this edge, what comes next at this level, and at what probability?" |
 | **down** | first-child edge → parent edge | "whose child is this?", which supports the exploration/climb upward |
 | **obs** | surface text → leaf edge | "which leaf **edges** can emit this surface token?" |
 

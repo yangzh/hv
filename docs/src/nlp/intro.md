@@ -31,7 +31,7 @@ Functionally, the parser sets out to do what the stanza demo does: given a token
 Matching that output contract, however, is the baseline rather than the point. The focus here is not to achieve performance parity with state-of-the-art neural networks, but to demonstrate the feasibility of an alternative model with the following characterizations:
 
 - **compaction** — the trained model for 2 languages (English and Chinese for now) fits in tens of MBs (see [Evaluations](evaluations.md) for more details);
-- **efficiency** — training is a single pass, and decoding is mostly integer/bitwise computation with no GPU needed;
+- **efficiency** — training is a single pass, and decoding is mostly integer/bitwise computation with no GPU needed. Additionally, online learning can be added if desired;
 - **transparency** — every decoding decision is transparent: you can print, trace, and improve it incrementally.
 
 ## Bootstrapping
