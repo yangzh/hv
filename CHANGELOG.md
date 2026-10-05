@@ -3,6 +3,44 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v5.4.0 (2026-10-05)
+
+### Breaking changes
+
+- **A materialized vector never reports an exponent.** `SparseSegmented`
+  holds no recipe, so there is nothing for an exponent to be pending against:
+  `power()` spends it into the offsets immediately and leaves the exponent at
+  1. `ss.power(1, 2).exponent()` and `x.core().exponent()` now return
+  `(1, 1)` where they previously returned the accumulated fraction. The LAZY
+  value still reports its own, so `Set.power(1, 2).exponent()` is `(1, 2)`
+  while its `.core()` is `(1, 1)`.
+- **A corrupt `stable_hash` is now rejected.** Reading a `SparseSegmented`
+  whose stored hash disagrees with its offsets raises instead of silently
+  accepting the payload, matching the reference engine. An absent hash (0)
+  stays legal.
+- **`memory.learner_sampler` is gone** — removed back in the v5.1.0 cycle but
+  never documented. It had no users, and the two engines never agreed on its
+  semantics.
+
+### New features
+
+- **`SparseSegmented` keeps its identity across the wire.** `(domain, pod)`
+  are now serialized and read back, where both previously reset to the
+  defaults on a round trip. Wire-compatible in both directions: an absent
+  domain/pod reads as the default, so existing payloads decode unchanged.
+
+### Performance
+
+- Content overlap answers from cached hashes before forcing either operand to
+  materialize. The compact-then-compare pattern no longer recomputes a
+  composite on every cycle (measured ~845x on a 64-member Set).
+
+### Fixes
+
+- Bundled notebooks are self-contained: the SVG viewer helper is gone, which
+  also removes its inline renderings. The visualization now lives in the
+  [documentation](https://yangzh.github.io/hv/concepts/hypervectors.html).
+
 ## v5.3.0 (2026-09-24)
 
 ### Breaking changes
@@ -241,14 +279,4 @@ substrate format is finalized.
 
 - Learner age-overflow divide-by-zero in Fisher-Yates bundling.
 - Identity-safe `Overlap` via batch offsets.
-
-## v4.7.0 (2026-07-07)
-
-### Breaking changes
-
-- **`Learner.affinity(probe)` → `Learner.support(probe)`**.
-
-### Build / deps
-
-- PyO3 0.28 → 0.29; wheel version injected from the `rel-v*` tag (in-tree placeholder is `0.0.0`).
 
