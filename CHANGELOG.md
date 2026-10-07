@@ -3,6 +3,25 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v6.0.0 (2026-10-07)
+
+### Breaking changes
+
+- **`LearnerPool.bundle()` requires an address.**
+
+### New features
+
+- **`count()` on `Learner` and `LearnerPool`** reports the raw bundled count of
+  a probe — the integer number of times it was written.
+
+### Performance
+
+- Pool writes allocate less. Bundling now shares an immutable operand instead of
+  defensively deep-copying it, removing one `Dart` clone per deferred write
+  (672 B / 7 allocations down to 48 B / 1). Measured 19% fewer bytes and 17%
+  fewer allocations per write on the open-pool path. Write latency is unchanged
+  — it is dominated by the circle scan, not the copy.
+
 ## v5.4.0 (2026-10-05)
 
 ### Breaking changes
@@ -266,17 +285,3 @@ substrate format is finalized.
 - **`disable_id_indexing=` kwarg** on `impress` / `produce` (all stores). When `True`, the
   chunk's Id-Sparkle is skipped from the index (item-key-only chunk) — pairs with
   `enable_semantic_indexing=` for full control over what each write indexes.
-
-## v4.8.0 (2026-07-23)
-
-### Breaking changes
-
-- **Knot / Sequence are immutable** — `expand` / `append` / `prepend` / `reset`
-  now return a NEW composite instead of mutating in place (Go/Rust/Python
-  aligned).
-
-### Fixes
-
-- Learner age-overflow divide-by-zero in Fisher-Yates bundling.
-- Identity-safe `Overlap` via batch offsets.
-
