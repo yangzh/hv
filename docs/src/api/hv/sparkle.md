@@ -55,10 +55,11 @@ core0.offsets()    # The raw offsets for each segment.
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-`power(0)` returns the identity vector (serialized in the canonical
-`SparseSegmented` nil-offsets form). Only `Sparkle` and `SparseSegmented`
-support `power(0)` — every other type has no identity-vector concept and
-rejects it. `power(-1)` returns the inverse.
+`power(0)` returns the identity vector, which every type supports: the result
+keeps its concrete type but holds identity's content, so it serializes in the
+canonical `SparseSegmented` nil-offsets form and reports
+[`hint()`](types.md#hint-the-type-on-the-wire) `HINT_SPARSE_SEGMENTED`.
+`power(-1)` returns the inverse.
 </div>
 
 ## Fractional powers

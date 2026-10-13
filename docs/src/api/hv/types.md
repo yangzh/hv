@@ -13,9 +13,52 @@ v.cardinality()
 v.stable_hash()  # unique hash for this vector
 v.seed128()
 v.exponent()     # (numerator, denominator), in lowest terms
+v.hint()         # HINT_* constant — the type this vector serializes as
 ```
 {{#endtab}}
 {{#endtabs}}
+
+## `hint()`: the type on the wire
+
+`hint()` reports which concrete type a vector serializes as, as one of the
+`hv.HINT_*` constants:
+
+| Constant | Type |
+|----------|------|
+| `HINT_SPARSE_SEGMENTED` | [SparseSegmented 🍡](sparse_segmented.md) |
+| `HINT_SPARKLE` | [Sparkle ✨](sparkle.md) |
+| `HINT_LEARNER` | [Learner 💫](learner.md) |
+| `HINT_SET` | [Set 🫧](set.md) |
+| `HINT_SEQUENCE` | [Sequence 📿](sequence.md) |
+| `HINT_OCTOPUS` | [Octopus 🐙](octopus.md) |
+| `HINT_KNOT` | [Knot 🪢](knot.md) |
+| `HINT_PARCEL` | [Parcel 🎁](parcel.md) |
+| `HINT_DART` | [Dart 🎯](dart.md) |
+| `HINT_CYCLONE` | Cyclone 🌀 |
+
+It is the tag `hv.from_message` dispatches on, so it also names the type a
+round-trip gives back — which is why it reads the wire form rather than the
+Python class:
+
+```python
+s = hv.Set(seed, a, b)
+s.hint()                       # HINT_SET
+hv.from_message(hv.to_message(s)).hint() == s.hint()   # True
+
+s.power(0).hint()              # HINT_SPARSE_SEGMENTED — see below
+```
+
+<div class="callout callout-note">
+<div class="callout-title">Note</div>
+
+An identity vector has one canonical wire form, `SparseSegmented` with no
+offsets, whatever type produced it. So `hint()` reports
+`HINT_SPARSE_SEGMENTED` for any identity — matching what serialization
+actually writes, and what a round-trip hands back.
+
+`Learner` is the exception: an age-0 Learner still serializes its own payload,
+because the RNG state has to survive. It reports `HINT_LEARNER` at every age.
+</div>
 
 ## Lazy materialization
 
