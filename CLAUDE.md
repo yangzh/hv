@@ -1,15 +1,32 @@
 # Workflow
 
-## PRs and review
+## Review and commit
 
-For every piece of work, follow this loop without asking for approval at each step:
+No GitHub PRs. Review happens in the local workspace.
 
-1. **Create the PR automatically.** When work on a branch is ready (commits pushed), open a PR against `main` immediately. Do not wait for the user to ask.
-2. **Push commits straight to the PR branch.** No approval needed for pushing additional commits to an open PR.
-3. **Address each review comment.**
-   - Reply to the comment with either a brief explanation or just `done`.
-   - When the comment requires a code change, **amend the relevant existing commit** (not a fixup commit), then force-push the branch. The PR history should stay clean.
-   - Use `git commit --amend` for the latest commit, or `git rebase -i` (non-interactive form via `GIT_SEQUENCE_EDITOR`) for older ones. Force-push with `--force-with-lease`.
-4. **Do not merge or close the PR** until the user explicitly says **"approve and merge"** (or equivalent explicit approval). Until then, the PR stays open even if all comments are resolved.
+1. **Make the change, then stop.** Run whatever gates apply (build the docs with
+   `mdbook build docs`, run the linters), then show the diff and wait.
+2. **Commit only on explicit approval** of that specific diff. An instruction to
+   make a change ("add X", "fix Y") approves the change, not the commit.
+   Approval must name or clearly cover the commit itself.
+3. **Don't branch for review.** Leave edits uncommitted on `main`; a feature
+   branch just adds cleanup.
+4. **Push after an approved commit** — this repo is the public mirror, so `main`
+   is meant to be pushed. Ask before anything that publishes beyond it
+   (release tags, workflow dispatches that deploy the docs site).
 
-Exception to the "always create new commits" default in the system prompt: this workflow explicitly opts into amending. Treat that as authorized for PR review iteration on this repo.
+## Docs site
+
+`docs/` is an mdBook. The site deploys **only on a `v*` tag**, deliberately, so
+published docs stay in lockstep with PyPI — see the comment in
+`.github/workflows/docs.yml`. Markdown on `main` is expected to run ahead of
+the deployed site.
+
+To publish `main` out of band, `gh workflow run docs.yml --ref main`. That
+publishes everything merged since the last tag, not just the current change, so
+check `git log <last-tag>..main -- docs/` first.
+
+Building locally needs the CI preprocessors (`mdbook-katex`, `mdbook-tabs`,
+`mdbook-last-changed`). Without them, mark the three `[preprocessor.*]` blocks
+`optional = true` in a scratch copy of `book.toml` and restore it afterwards —
+don't commit that edit.
