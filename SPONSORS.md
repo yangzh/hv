@@ -1,8 +1,10 @@
 # Sponsorship and commercial support
 
 `hv` / [`kongming-rs-hv`](https://pypi.org/project/kongming-rs-hv/) is maintained
-by [Zhonghao (Kevin) Yang](https://www.linkedin.com/in/yangzh/) and released
-under the [MIT License](LICENSE). It is free to use, including commercially.
+by [Zhonghao (Kevin) Yang](https://www.linkedin.com/in/yangzh/). All code in this
+repository — Python source, examples, and documentation — is released under the
+[MIT License](LICENSE) and is free to use, including commercially. The
+underlying engine, shipped as a compiled extension in the published wheel, however, is proprietary.
 
 There are two separate ways to work with the project. Pick whichever matches
 what you need — they are independent.
@@ -34,7 +36,7 @@ sponsorship tier. Typical engagements:
 - **Training and knowledge transfer** — walkthroughs of the substrate, the
   dependency parser, and how to read a decode.
 - **Feature development** — prioritised work on the library itself, upstreamed
-  under the MIT License unless agreed otherwise.
+  under the project's existing licensing unless agreed otherwise.
 - **Support agreement** — a defined response time for issues affecting you.
 
 To start a conversation, use the

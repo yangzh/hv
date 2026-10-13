@@ -66,3 +66,5 @@ For private inquiries, use the [contact form](https://docs.google.com/forms/d/e/
 ## License
 
 The Python source code, examples, and documentation in this repository are licensed under the [MIT License](LICENSE).
+
+The underlying engine, shipped as a compiled extension in the published wheel, however, is proprietary.

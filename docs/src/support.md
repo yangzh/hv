@@ -1,8 +1,10 @@
 # Commercial support
 
-`kongming-rs-hv` is released under the [MIT License][license] and is free to
-use, including in commercial products. Nothing on this page is required in
-order to use the library.
+All code in the [hv repository][repo] — Python source, examples, and
+documentation — is released under the [MIT License][license] and is free to use,
+including in commercial products. The underlying engine, shipped as a compiled
+extension in the published wheel, is proprietary. Nothing on this page is
+required in order to use the library.
 
 ## Consulting and support agreements
 
@@ -14,7 +16,7 @@ the usual engagements are:
 - **Training and knowledge transfer** — walkthroughs of the substrate, the
   [dependency parser](nlp/index.md), and how to read a decode.
 - **Feature development** — prioritised work on the library itself, upstreamed
-  under the MIT License unless agreed otherwise.
+  under the project's existing licensing unless agreed otherwise.
 - **Support agreement** — a defined response time for issues affecting you.
 
 To start a conversation, use the [contact form][contact] and mention the scope
@@ -36,6 +38,7 @@ that is what the consulting route above is for.
 Full terms, and the list of current sponsors, are in [SPONSORS.md][sponsors] in
 the repository.
 
+[repo]: https://github.com/yangzh/hv
 [license]: https://github.com/yangzh/hv/blob/main/LICENSE
 [sponsors]: https://github.com/yangzh/hv/blob/main/SPONSORS.md
 [contact]: https://docs.google.com/forms/d/e/1FAIpQLSeAPEzqIgcf1CYJZJepN2jtNy1QTPKtpQYkdBBs1-rNeIuoGQ/viewform
