@@ -1,0 +1,3 @@
+# Renders a "Sponsor" button on the repo and beside each issue/PR.
+# Keys only take effect once the corresponding account is live.
+buy_me_a_coffee: yangzh
