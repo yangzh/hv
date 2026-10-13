@@ -1,12 +1,19 @@
-// Adds a Sponsor icon to the header bar, beside print / repository / edit.
+// Adds a Sponsor icon to the header bar, ahead of print / repository / edit.
 //
 // Done in JS rather than by overriding index.hbs: the template would have to be
 // vendored into theme/ and kept in step with every mdBook upgrade, for one
 // anchor. The icon mirrors mdBook's own markup — an <a> wrapping a
-// <span class="fa-svg"> with an inline SVG — so it inherits the existing
-// hover and theme styling with no extra CSS.
+// <span class="fa-svg"> with an inline SVG — so it picks up the bar's sizing
+// and spacing with no extra CSS. Its colour is the one thing deliberately NOT
+// inherited; see SPONSOR_COLOR.
 (function () {
     "use strict";
+
+    // GitHub's sponsors colour (Primer --fgColor-sponsors). Set inline on the
+    // element so it beats both `.menu-bar a .fa-svg { color: var(--icons) }`
+    // and the :hover rule — the heart stays this colour in every theme and on
+    // hover, matching the Sponsor button on the repo page.
+    var SPONSOR_COLOR = "#bf3989";
 
     // Font Awesome Free 6.2.0 "heart" (CC BY 4.0), matching the bundled icons.
     var HEART =
@@ -32,9 +39,10 @@
         icon.className = "fa-svg";
         icon.id = "sponsor-button";
         icon.innerHTML = HEART;
+        icon.style.color = SPONSOR_COLOR;
 
         link.appendChild(icon);
-        bar.appendChild(link);
+        bar.prepend(link); // first in the bar, before print / repository / edit
     }
 
     if (document.readyState === "loading") {
