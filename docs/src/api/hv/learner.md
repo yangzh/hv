@@ -48,7 +48,7 @@ learner.domain()
 learner.pod()
 
 learner.support(a)           # overlap above the chance baseline
-learner.weight(a)            # support, normalized to [0.0, 1.0]
+learner.barycentric(a)       # a's barycentric coordinate: normalized support
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -56,7 +56,7 @@ learner.weight(a)            # support, normalized to [0.0, 1.0]
 <div class="callout callout-warning">
 <div class="callout-title">Probing an untrained learner</div>
 
-`Support` and `Weight` require content to probe against: calling either on a
+`Support` and `Barycentric` require content to probe against: calling either on a
 blank learner is a contract violation and panics (a
 `PanicException` in Python); check `blank()` first.
 </div>
