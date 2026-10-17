@@ -27,8 +27,11 @@ auto-associatively.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-pool.bundle(data, addr=addr)            # hetero-associative write
-pool.bundle(data, addr=addr, multiple=3)  # with weight
+pool.bundle(data, addr=addr)              # hetero-associative write
+pool.bundle(data, addr=addr, multiple=3)  # three whole observations
+
+# Below one observation: a numerator over hv.mass_denominator(model).
+pool.bundle_fractional(data, addr, hv.mass_denominator(model) // 4)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -48,6 +51,7 @@ We support wwo read scenarios:
 {{#tab name="Python"}}
 ```python
 s = pool.support(addr, probe)      # scalar evidence
+m = pool.mass(addr, probe)         # probe's accumulated weight, whole observations
 
 for attractor in pool.read_members(addr):
     ...                            # feed into NNS / overlap checks

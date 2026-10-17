@@ -30,7 +30,11 @@ learner = hv.Learner.random(so)
 ```python
 learner.bundle(a)                 # single observation
 
-learner.bundle_multiple(b, 3)     # with weight multiplier
+learner.bundle_multiple(b, 3)     # three whole observations
+
+# Below one observation. Weights are numerators over hv.mass_denominator(model),
+# so a quarter-observation is that denominator // 4.
+learner.bundle_fractional(c, hv.mass_denominator(model) // 4)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -40,7 +44,8 @@ learner.bundle_multiple(b, 3)     # with weight multiplier
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-learner.age()                # total observed weight (int)
+learner.age()                # how many bundle calls, whatever weight they carried
+learner.mass_numerator()     # accumulated weight, in units of 1/mass_denominator
 learner.blank()              # bool: whether this learner is blank (nothing observed yet)
 
 learner.model()              # identity accessors: model / domain / pod
@@ -49,6 +54,9 @@ learner.pod()
 
 learner.support(a)           # overlap above the chance baseline
 learner.barycentric(a)       # a's barycentric coordinate: normalized support
+
+learner.mass(a)              # a's accumulated weight, in WHOLE observations
+learner.mass_fractional(a)   # ... and exactly, as a numerator
 ```
 {{#endtab}}
 {{#endtabs}}
