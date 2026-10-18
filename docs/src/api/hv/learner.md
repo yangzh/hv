@@ -53,9 +53,10 @@ learner.domain()
 learner.pod()
 
 learner.support(a)           # overlap above the chance baseline, clamped at 0
-learner.barycentric(a)       # a's share of the accumulated weight; unbiased, so
+learner.occupancy(a)         # a's share of the accumulated weight; unbiased, so
                              # it reads negative below chance (clamp at the call
                              # site if you need a non-negative share)
+learner.barycentric(a)       # deprecated alias of occupancy()
 
 learner.mass(a)              # a's accumulated weight, in WHOLE observations
 learner.mass_fractional(a)   # ... and exactly, as a numerator
