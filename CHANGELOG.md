@@ -3,6 +3,186 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v7.0.0 (2026-10-18)
+
+### Licensing
+
+- **The wheel is no longer MIT throughout.** The declared expression is now
+  `MIT AND LicenseRef-Kongming-Engine-Proprietary`: the Python layer stays MIT,
+  the compiled engine is proprietary (`LICENSE-ENGINE`). v6.0.0 declared
+  `MIT AND (Apache-2.0 OR BSD-2-Clause)`, which described the dependency tree
+  rather than the artifact. Automated license scanners will see the change.
+- The wheel now ships `LICENSE`, `LICENSE-ENGINE` and `THIRD-PARTY-NOTICES.md`,
+  the last carrying the real notice texts for every statically linked
+  dependency. Declared as a PEP 639 license expression, so the metadata is a
+  validated `License-Expression:` field rather than the deprecated free-text
+  `License:`.
+
+### Breaking changes
+
+- **`Learner.barycentric()` is now `Learner.occupancy()`.** Same signature and
+  same value. "Occupancy" is what the design note calls this — the share of the
+  `M` segments a probe owns — and `mass()` is the same quantity un-normalized.
+  `barycentric()` still works, delegating to `occupancy()`, but is deprecated
+  and will be removed: the barycentric coordinate is what the share IS formally,
+  which is precise and no help in reading the code.
+
+- **`Learner.barycentric()` can now return a NEGATIVE value.** It no longer
+  routes through `support()`, which clamps at 0, so it is an unbiased estimate
+  of the probe's share of the accumulated weight. A probe below the chance
+  baseline reads negative, which about 4% of never-observed probes do.
+
+  The clamp was quietly biasing the estimate upward exactly where shares are
+  smallest: a never-observed probe averaged `+.0004` instead of 0, against a
+  resolution floor of `1/M == .0039`. Small per read, but it does not cancel
+  when summed over a vocabulary, and averaging more reads no longer converged
+  on the truth. `frame_barycentric()` never clamped, so the two agree now.
+
+  If you need a non-negative share, clamp at the call site, or use `support()`
+  for the "how strongly is this backed" reading — that one still clamps and is
+  unchanged. `mass()` and `mass_fractional()` are also unchanged: they floor at
+  0 themselves, since mass is unsigned.
+
+- **`Learner.count()` is now `Learner.mass()`, and `LearnerPool.count()` is
+  `LearnerPool.mass()`.** The name was wrong: it never counted writes, it
+  reported the probe's accumulated WEIGHT divided by one observation's worth.
+  Under fractional writes that distinction is load-bearing, so the new
+  `Learner.mass_fractional()` returns the exact numerator — a quarter-observation
+  holding reads `mass() == 0` but `mass_fractional() == cardinality // 4`.
+  `hv.mass_denominator(model)` gives the units-per-observation those numerators
+  are over.
+
+  Two bugs went with the rename. Sub-observation holdings were unrepresentable
+  rather than merely rounded, and the two internal storage modes disagreed —
+  the list path truncated where the spilled path rounded, so the same holding
+  read 0 before a spill and 1 after. `mass()` now rounds in both.
+
+- **The template/replace operators are gone**: `hv.Replacement`,
+  `hv.replace()`, `hv.replace_single()` and `hv.Parcel.template()`. They were
+  thin spellings of `bind`/`release` that no library code used — `replace(tmpl,
+  seed, reps)` is `bind(tmpl, bundle(seed, [release(new, old) for each rep]))`,
+  `replace_single(tmpl, old, new)` is `bind(tmpl, release(new, old))`, and
+  `Parcel.template(seed, *roles)` is `bundle(seed, [bind(r, r) for r in
+  roles])`. Each is one line at the call site, so nothing is lost.
+
+- **`hv.frame_coefficient()` is now `hv.frame_barycentric()`.** Same signature and
+  same value; the name says what it returns. A frame member reads its own
+  weight and a stranger reads ~0, so over a normalized frame the members'
+  coordinates sum to 1 — a barycentric coordinate, not an opaque coefficient.
+
+- **`Learner.weight()` is now `Learner.barycentric()`.** Same signature and same
+  value; the name says what it returns. Each of the `M` segments is owned by one
+  observation, so the normalized overlap is that observation's barycentric
+  coordinate in the learner — a share, not an opaque weight. Not to be confused
+  with `bundle_multiple`'s `weight` argument, which is unchanged.
+
+- **`Set.unmasked()` and `Sequence.unmasked()` return a `Dart`**, not a
+  `SparseSegmented`. The result is LAZY, so the bits are computed only when you
+  ask: call `.core()` for the materialized form. Every HyperBinary read works
+  unchanged on the returned value — `overlap()`, `core()`, `stable_hash()` —
+  so only an explicit `isinstance(..., SparseSegmented)` needs updating.
+
+- **`Learner.age()` counts bundle calls, not accumulated weight.** A
+  `bundle_multiple(obs, 3)` now ages the learner by 1, not 3; the weight it
+  carried lands in the new `Learner.mass_numerator()`. The two agree on the
+  plain `bundle()` path, so the age is an exact occurrence count there — which
+  is the point: it can serve as a frequency without a side table.
+  `LearnerPool.load()` likewise counts writes absorbed. Reads that are shares
+  or ratios — `barycentric()`, `mass()`, `support()`, `overlap()` — are
+  unchanged, because the mixing share depends only on *relative* weights.
+  Payloads written before this read back unchanged — a pre-split learner is
+  recognised and its weights rescaled, by a missing mass in buffer mode and by
+  the weights summing to the age in list mode — but the stored learner bytes
+  change, so trained substrates must be regenerated. The mass is serialized in
+  buffer mode only; in list mode it is exactly the sum of the stored weights,
+  so it is recomputed on load rather than written twice.
+
+### New features
+
+- **Fractional bundle weights**: `Learner.bundle_fractional(obs,
+  weight_numerator)` and `LearnerPool.bundle_fractional(data, addr,
+  weight_numerator)`. Weights are numerators over `hv.cardinality(model)`, so
+  one whole observation is `cardinality` units and a weight of 1/n is
+  `cardinality // n` — anything down to a single unit is expressible. This is
+  what makes per-observation weighting possible without an integer floor: an
+  IDF-style `1/count` write now actually moves the learner by 1/count instead
+  of rounding to zero or one. `bundle()` and `bundle_multiple()` are unchanged
+  and still take whole observations.
+
+- **`Learner.mass_numerator()`** reports the accumulated weight in those same
+  units. This is the quantity that drives the mixing share, where `age()` does
+  not, and it accumulates in 64 bits — so it no longer saturates at the `u32`
+  roof that used to cap a heavily-trained learner.
+
+- **`LearnerPool` takes an optional RNG backend**:
+  `LearnerPool(model, member_domain, total, *, rng_hint=hv.RNG_*)`. Keyword-only
+  and defaulting to the process default, so existing calls are unaffected. The
+  member roster replays from it, so a pool stored under one backend must be
+  reloaded under the same one.
+
+- **`hv.lee_distance(x, y)`** — the sum over segments of the *circular* offset
+  difference, `min(d, q - d)` for segment size `q`. Where `hamming` asks only
+  whether two segments disagree, Lee asks how far apart their offsets sit on the
+  ring of `q` positions, so it is the right metric only where offsets carry an
+  ORDINAL meaning (fractional-power encoding). For the seeded random codes a
+  `Sparkle` produces, two offsets are unrelated draws and `hamming` stays the
+  honest measure. Materializes both operands; identity reads as all-zero.
+
+- **`.hint()` is back on every hypervector type**, reporting the `hv.HINT_*`
+  constant the value *serializes* as — which is also the type a proto round-trip
+  restores, so an identity reads `HINT_SPARSE_SEGMENTED` whatever carries it.
+  Not the construction-time type tag of the same name removed in v4.10.0: that
+  one answered "what did you build", this one answers "what goes on the wire,
+  and what comes back".
+
+### Fixes
+
+- **`repr()` now shows the packed `env` word with its decoded fields** instead
+  of a `hint:` / `model:` pair: `env: 4131 # v1 SPARKLE MODEL_1M_10BIT
+  PHILOX_4X64`. The old form rendered two of the four fields env carries and
+  silently dropped the other two — the format version and the RNG backend —
+  which is the one thing you most need when a seed-derived vector reloads under
+  a different backend. The `env:` lines now match Go's dump byte for byte, and
+  nested members (a composite's parts, a learner's `deferred_data`) annotate
+  too. Debug output only; nothing on the wire changed.
+
+- **`hv.overlap()` / `hv.hamming()` now dispatch on their first operand.** Given
+  a `Learner` still in list mode as `x`, both compared materialized content,
+  skipping the estimate `Learner.overlap` answers from its stored entries — so
+  they disagreed with Go, which delegates to `x.Overlap(y)`. Values move for
+  list-mode learners only (measured 13 → 17, 29 → 33, 70 → 65 on a 7-item
+  learner); pass `.core()` explicitly for the old buffer-compare behaviour.
+
+- **A seed-derived vector now reloads under the backend that produced it.**
+  Sparkle, Cyclone, Set, Sequence, Octopus and Parcel record their RNG backend
+  on the wire; previously a reader re-derived their content using *its own*
+  default, which silently produced different offsets for the same seed whenever
+  the two disagreed (via `KONGMING_RNG`). Payloads written before this read
+  back exactly as they did, and older readers ignore the new field, so the
+  change is compatible in both directions — but stored payloads grow 2 bytes
+  per RNG-fed vector. Vectors whose content is explicit or RNG-free
+  (`SparseSegmented`, `Knot`, `Dart`) record nothing; `Learner` keeps the hint
+  in its own payload beside the RNG state.
+- `Learner` equality no longer reports two learners as equal when they hold the
+  same observations under different RNG backends — their bundled content
+  genuinely differs.
+
+- **A learner no longer freezes once trained past age `2·cardinality`.** The
+  per-observation segment share was rounded with `round()`, which floors to ZERO
+  past that point — so every further unit `bundle()` was a silent no-op while
+  `age()` kept counting. The wall sat at 512 observations at 8-bit and 2048 at
+  10-bit. Measured past it, 5000 unit observations of a fresh vector moved its
+  overlap 2 → 3 (chance is 1), where the same mass delivered as a single
+  `bundle_multiple(fresh, 5000)` reached 232. That truncated the `1/t` schedule
+  to a dead stop, so the learner settled at a biased point instead of
+  converging. The share now floors and adds one more with probability equal to
+  the leftover fraction — unbiased at every age, and integer-only so Go and Rust
+  draw alike. Applies to the spilled-learner replay path too.
+
+### Build / deps
+
+- fjall 3.1.12 (lsm-tree 3.1.10), the `Embedded` storage engine.
+
 ## v6.0.0 (2026-10-07)
 
 ### Breaking changes
@@ -271,17 +451,3 @@ substrate format is finalized.
 - **Two more RNG backends** — Philox-4×64-10 and xoroshiro128++ join
   xoshiro256++ (default) and PCG-DXSM, all bit-identical across engines. Select
   via the `KONGMING_RNG` environment variable.
-
-## v4.9.0 (2026-08-03)
-
-### Breaking changes
-
-- **`semantic_indexing=` → `enable_semantic_indexing=`.** The impress / produce kwarg
-  was renamed across all stores (Embedded, InMemory, Scylla). Update
-  `impress(chunk, semantic_indexing=True)` → `impress(chunk, enable_semantic_indexing=True)`.
-
-### New features
-
-- **`disable_id_indexing=` kwarg** on `impress` / `produce` (all stores). When `True`, the
-  chunk's Id-Sparkle is skipped from the index (item-key-only chunk) — pairs with
-  `enable_semantic_indexing=` for full control over what each write indexes.
