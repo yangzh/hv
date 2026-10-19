@@ -84,8 +84,9 @@ def learner(domain, pod):
 def occupancy(learner, probe):
     """`probe`'s share of the learner's accumulated weight.
 
-    Called ``occupancy()`` from v7 on, ``barycentric()`` on earlier wheels. Same
-    value either way: the share of the M segments that `probe` owns.
+    Called ``occupancy()`` from v7 on; ``barycentric()`` was the name on earlier
+    wheels and was removed after v7. Same value either way: the share of the M
+    segments that `probe` owns.
     """
     fn = getattr(learner, "occupancy", None)
     return fn(probe) if fn is not None else learner.barycentric(probe)
@@ -177,7 +178,7 @@ def claim_schedule_table(trials):
                         floored += 1
                     L.bundle_fractional(s, max(1, round(w)))
             for j, s in enumerate(sp):
-                acc[j] += L.barycentric(s)
+                acc[j] += occupancy(L, s)
         mass = [lam[j] * g(n) for j, n in enumerate(N)]
         tot = sum(mass)
         pred = [m / tot for m in mass]
@@ -207,7 +208,7 @@ def claim_log_is_a_log(trials):
             for k in range(1, n + 1):
                 L.bundle_fractional(s, max(1, round(1024 * (g(k) - g(k - 1)))))
         for j, s in enumerate(sp):
-            acc[j] += L.barycentric(s)
+            acc[j] += occupancy(L, s)
     meas = [a / trials for a in acc]
 
     def r2(xs):
@@ -338,7 +339,7 @@ def claim_representability(trials):
                         sub += 1
                     L.bundle_fractional(s, max(1, round(w)))
             for j, s in enumerate(sp):
-                acc[j] += L.barycentric(s)
+                acc[j] += occupancy(L, s)
         meas = [a / trials for a in acc]
         # what the INTENDED shape predicts, vs what the written integers predict
         want = [g(n) for n in N]

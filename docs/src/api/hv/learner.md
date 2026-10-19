@@ -56,7 +56,6 @@ learner.support(a)           # overlap above the chance baseline, clamped at 0
 learner.occupancy(a)         # a's share of the accumulated weight; unbiased, so
                              # it reads negative below chance (clamp at the call
                              # site if you need a non-negative share)
-learner.barycentric(a)       # deprecated alias of occupancy()
 
 learner.mass(a)              # a's accumulated weight, in WHOLE observations
 learner.mass_fractional(a)   # ... and exactly, as a numerator
@@ -67,7 +66,7 @@ learner.mass_fractional(a)   # ... and exactly, as a numerator
 <div class="callout callout-warning">
 <div class="callout-title">Probing an untrained learner</div>
 
-`Support` and `Barycentric` require content to probe against: calling either on a
+`Support` and `Occupancy` require content to probe against: calling either on a
 blank learner is a contract violation and panics (a
 `PanicException` in Python); check `blank()` first.
 </div>

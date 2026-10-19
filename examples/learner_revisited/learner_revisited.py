@@ -10,7 +10,7 @@ over the stream of observations, and that one fact determines everything you can
 an observation owns a share of the vector equal to its share of the total weight
 -- exactly, at every age, regardless of arrival order.
 With every write carrying weight 1 this degenerates to the familiar case,
-where the learner tracks the empirical frequency P(A_j) and `barycentric` produces
+where the learner tracks the empirical frequency P(A_j) and `occupancy` produces
 an unbiased estimate of it.
 
 This script checks each of those statements against the library and prints
@@ -116,10 +116,10 @@ def claim_centroid(trials):
 
 
 # --------------------------------------------------------------------------
-# "E[O(L,A_j)] = P(A_j)(M-1) + 1" and "Barycentric = (O-1)/(M-1) = P(A_j)"
+# "E[O(L,A_j)] = P(A_j)(M-1) + 1" and "Occupancy = (O-1)/(M-1) = P(A_j)"
 # --------------------------------------------------------------------------
-def claim_barycentric(trials):
-    print("\nE[O] = P(M-1)+1, and Barycentric inverts it to P(A_j)")
+def claim_occupancy(trials):
+    print("\nE[O] = P(M-1)+1, and Occupancy inverts it to P(A_j)")
     counts = [50, 30, 10, 6, 4, 2, 1, 2, 2, 1, 1, 1]  # 12 distinct, sums to 111
     n = float(sum(counts))
     accO = [0.0] * len(counts)
@@ -131,14 +131,14 @@ def claim_barycentric(trials):
             L.bundle_multiple(s, c)
         for j, s in enumerate(sp):
             accO[j] += hv.overlap(L, s)
-            accB[j] += L.barycentric(s)
+            accB[j] += L.occupancy(s)
     eO = eB = 0.0
     for j, c in enumerate(counts):
         p = c / n
         eO = max(eO, abs(accO[j] / trials - (p * (M - 1) + 1)))
         eB = max(eB, abs(accB[j] / trials - p))
     check("max |E[O] - (P(M-1)+1)| < 1 overlap", eO < 1.0, "max err %.3f overlaps" % eO)
-    check("max |Barycentric - P| < 1/M", eB < 1.0 / M, "max err %.5f (1/M=%.5f)" % (eB, 1.0 / M))
+    check("max |Occupancy - P| < 1/M", eB < 1.0 / M, "max err %.5f (1/M=%.5f)" % (eB, 1.0 / M))
 
 
 # --------------------------------------------------------------------------
@@ -175,7 +175,7 @@ def claim_occupancy_is_weight_share(trials):
         for s, wi in zip(sp, w):
             L.bundle_multiple(s, wi)
         for j, s in enumerate(sp):
-            acc[j] += L.barycentric(s)
+            acc[j] += L.occupancy(s)
     worst = max((abs(acc[j] / trials - w[j] / W), w[j] / W) for j in range(len(w)))
     err, p = worst
     tol = stderr_bound(p, trials)
@@ -200,7 +200,7 @@ def claim_order_independence(trials):
             for j in order:
                 L.bundle(sp[j])
             for j, s in enumerate(sp):
-                means[v][j] += L.barycentric(s) / trials
+                means[v][j] += L.occupancy(s) / trials
     worst, at_p = 0.0, 0.0
     for j in range(len(w)):
         col = [means[v][j] for v in range(3)]
@@ -329,7 +329,7 @@ def main():
     claim_random_overlap()
     claim_overlaps_sum_to_M(t)
     claim_centroid(max(40, t // 5))
-    claim_barycentric(t)
+    claim_occupancy(t)
     claim_occupancy_is_weight_share(t)
     claim_order_independence(max(20, t // 4))
     claim_age_counts_observations()
