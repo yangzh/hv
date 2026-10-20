@@ -141,9 +141,9 @@ def claim_telescoping():
             L_.bundle_fractional(s_, w)
             total += w
     check(
-        "MassNumerator == the sum of every weight written",
-        L_.mass_numerator() == total,
-        "%d == %d" % (L_.mass_numerator(), total),
+        "TotalMassUnits == the sum of every weight written",
+        L_.total_mass_units() == total,
+        "%d == %d" % (L_.total_mass_units(), total),
     )
 
 
@@ -231,7 +231,7 @@ def claim_log_is_a_log(trials):
 
 # --------------------------------------------------------------------------
 # "mass differences come out exact and offset-free"  and
-# "MassFractional/C = H(n_j), minus log Age(L), leaves log P(A_j)"
+# "MassUnits/C = H(n_j), minus log Age(L), leaves log P(A_j)"
 # --------------------------------------------------------------------------
 def claim_log_offset(trials):
     print("\nThe log n offset is shared, so log P(A_j) is one subtraction away")
@@ -248,7 +248,7 @@ def claim_log_offset(trials):
                 L.bundle_fractional(s, max(1, round(S * (g(k) - g(k - 1)))))
         age = L.age()
         for j, s in enumerate(sp):
-            m = L.mass_fractional(s)
+            m = L.mass_units(s)
             acc[j] += m
             sq[j] += float(m) * m
     check("Age(L) is the write total (one call per write)", age == n_tot, "Age=%d, sum n_j=%d" % (age, n_tot))
@@ -292,7 +292,7 @@ def claim_log_offset(trials):
             L.bundle_fractional(s, max(1, round(S * (H[k] - H[k - 1]))))
     bad = []
     for s, n in zip(sp, small):
-        m = L.mass_fractional(s) / float(S)
+        m = L.mass_units(s) / float(S)
         k = min(range(1, len(H)), key=lambda i: abs(H[i] - m))
         if k != n:
             bad.append((n, k))
@@ -309,7 +309,7 @@ def claim_log_offset(trials):
         for s, n in zip(sp, (8, 32)):
             for k in range(1, n * mult + 1):
                 L.bundle_fractional(s, max(1, round(S * (g(k) - g(k - 1)))))
-        d = (L.mass_fractional(sp[1]) - L.mass_fractional(sp[0])) / float(S)
+        d = (L.mass_units(sp[1]) - L.mass_units(sp[0])) / float(S)
         # the EXACT prediction is the H difference; C*log(n_j/n_i) is only its
         # asymptotic form and is off by .046 here, which a loose tolerance hides
         want = H[32 * mult] - H[8 * mult]
@@ -537,7 +537,7 @@ def claim_sampled_distribution(trials):
                 seen = [0] * K_PAT
                 for j in stream:  # one arrival at a time, interleaved
                     if mode == "k from mass":
-                        held = 0.0 if L.blank() else float(L.mass_fractional(sp[j]))
+                        held = 0.0 if L.blank() else float(L.mass_units(sp[j]))
                         w = weight_from_mass(gtab, held, lam[j], S_SAMP)
                     else:
                         seen[j] += 1
@@ -603,7 +603,7 @@ def claim_segment_reallocation(trials):
             sp = sparkles(K_PAT, 8800 + trial)
             L = learner("realloc-%s" % name, trial)
             for j in stream:
-                held = 0.0 if L.blank() else float(L.mass_fractional(sp[j]))
+                held = 0.0 if L.blank() else float(L.mass_units(sp[j]))
                 w = weight_from_mass(gtab, held, 1.0, S_SAMP)
                 L.bundle_fractional(sp[j], max(1, round(w)))
             for j, s_ in enumerate(sp):

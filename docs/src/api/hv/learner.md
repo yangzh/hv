@@ -45,7 +45,7 @@ learner.bundle_fractional(c, hv.mass_denominator(model) // 4)
 {{#tab name="Python"}}
 ```python
 learner.age()                # how many bundle calls, whatever weight they carried
-learner.mass_numerator()     # accumulated weight, in units of 1/mass_denominator
+learner.total_mass_units()   # the learner's whole accumulated weight, in units
 learner.blank()              # bool: whether this learner is blank (nothing observed yet)
 
 learner.model()              # identity accessors: model / domain / pod
@@ -57,8 +57,10 @@ learner.occupancy(a)         # a's share of the accumulated weight; unbiased, so
                              # it reads negative below chance (clamp at the call
                              # site if you need a non-negative share)
 
-learner.mass(a)              # a's accumulated weight, in WHOLE observations
-learner.mass_fractional(a)   # ... and exactly, as a numerator
+learner.mass_units(a)        # a's accumulated weight, in the same units;
+                             # mass_denominator(model) of them is one observation
+hv.mass(learner, a)          # ... the same, converted to whole observations
+                             # (a float: 0.4 reads 0.4, not 0)
 ```
 {{#endtab}}
 {{#endtabs}}

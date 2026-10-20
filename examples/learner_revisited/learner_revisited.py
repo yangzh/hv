@@ -221,12 +221,12 @@ def claim_age_counts_observations():
     check(
         "one observation of weight 5 -> age 1; five of weight 1 -> age 5",
         a.age() == 1 and b.age() == 5,
-        "ages %d and %d; both hold mass %d" % (a.age(), b.age(), a.mass(sp[0])),
+        "ages %d and %d; both hold %d units of mass" % (a.age(), b.age(), a.mass_units(sp[0])),
     )
     check(
         "both routes accumulate the same mass",
-        a.mass_fractional(sp[0]) == b.mass_fractional(sp[0]),
-        "mass_fractional %d == %d" % (a.mass_fractional(sp[0]), b.mass_fractional(sp[0])),
+        a.mass_units(sp[0]) == b.mass_units(sp[0]),
+        "mass_units %d == %d" % (a.mass_units(sp[0]), b.mass_units(sp[0])),
     )
 
 
