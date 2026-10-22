@@ -66,6 +66,26 @@ N = [2, 3, 4, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48]
 NEXT = [1, 1, 2, 2, 4, 4, 8, 8, 16, 16, 32, 32, 64]
 
 
+def _digamma(x):
+    """psi(x) for x > 0: recurrence into the asymptotic regime, then the series."""
+    acc = 0.0
+    while x < 10:
+        acc -= 1 / x
+        x += 1
+    inv = 1 / x
+    inv2 = inv * inv
+    return acc + math.log(x) - 0.5 * inv - inv2 * (1 / 12 - inv2 * (1 / 120 - inv2 / 252))
+
+
+def Hreal(x):
+    """H(x) = psi(x+1) + gamma, the harmonic number extended to the reals.
+
+    A fractional count advance needs H off the integers; H(n) still agrees with
+    sum 1/k at integer n.
+    """
+    return 0.0 if x <= 0 else _digamma(x + 1) + GAMMA
+
+
 def check(claim, ok, detail):
     print("  [%s] %-56s %s" % ("PASS" if ok else "FAIL", claim, detail))
     if not ok:
@@ -649,17 +669,89 @@ def claim_segment_reallocation(trials):
 # "the levers multiply, giving lambda_j g(n_j) and never g(lambda_j n_j)"
 # --------------------------------------------------------------------------
 def claim_unreachable():
-    print("\nThe levers multiply: log(n_j/N_j) is not expressible as a schedule")
+    print("\nMultiplying the levers cannot reach log PMI; advancing the count can")
     g = SHAPES["C*H(n)"]
     worst = 0.0
     for n, Nj in ((8, 4), (32, 8), (48, 16)):
-        got = g(n) / Nj  # what any (lambda, g) pair can produce
-        want = math.log(n / float(Nj))  # what log-PMI would need
+        got = g(n) / Nj  # the best any (lambda, g) PRODUCT can produce
+        want = math.log(n / float(Nj))
         worst = max(worst, abs(got - want))
-    check("lambda*g(n) cannot equal g(n/N) for these (n,N)", worst > 0.5, "closest attempt is off by %.2f nats" % worst)
-    # the offset it would need is negative, and weights cannot be
-    need = g(1) - math.log(8.0)  # first write's weight under the target
-    check("the required first weight is negative, hence unwritable", need < 0, "would need omega(1) = %.3f" % need)
+    check("lambda*g(n) cannot equal g(n/N)", worst > 0.5, "closest product is off by %.2f nats" % worst)
+    need = g(1) - math.log(8.0)
+    check("as a product it would need a negative first weight", need < 0, "would need omega(1) = %.3f" % need)
+    check("but g(sum delta) CAN: the division moves inside H", True, "see the PMI schedule below")
+
+
+# --------------------------------------------------------------------------
+# "delta_j = K/N_j advancing the COUNT puts PMI on the log scale"
+# --------------------------------------------------------------------------
+def claim_pmi_schedule():
+    print("\nAdvancing the count by K/count(A_j) reaches log PMI directly")
+    # K must satisfy K*n/N >~ 10 at the THINNEST case or H's asymptotic has not
+    # kicked in; the -11 nat case needs K >= 6e5, so 1e6.
+    K, C = 1e6, 16.0
+    # Seven distinct observations keeps the learner in LIST mode at 8-bit
+    # (cap 8), where mass IS the exact weight sum -- so this tests the schedule
+    # itself, with the sketch's resolution floor out of the way.
+    #
+    # The span is ~11 nats, chosen to cover what text8 actually realizes: the
+    # median centre's PMI runs [-8.93, -2.30] at w=2, and a 2-nat span would
+    # test almost none of it.
+    cases = [(905, 1000), (368, 1000), (50, 1000), (7, 1000), (1, 1097), (1, 8103), (1, 59874)]
+    L = learner("pmi-sched", 1)
+    sp = sparkles(len(cases), 4242)
+    for j, (n, Nj) in enumerate(cases):
+        prev = 0.0
+        for k in range(1, n + 1):
+            s = k * K / Nj  # delta = K/Nj per arrival, so sum delta = k*K/Nj
+            w = C * (Hreal(s) - Hreal(prev))
+            L.bundle_fractional(sp[j], max(1, int(round(w * CARD))))
+            prev = s
+    check(
+        "the learner stayed in list mode, so mass is exact",
+        not L.blank(),
+        "age %d over %d distinct observations" % (L.age(), len(cases)),
+    )
+
+    worst, rows = 0.0, []
+    for j, (n, Nj) in enumerate(cases):
+        got = hv.mass(L, sp[j]) / C - GAMMA - math.log(K)
+        want = math.log(n / float(Nj))
+        worst = max(worst, abs(got - want))
+        rows.append((n, Nj, want, got, K * n / Nj))
+    print("    %-7s %-8s %-10s %-10s %-9s %s" % ("n_j", "count", "true PMI", "recovered", "err", "sum delta"))
+    for n, Nj, want, got, sd in rows:
+        print("    %-7d %-8d %-+10.4f %-+10.4f %-+9.4f %.1f" % (n, Nj, want, got, got - want, sd))
+    span = max(r[2] for r in rows) - min(r[2] for r in rows)
+    check(
+        "Mass/C - gamma - log K recovers PMI",
+        worst < 0.05,
+        "worst error %.4f nats over a %.1f-nat span (%.0fx in ratio)" % (worst, span, math.exp(span)),
+    )
+
+    # The asymptotic needs the argument above ~10; below it H is linear, not log.
+    tiny = [(1, 10000000), (1, 1000000)]  # S = 0.1 and 1.0 at K = 1e6
+    for n, Nj in tiny:
+        s = K * n / Nj
+        got = C * Hreal(s) / C - GAMMA - math.log(K)
+        want = math.log(n / float(Nj))
+        check(
+            "sum delta = %.2f is below the asymptotic, so it decays" % s,
+            abs(got - want) > 0.1,
+            "off by %.2f nats" % abs(got - want),
+        )
+
+    # And the one-pass form, with the RUNNING count, does not work.
+    worst_rt = 0.0
+    for n, Nj in ((5, 100), (50, 100), (500, 1000)):
+        sd = sum(K / (Nj * k / n) for k in range(1, n + 1))  # age at the k-th arrival
+        got = Hreal(sd) - GAMMA - math.log(K)
+        worst_rt = max(worst_rt, abs(got - math.log(n / float(Nj))))
+    check(
+        "the RUNNING count variant does not reach PMI",
+        worst_rt > 0.3,
+        "off by up to %.2f nats, so the final count is required" % worst_rt,
+    )
 
 
 # --------------------------------------------------------------------------
@@ -745,6 +837,7 @@ def main():
     claim_sampled_distribution(max(20, t // 4))
     claim_segment_reallocation(max(20, t // 4))
     claim_unreachable()
+    claim_pmi_schedule()
     print("\n%s" % ("ALL CLAIMS PASS" if not FAILED else "FAILED: %s" % "; ".join(FAILED)))
     return 1 if FAILED else 0
 
