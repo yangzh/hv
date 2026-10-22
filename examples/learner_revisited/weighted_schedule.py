@@ -1,35 +1,111 @@
 #!/usr/bin/env python3
 """Choosing what a Learner's occupancy MEASURES, by choosing the write weights.
 
-Run learner_revisited.py first: it establishes that occupancy is an observation's
-share of the accumulated mass. That leaves the mass itself free, and the weight schedule
-is how you pick it. Writing the k-th repeat of an observation with weight
+WHAT THIS FILE IS
+    A set of executable CLAIMS. Each prints PASS or FAIL next to the number it
+    measured, so the file doubles as a spec: when a claim fails, either the
+    library changed or the claim was wrong, and the printed number says which.
 
-    omega_j(k) = lambda_j * [ g(k) - g(k-1) ],    g(0) = 0
+        pip install kongming-rs-hv
+        python weighted_schedule.py            # ~17s, full trial counts
+        python weighted_schedule.py --quick    # fewer trials, same claims
 
-makes its accumulated mass telescope to lambda_j * g(n_j), so occupancy lands on
-any non-decreasing g of the observation's own count, times any external
-per-observation scale lambda.
+BACKGROUND, FOR A READER NEW TO HYPERVECTORS
+    A hypervector here is a SPARSE BINARY vector: a large address space (1M at
+    MODEL_1M_10BIT) of which only M = 1024 positions are set. Picture it as M
+    "segments", each holding one address. Two unrelated vectors share almost no
+    addresses; two related ones share many. OVERLAP -- how many addresses two
+    vectors have in common -- is the only similarity notion used below.
 
-Three schedules are checked here, each with PASS/FAIL and a tolerance taken
-from the sampling spread:
+    A LEARNER is a hypervector that ACCUMULATES. You bundle observations in,
 
-    NAIVE  g(n) = n              occupancy lands on P(A_j)
-    LOG    g(n) = C*H(n)         occupancy lands on log n_j
-    PMI    g(S) = C*H(S),        occupancy lands on log PMI,
-           S = K*n_j/count(A_j)  the division moving INSIDE g
+        learner.bundle_fractional(sparkle, weight_in_units)
 
-The lambda lever -- an external per-observation scale -- is kept only where the
-PMI story needs it: claim_unreachable shows no lambda outside g can reach what
-advancing the count inside it does.
+    and it keeps a running total -- but under a fixed budget. Still M segments,
+    however much you write. So bundling cannot keep everything and has to decide
+    which observations hold segments. It decides by WEIGHTED RESERVOIR SAMPLING,
+    whose steady state is the SHARE LAW:
 
-    pip install kongming-rs-hv
-    python weighted_schedule.py            # ~17s
-    python weighted_schedule.py --quick    # fewer trials, same claims
+        occupancy(L, A_j) = (mass accumulated for A_j) / (total mass in L)
 
-matplotlib is optional. With it installed, --plot writes two figures: the
-occupancy of every code under each schedule (its mass function, measured against
-the target), and the segment budget dealt out two ways.
+    An observation's share of the SEGMENTS equals its share of the accumulated
+    WEIGHT. Everything here builds on that one fact; learner_revisited.py
+    establishes it on its own.
+
+THE LEVER
+    The share law ties occupancy to the weights but says nothing about what the
+    weights should be -- those are ours. Write the k-th repeat of observation
+    A_j with
+
+        omega_j(k) = lambda_j * [ g(k) - g(k-1) ],    g(0) = 0
+
+    and A_j's first n_j repeats sum (telescope) to exactly lambda_j * g(n_j).
+    So after writing,
+
+        occupancy(L, A_j) = lambda_j*g(n_j) / sum_x lambda_x*g(n_x)
+
+    Choosing g chooses WHAT OCCUPANCY MEANS. Two independent knobs: g reshapes
+    an observation against its own repeat count, lambda reweights observations
+    against each other.
+
+THE THREE SCHEDULES
+        NAIVE  g(n) = n       -> occupancy = P(A_j), plain empirical frequency
+        LOG    g(n) = C*H(n)  -> occupancy is affine in log n_j
+        PMI    g(S) = C*H(S)  -> occupancy is affine in log PMI,
+               S = K*n_j/count(A_j)
+
+    H(n) = 1 + 1/2 + ... + 1/n is the harmonic number, which grows like
+    log n + gamma. That is the whole trick for LOG: differencing H gives
+    increments 1/k, so the k-th repeat is written with weight C/k -- diminishing
+    returns, deliberately -- and the accumulated mass lands on a logarithm.
+
+    PMI is the same trick with the count RESCALED before g sees it. PMI
+    (pointwise mutual information) measures how much more two things co-occur
+    than chance would predict,
+
+        PMI(c,o) = log [ n(c,o) * N / (count(c) * count(o)) ]
+
+    and the division by count(o) is what separates PMI from a raw count. The
+    only way to get a DIVISION out of a schedule is to put it INSIDE g, where
+    the log turns it into a subtraction: advance the count by
+    delta = K/count(o) per arrival. claim_unreachable shows the alternative --
+    scaling by lambda OUTSIDE g -- provably cannot get there, which is why the
+    lambda knob survives in this file only as that negative result.
+
+    K is a PIVOT FREQUENCY: a context seen exactly K times passes through
+    unscaled. It has to be found empirically; on text8 it is about 10^4.
+
+HOW TO READ THE OUTPUT
+    Each claim prints what it measured and the bound it had to beat. Bounds are
+    mostly derived from the spread the run itself shows rather than hardcoded,
+    so a claim does not quietly turn into a test of the trial count. Where a
+    bound IS a constant, the comment next to it says where the constant came
+    from and what regime it was calibrated in.
+
+THE ONE THING THAT LIMITS ALL OF IT
+    A learner holds M segments. Write more than M DISTINCT observations into it
+    and most of them get less than one segment each, so a single read of any one
+    is mostly noise. Expected segments for observation j is
+
+        lambda_j = M * g(n_j) / Omega,    Omega = sum_x g(n_x)
+
+    which for a weight-homogeneous set is just M / (number of distinct
+    observations). Hence
+
+        support << M  ->  individual reads are clean
+        support >> M  ->  individual reads are worthless, yet still UNBIASED,
+                          so an average over many learners (trials) recovers the target
+
+    Most claims below average over trials and therefore test the EXPECTATION.
+    That is the right test for "is the schedule's arithmetic correct" and NOT
+    the guarantee for "will one production read work".
+    claim_single_read_at_production_support covers the latter on purpose, and it
+    fails to rank anything -- the honest result, not a bug.
+
+PLOTS (optional)
+    matplotlib is optional. With it installed, --plot writes two figures: the
+    occupancy of every code under each schedule (its mass function, measured
+    against the target), and the segment budget dealt out two ways.
 
     pip install matplotlib
     python weighted_schedule.py --plot DIR   # DIR defaults to . if omitted
@@ -68,20 +144,54 @@ GAMMA = 0.5772156649015329
 EXCESS = 2.5
 FAILED = []
 
-# multiplicities spanning a 24x range, so the reshaping has something to do
-# 500 unique observations, log-spaced over a 24x span of multiplicities. At
+# SUPPORT unique observations, log-spaced over a 24x span of multiplicities. At
 # 10-bit the list cap is 40, so this SPILLS -- the regime the design runs in.
 #
-# Note what 500 against M=1024 means: the mean share is 1/500 = .002 against a
-# chance floor of 1/1023 = .00098, so an INDIVIDUAL read is barely above noise.
-# The trial MEAN still resolves it, so these claims test that the schedule's
-# expectation is right, not that a single read recovers it.
-N = [max(2, round(2 * (24.0 ** (j / 499.0)))) for j in range(500)]
-# an external count, deliberately uncorrelated with N
+# Note what SUPPORT = M/2 means. A code's mean share is 1/512 = .00195, and ONE
+# SEGMENT is 1/1023 = .00098 of occupancy, so the typical code owns about 2
+# segments -- 2x the quantum, which sounds comfortable and is not.
+#
+# The segments a code owns are Binomial(M, s), where the trials are the M SEGMENTS
+# and s is that code's SHARE of the mass (not 1/M). At s = 1/512 the mean
+# is M*s = 2.0 segments and the spread is sqrt(M*s*(1-s)) = 1.41, so SUPPORT = M/2
+# lands the SNR at exactly root-two whatever M is. Measured, a NEVER-WRITTEN probe still
+# reads up to +2 segments at p95, which is the whole signal.
+#
+# So a single read does not separate from noise, while the trial MEAN does.
+# That is what these claims test: the schedule's EXPECTATION is right, not that
+# one read recovers it. claim_single_read_at_production_support is the opposite
+# case on purpose.
+SUPPORT = 512  # unique codes written into one learner; M/2 at 10-bit
+assert SUPPORT & (SUPPORT - 1) == 0, "bit-reversal below needs a power of two"
+_BITS = SUPPORT.bit_length() - 1
+
+# Multiplicities follow a ZIPF, calibrated to text8 rather than invented.
+# Measured within a word whose support is 512-1024 (the bucket SUPPORT sits in,
+# see CodeSpread in the Go embedding package):
+#
+#     p50 1   p75 2   p90 4   p99 30   max 470
+#
+# so MOST CONTEXTS OCCUR ONCE and the spread is ~470x. An earlier version used
+# a log-uniform 2..48, which had no singletons at all and only a 24x span --
+# convenient for exercising the reshaping, and not what a corpus looks like.
+#
+# N_j = ZIPF_HEAD/(j+1)^ZIPF_ALPHA reproduces max, p75 and p50 exactly and
+# overshoots the middle (p99 64 vs 30, p90 6 vs 4), so the tail here is a
+# little heavier than text8's. Note the exponent is NOT the 0.83 that a
+# rank-count slope fit reports: that fit excludes the n=1 floor and so measures
+# only the head, where the decay is shallower. Across all SUPPORT ranks,
+# including the singletons, the effective exponent is ~1.11.
+ZIPF_HEAD = 470
+ZIPF_ALPHA = 1.109
+N = [max(1, round(ZIPF_HEAD / (j + 1) ** ZIPF_ALPHA)) for j in range(SUPPORT)]
+
 # An external count per observation, deliberately uncorrelated with N: a
-# bit-reversal permutation of the same span, so no row can pass by the two
+# bit-reversal permutation over the same span. SUPPORT being 2^_BITS makes the
+# reversal an EXACT permutation of 0..SUPPORT-1, so no row can pass by the two
 # cancelling.
-NEXT = [max(1, round(2 * (32.0 ** (int(format(j, "09b")[::-1], 2) / 511.0)))) for j in range(500)]
+NEXT = [
+    max(1, round(2 * (32.0 ** (int(format(j, f"0{_BITS}b")[::-1], 2) / float(SUPPORT - 1))))) for j in range(SUPPORT)
+]
 
 
 def _digamma(x):
@@ -122,12 +232,10 @@ def learner(domain, pod):
 def occupancy(learner, probe):
     """`probe`'s share of the learner's accumulated weight.
 
-    Called ``occupancy()`` from v7 on; ``barycentric()`` was the name on earlier
-    wheels and was removed after v7. Same value either way: the share of the M
-    segments that `probe` owns.
+    Equivalently the share of the M segments that `probe` owns, which is the
+    one quantity every claim below reads.
     """
-    fn = getattr(learner, "occupancy", None)
-    return fn(probe) if fn is not None else learner.barycentric(probe)
+    return learner.occupancy(probe)
 
 
 def numerators(inc, lam, n, scale):
@@ -147,7 +255,22 @@ SHAPES = {
 
 
 # --------------------------------------------------------------------------
-# "makes that sum telescope to lambda_j g(n_j) EXACTLY"
+# CLAIM 1: the schedule telescopes
+#
+# PROVES   writing the k-th repeat with weight lambda_j*[g(k) - g(k-1)] makes
+#          the accumulated weight land on exactly lambda_j * g(n_j).
+#          The lambda_j rides on every increment, which is why it survives
+#          the telescoping as a factor rather than cancelling.
+# WHY CARE This is the foundation. If the sum did not land on g, choosing g
+#          would not choose what occupancy means and nothing else would follow.
+# HOW      Pure arithmetic on the integers actually written -- no learner, no
+#          sampling. The only error allowed is rounding: each of the n weights
+#          is stored as a whole number of units, so the sum can drift by at
+#          most half a unit per write. That is the bound, and it is exact
+#          rather than statistical.
+# READ IT  "worst drift" against "rounding bound". The final check is an
+#          EQUALITY: the library's own mass total must match the sum of every
+#          weight handed to it, which is bookkeeping, not estimation.
 # --------------------------------------------------------------------------
 def claim_telescoping():
     """The schedule is g's finite difference, so the weights sum back to g."""
@@ -186,6 +309,24 @@ def claim_telescoping():
     )
 
 
+# --------------------------------------------------------------------------
+# CLAIM 2: each schedule lands on its own target
+#
+# PROVES   naive, log and PMI each put occupancy where the share law says they
+#          should -- the headline result of the whole file.
+# WHY CARE Claim 1 was arithmetic on paper. This is the first time a real
+#          Learner is involved, so it is where "the design works" is actually
+#          decided.
+# HOW      Write SUPPORT codes into a fresh learner, read every occupancy,
+#          average over independent trials, compare against lambda_j*g(n_j)/Omega.
+#          Averaging is essential: SUPPORT codes against M leaves each one
+#          barely above the noise floor individually (see the N comment above),
+#          so this tests the EXPECTATION. Claim 10 tests a single read.
+# READ IT  "max err" against "bound". The bound is a 4-sigma binomial standard
+#          error widened by EXCESS, because the read is measurably noisier than
+#          a clean segment count. "sub-unit increments 0" confirms no weight got
+#          floored up to 1 unit, which would have changed the shape being tested
+#          -- claim 5 is what happens when that goes wrong.
 # --------------------------------------------------------------------------
 # the schedule table: occupancy of code j == lambda_j g(n_j) / Omega,
 # where Omega = sum over codes of lambda g(n), and n_j counts code j's own writes
@@ -242,7 +383,19 @@ def claim_schedule_table(trials):
 
 
 # --------------------------------------------------------------------------
-# "the SCALE moved rather than the spread narrowing"
+# CLAIM 3: the log schedule is really a LOG
+#
+# PROVES   occupancy under g = C*H(n) is affine in log P, not merely a squashed
+#          version of P.
+# WHY CARE Any concave g compresses the frequent codes; that alone would not
+#          make the result a logarithm. Only a genuine log makes DIFFERENCES
+#          meaningful -- which is what lets the PMI schedule subtract a count
+#          later on. Compression without the log would not support that.
+# HOW      Fit occupancy against log P and against P, and compare R^2. The
+#          GAP is the claim; absolute R^2 drifts with both the trial count and
+#          the code count, so no fixed threshold on it would be honest.
+# READ IT  R^2 on log P should clearly exceed R^2 on P. Values in the comment
+#          below record what three different regimes produced.
 # --------------------------------------------------------------------------
 def claim_log_is_a_log(trials):
     print("\nThe log schedule is a LOG, not merely a compression")
@@ -269,8 +422,8 @@ def claim_log_is_a_log(trials):
     r_log = r2([math.log(n / n_tot) for n in N])
     r_lin = r2([n / n_tot for n in N])
     # The GAP is the claim, and only the gap: absolute R^2 moves with BOTH the
-    # trial count and the code count (.998 at 13 codes/200 trials, .965 at 500
-    # codes/200, .800 at 500/25), so any fixed threshold on it tests the budget
+    # trial count and the code count (.998 at 13 codes/200 trials, .965 at 512
+    # codes/200, .800 at 512/25), so any fixed threshold on it tests the budget
     # rather than the shape. The gap survives all three at .10 or better.
     check(
         "occupancy is affine in log P, not in P",
@@ -280,8 +433,21 @@ def claim_log_is_a_log(trials):
 
 
 # --------------------------------------------------------------------------
-# "mass differences come out exact and offset-free"  and
-# "MassUnits/C = H(n_j), minus log Age(L), leaves log P(A_j)"
+# CLAIM 4: the log offset is SHARED, so one subtraction recovers log P
+#
+# PROVES   mass/C = H(n_j), and subtracting a single per-learner constant
+#          (gamma + log Age) turns it into log P(A_j).
+# WHY CARE This is what makes the log schedule useful rather than merely
+#          interesting. The offset is the same for every code in a learner, so
+#          it cancels in any COMPARISON between two codes -- you never have to
+#          know Age to rank, only to read an absolute value.
+# HOW      Read mass, remove the offset, compare against the true log P. Two
+#          checks follow: that the leftover residual is exactly H's asymptotic
+#          step H(n) - gamma - log n (a known function, not noise), and that
+#          inverting H exactly recovers the integer count n_j itself.
+# READ IT  "max err" against "step + spread". The budget is measured, not
+#          fixed: a constant .25 only worked while the step dominated it, which
+#          was true at 13 codes and is not at SUPPORT.
 # --------------------------------------------------------------------------
 def claim_log_offset(trials):
     print("\nThe log n offset is shared, so log P(A_j) is one subtraction away")
@@ -344,7 +510,18 @@ def claim_log_offset(trials):
     # outright, which is where the asymptotic step came from
     # up to 10x max(N): the stream-length check below writes that many repeats
     H = [SHAPES["C*H(n)"](i) for i in range(0, 10 * max(N) + 1)]
-    small = N[:8]
+    # Exact recovery has a RESOLUTION BOUND, and the Zipf head sits past it.
+    # Each write rounds to a whole unit, so error accumulates as
+    # 0.289*sqrt(n)/S, while adjacent H values close as 1/(n+1). Recovery needs
+    # the first below half the second:
+    #
+    #     n^1.5 < 1.73 * S   ->   n <= (1.73*S)^(2/3) = 369 at S = 4096
+    #
+    # n = 470 (the head multiplicity) reads back as 471 and that is correct
+    # behaviour, not a miss: it would need S >= 5890. The old log-uniform N
+    # topped out at 48 and never met this edge.
+    n_exact = int((1.73 * S) ** (2.0 / 3.0))
+    small = [n for n in N[:8] if n <= n_exact]
     sp = sparkles(len(small), 7460)
     L = learner("exactH", 0)
     for s, n in zip(sp, small):
@@ -357,7 +534,7 @@ def claim_log_offset(trials):
         if k != n:
             bad.append((n, k))
     check(
-        "inverting H exactly recovers n_j itself",
+        "inverting H recovers n_j itself, up to n=%d" % n_exact,
         not bad,
         "all %d counts recovered" % len(small) if not bad else "misses %s" % bad,
     )
@@ -380,6 +557,25 @@ def claim_log_offset(trials):
         )
 
 
+# --------------------------------------------------------------------------
+# CLAIM 5: too small a scale destroys the shape
+#
+# PROVES   the schedule only works while every increment stays at or above one
+#          storable unit; below that the shape collapses toward linear.
+# WHY CARE It is the practical trap. The increment is lambda_j*[g(k) - g(k-1)],
+#          and this claim runs at lambda_j = 1 so the scale alone decides; for
+#          the log shape that is C/k, which SHRINKS with every repeat. Pick C too
+#          small and the late repeats all round to the 1-unit floor, so the
+#          learner silently stores a linear schedule while you believe it is
+#          storing a log one. This is the one failure mode that does not
+#          announce itself.
+# HOW      Run the same log schedule at a healthy scale (4096) and a crushed one
+#          (4), and check two things: occupancy follows the weights ACTUALLY
+#          written in both cases, and the written weights match the intended
+#          shape only when nothing floored.
+# READ IT  The second check compares intended against written in L1, which is
+#          deterministic -- no read noise -- and does not shrink as codes
+#          multiply the way a max-deviation threshold does.
 # --------------------------------------------------------------------------
 # "a shape holds only while lambda_j [g(k)-g(k-1)] stays above one unit"
 # --------------------------------------------------------------------------
@@ -426,10 +622,26 @@ def claim_representability(trials):
 
 
 # --------------------------------------------------------------------------
-# End to end: SAMPLE from a known P, and check the occupancy the learner ends
-# up with is the schedule's transform of that P. Unlike the runs above, the
-# realized counts are themselves random, so the draw's noise rides on top of
-# the reservoir's.
+# CLAIM 6: end to end, from a known distribution
+#
+# PROVES   sample a stream from a KNOWN P, write it with a schedule, and the
+#          occupancy you read back is that schedule's transform of P.
+# WHY CARE Every claim so far handed the learner a fixed, chosen set of counts.
+#          Real input arrives as a random stream, so the realized counts are
+#          themselves random and the draw's noise rides on top of the
+#          reservoir's. This is the closest thing here to a production run.
+# HOW      Draw 2000 samples from a Zipf P over 20 patterns, one arrival at a
+#          time and interleaved as they would really arrive. Two write modes are
+#          compared: "k known (oracle)", which looks up the true repeat count,
+#          and "k from mass", which RECOVERS the count from the mass already
+#          held -- the form production must use, since nothing tracks k.
+# READ IT  The two modes should agree, which is what makes the mass-recovered
+#          form trustworthy. The bound carries a small "lift" allowance: the
+#          read nudges weak codes UP (see claim 10), and because segments are
+#          conserved the head is nudged down to pay for it, so the realized
+#          shape is slightly flatter than the target. ~3 segments at the worst
+#          code. The residual's SHAPE is asserted separately, since its
+#          magnitude just tracks M while a sign flip would be a real regression.
 # --------------------------------------------------------------------------
 K_PAT = 20  # distinct patterns
 DRAWS = 2000  # samples per learner, drawn from the known distribution
@@ -674,6 +886,19 @@ def claim_sampled_distribution(trials):
 
 
 # --------------------------------------------------------------------------
+# CLAIM 7: the budget is REALLOCATED, not enlarged
+#
+# PROVES   the log schedule hands the same M segments out differently -- the
+#          frequent codes are compressed and the rare ones gain -- with the
+#          crossover at a predictable frequency.
+# WHY CARE It explains what the log schedule actually buys and what it costs.
+#          Nothing creates capacity; a rare code only becomes legible because a
+#          frequent one gave up segments. Useful when deciding whether the trade
+#          is the right one for a given workload.
+# READ IT  Segments should sum to M under both schedules (nothing is lost), the
+#          head should lose and the tail gain, and the losers should be exactly
+#          the head rather than a scatter.
+# --------------------------------------------------------------------------
 # What the log schedule DOES to a fixed budget: the same M segments, dealt out
 # differently. Low-frequency codes gain, high-frequency codes are compressed.
 # --------------------------------------------------------------------------
@@ -733,6 +958,20 @@ def claim_segment_reallocation(trials):
 
 
 # --------------------------------------------------------------------------
+# CLAIM 8: the lambda lever CANNOT reach PMI (a negative result)
+#
+# PROVES   no choice of lambda_j outside g can produce g(n_j / N_j). The two
+#          levers MULTIPLY -- you always get lambda_j * g(n_j) -- so a division
+#          applied outside g can never become a division inside it.
+# WHY CARE This is why the PMI schedule looks the way it does. The obvious move
+#          is to scale each observation by 1/count, which is cheap and needs no
+#          change to the write path. It provably does not work, and this claim
+#          is what rules it out: reaching PMI REQUIRES advancing the count
+#          inside g, which is what claim 9 then does.
+# READ IT  A big gap is a PASS here, the opposite of the other claims. The
+#          second check shows why it fails concretely -- matching would demand a
+#          NEGATIVE first weight, which the reservoir cannot store.
+# --------------------------------------------------------------------------
 # "the levers multiply, giving lambda_j g(n_j) and never g(lambda_j n_j)"
 # --------------------------------------------------------------------------
 def claim_unreachable():
@@ -749,6 +988,24 @@ def claim_unreachable():
     check("but g(sum delta) CAN: the division moves inside H", True, "see the PMI schedule below")
 
 
+# --------------------------------------------------------------------------
+# CLAIM 9: advancing the count by K/count reaches log PMI
+#
+# PROVES   with the count advanced by delta = K/count(A_j) per arrival,
+#          mass/C - gamma - log K returns PMI directly.
+# WHY CARE The payoff. Claim 8 showed the cheap route is impossible; this is the
+#          route that works, and it recovers PMI to .030 nats over a 10.9-nat
+#          span -- a 54000x ratio in the underlying probabilities.
+# HOW      SEVEN distinct observations only, which keeps the learner in LIST
+#          mode where mass is the exact weight sum. That is deliberate: it tests
+#          the SCHEDULE with the sketch's resolution floor removed entirely.
+#          Claim 10 is the other half, at production support with one read.
+# READ IT  The printed table gives true PMI beside recovered PMI per case. Two
+#          limits follow: K must be large enough that K*n/count stays above ~10
+#          or H is still in its linear region rather than its log one, and the
+#          one-pass variant that advances by the RUNNING count instead of the
+#          final one does not reach PMI -- so the final count really is needed,
+#          which is what forces a counting pre-pass.
 # --------------------------------------------------------------------------
 # "delta_j = K/N_j advancing the COUNT puts PMI on the log scale"
 # --------------------------------------------------------------------------
@@ -848,7 +1105,40 @@ def _spearman(xs, ys):
 
 
 # --------------------------------------------------------------------------
-# "At production support, ONE read cannot rank the codes"
+# CLAIM 10: at production support, ONE read cannot rank the codes
+#
+# PROVES   with 5292 distinct codes against M = 1024 segments, read ONCE, the
+#          rank correlation against the truth is ~.02. Nothing.
+# WHY CARE Every claim above removes the hard part by construction: claim 9
+#          keeps the learner in list mode so mass is exact, and claims 2-7
+#          average over independent trials. Production does NEITHER -- one
+#          learner, one read. This claim is that configuration, and it exists
+#          because the list-mode result was being quoted as though it settled
+#          the spilled case. It does not.
+#
+#          Note this is NOT a contradiction of claim 2. The read is exactly
+#          UNBIASED -- E[Omega * seg/M] = H(S_j) -- so averaging recovers the
+#          target, which is what claim 2 measures. The problem is variance:
+#          expected segments per code is lambda = M*H(S_j)/Omega ~ M/support,
+#          and sd/mean = 1/sqrt(lambda). At 5292 codes that is ~1.9, so one draw
+#          says almost nothing. Fix support and it works; on text8, 88% of words
+#          are already under M.
+#
+# HOW      SUPPORT is the variable, and support means UNIQUE CODES -- not age,
+#          not arrivals. Omega sums over DISTINCT codes, so repeats enter only
+#          inside H, logarithmically: doubling repeats barely moves lambda,
+#          doubling codes halves it. Trials here average the per-trial
+#          STATISTIC, never the read itself; over-averaging is the thing this
+#          claim exists to rule out.
+#
+# READ IT  Three findings, in order. (1) lambda < 1, so most codes own no
+#          segment. (2) A positive read does NOT mean the code is present: only
+#          M of 5292 can be, a 19.3% ceiling, yet 33.5% read positive -- so the
+#          read is noisy around the chance floor rather than a segment
+#          indicator, and part of the readable set holds nothing. (3) The
+#          spread is 2.2x a clean binomial estimator's, which is where EXCESS
+#          comes from, and more trials cannot absorb it because the bound
+#          shrinks at the same 1/sqrt(T).
 # --------------------------------------------------------------------------
 def claim_single_read_at_production_support(trials):
     """What every claim above removes by construction: the single read.
@@ -947,6 +1237,21 @@ def claim_single_read_at_production_support(trials):
     )
 
 
+# --------------------------------------------------------------------------
+# CLAIM 11: a concave shape makes MORE observations legible
+#
+# PROVES   under the log schedule, more distinct observations clear the noise
+#          floor than under the naive one.
+# WHY CARE Claim 7 showed segments move from head to tail. This says the move is
+#          WORTH it: the rare codes that gained are now readable at all, where
+#          before they sat at chance. That is the actual benefit, stated as a
+#          count rather than as a distribution shape.
+# HOW      The floor is measured, not assumed -- "null" sparkles that were never
+#          written establish the 95th percentile of pure chance overlap, and a
+#          code counts as recovered only if it reads above that.
+# READ IT  The per-band table shows where the gains land. The last check
+#          confirms the log shape's tail converges on the equal-share
+#          allocation M/K+1, which is the most compression can achieve.
 # --------------------------------------------------------------------------
 # "Reshaping also changes HOW MANY observations are recoverable at all"
 # --------------------------------------------------------------------------
