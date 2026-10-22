@@ -10,9 +10,9 @@ pip install kongming-rs-hv
 
 | Platform | Architectures | Python Versions |
 |----------|--------------|-----------------|
-| Linux | x86_64 | 3.10–3.14 |
-| macOS | Apple Silicon & Intel | 3.10–3.14 |
-| Windows | x86_64 | 3.10–3.14 |
+| Linux | x86_64 | 3.11–3.14 |
+| macOS | Apple Silicon & Intel | 3.11–3.14 |
+| Windows | x86_64 | 3.11–3.14 |
 
 ## Verifying Installation
 

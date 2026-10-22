@@ -13,7 +13,7 @@ Public release of sparse binary hypervectors and associated learners, powered by
 pip install kongming-rs-hv
 ```
 
-Supports Linux, macOS, and Windows on Python 3.10–3.14.
+Supports Linux, macOS, and Windows on Python 3.11–3.14.
 
 ## Featured: the Dependency Parser
 
