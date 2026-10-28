@@ -10,7 +10,6 @@ See docs: https://yangzh.github.io/hv/examples/mexican_dollar/index.html
 from kongming import hv
 
 model = hv.MODEL_64K_8BIT
-so = hv.SparseOperation(model, "knowledge", 0)
 
 # Create role markers
 country_code = hv.Sparkle.from_word(model, "role", "country_code")
@@ -30,19 +29,19 @@ krona = hv.Sparkle.from_word(model, "currency", "krona")
 
 # Encode each country as role-filler bundles
 us_record = hv.bundle(
-    hv.Seed128.random(so),
+    hv.Seed128("record", "usa"),
     hv.bind(country_code, usa),
     hv.bind(capital, dc),
     hv.bind(currency, dollar),
 )
 mexico_record = hv.bundle(
-    hv.Seed128.random(so),
+    hv.Seed128("record", "mex"),
     hv.bind(country_code, mex),
     hv.bind(capital, mexico_city),
     hv.bind(currency, peso),
 )
 sweden_record = hv.bundle(
-    hv.Seed128.random(so),
+    hv.Seed128("record", "swe"),
     hv.bind(country_code, swe),
     hv.bind(capital, stockholm),
     hv.bind(currency, krona),
