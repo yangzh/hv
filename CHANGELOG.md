@@ -3,6 +3,132 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v7.1.0 (2026-10-27)
+
+### Breaking changes
+
+- **`Learner.mass()` is removed; `mass_fractional()` is now `mass_units()` and
+  `mass_numerator()` is `total_mass_units()`.** Mass is measured in one unit —
+  numerators over `mass_denominator(model)` — and the names now say so at both
+  scopes: `mass_units(probe)` for one observation's share, `total_mass_units()`
+  for the learner's whole. Divide by `mass_denominator(model)` when you want
+  whole observations, ONCE, at the end of any summation.
+
+  The removed `mass()` rounded per probe, which read as the primary accessor
+  while being the lossy one — sub-observation holdings became 0, and summing
+  several of them erased the lot. That is not hypothetical: it is the pool bug
+  fixed just below. Every break here is a compile error or an AttributeError,
+  not a silent change of units.
+
+  The float version `mass()` was approximating is now the free function
+  `hv.mass(learner, probe)` (Go `hv.Mass`, Rust `hv::learner::mass`), which
+  returns whole observations: a 0.4-observation holding reads `0.398` rather
+  than `0`. It is a unit conversion, not a rounding, so nothing is lost.
+  Deliberately not a method — the old `learner.mass(probe)` still breaks loudly,
+  and no call site can mistake the numerator for the observation.
+
+- **`Learner.random(so)` is now `Learner.random(domain, so, initial=None)`, and
+  `Seed128.random(so)` is removed.** The old constructor was random in neither
+  useful sense: with no initial the content is the identity, so two "random"
+  learners were byte-identical, and the random DOMAIN made them unaddressable.
+  The caller now fixes the domain and supplies an initial value if it wants one.
+
+  The library deliberately does not fill in the learner's own Sparkle: a
+  learner's seed names it rather than describing what it holds, and
+  auto-filling would leave every learner holding one observation it never saw,
+  polluting `age`, mass, and so the conditional. Pass it explicitly when you
+  want a learner distinguishable at birth.
+
+  To reproduce the old RNG stream exactly, draw the domain first —
+  `Learner.random(Domain.from_id(so.uint64()), so)` consumes the same two
+  values in the same order.
+
+- **`Learner.revitalize(age)` is replaced by `Learner.reduce_mass(units)`.**
+  The old call set `mass = age * mass_denominator(model)`, which is the
+  invariant from before age and mass were split — true only when every write
+  was one whole observation. Under `bundle_fractional` it was false, so
+  `revitalize(learner.age())`, asking only to keep the SAME age, silently
+  rewrote the mass: measured 6.00 observations becoming 21.00.
+
+  The operation was always about PLASTICITY, which lives in the mass: a write's
+  mixing share is its weight over the running total, so lowering the total makes
+  new input count for more. `reduce_mass` says that and leaves `age` alone.
+  Reduction only — raising it would fabricate weight the learner never
+  received — and it panics above the current mass, as it already did on a blank
+  learner. No library code called `revitalize`, so nothing but direct callers
+  breaks.
+
+- **Wire field `LearnerPayload.mass_numerator` is renamed `mass_in_units`.**
+  Field number 6 is unchanged, so BINARY payloads round-trip across the rename
+  in both directions. What changes is anything that goes by field NAME: JSON and
+  prototext encodings, and the YAML repr used by the Go/Rust fixtures. The Go
+  and Rust struct fields follow (`massInUnits` / `mass_in_units`), and the
+  generated accessor is now `GetMassInUnits()`.
+
+- **`Learner.barycentric()` is gone — use `Learner.occupancy()`.** The alias
+  shipped deprecated in v7.0.0 and delegated to `occupancy()`, so the
+  replacement is a rename at the call site with no change in value or
+  signature. `hv.frame_barycentric()` is a different function and is
+  unaffected.
+
+  The formal name stays in the prose, because the quantity *is* a barycentric
+  coordinate (Eq. 28 of https://arxiv.org/pdf/2310.18316) — what moved is the
+  method you call to read it.
+
+### New features
+
+- **`hv.Point(frame, coords)` — a position in a frame of basis hypervectors.**
+  Given bases `b0..b[n-1]` and coordinates `c0..c[n-1]` the Point is
+  `b0**c0 (x) ... (x) b[n-1]**c[n-1]`, so each axis contributes one power and
+  bind composes them. `frame()`, `coords()` and `rank()` read it back; a short
+  coordinate list pads with the origin, and the all-origin Point is the
+  identity. Coordinates are an int or a `(numerator, denominator)` pair and
+  always come back as pairs, in lowest terms.
+
+  The coordinates are KEPT as exact rationals rather than folded into the
+  vector, because bind is not additive on fractional powers: `K**u (x) K**v`
+  agrees with `K**(u+v)` on only ~50% of segments (measured 512–545 of 1024),
+  since flooring each factor separately loses what flooring the sum keeps. So
+  arithmetic on an encoded value belongs on the rationals, with a single
+  truncation at materialization — `Point.power()` scales the coordinates for
+  exactly that reason. A frame must be readable: shared model, pairwise
+  distinct, no identity basis.
+
+- **Recovering coordinates from a bare `SparseSegmented`**, in three routines
+  by regime. A materialized vector holds no coordinates — they were spent into
+  its offsets — yet they are fully determined by it given the frame, and all
+  three verify against EVERY segment, so a vector that is not a point on the
+  frame raises rather than returning a best fit.
+
+  `hv.recover_point(frame, raw)` is exact for INTEGER coordinates and not a
+  search: an integer power never truncates, so each segment is one linear
+  equation mod `cardinality(model)` and Gaussian elimination solves the system
+  outright, with the surplus equations verifying. Exact through rank 20 on
+  every model. Coordinates land in `[0, W)`, which is the whole answer — `c`
+  and `c+W` scale every offset identically.
+
+  `hv.recover_point_fractional(frame, raw, level)` handles a `1/2**level` grid,
+  where the power truncates and the problem becomes a closest-vector one: LLL
+  lattice reduction over `4*rank` segments places the answer, then a polish
+  pass scores it against all segments. Reliability follows `rank/W`, so it
+  tracks the MODEL rather than the level — every rank through 10 recovered at
+  10-bit and above, while 8-bit holds to about rank 4. A higher `level` does
+  not help; it buys code count, not resolution. `level + sparsity_bits(model)`
+  is capped at 28, past which it refuses rather than overflowing.
+
+  `hv.recover_point_noisy(frame, raw, max_bad)` returns `(Point, bad_count)`
+  for a vector whose offsets are CORRUPTED. The exact solve cannot do this at
+  all — coordinates live in a modular group with no notion of "close", so one
+  wrong offset among those the elimination pivots on randomizes the answer
+  rather than perturbing it. This repeats the same solve on random segment
+  subsets and scores each candidate against all segments, keeping the best.
+  Rank costs tolerance, as `(1-f)**rank` predicts: exact recovery held through
+  ~60% corrupted segments at rank 3 and ~40% at rank 10. The returned count is
+  a diagnostic — on success it is exactly the number of disagreeing segments —
+  and a foreign vector still raises rather than passing as heavily corrupted.
+
+  Worked examples: `examples/point/point_2d.py` and `point_3d.py`.
+
 ## v7.0.0 (2026-10-18)
 
 ### Licensing
@@ -435,19 +561,3 @@ substrate format is finalized.
 - **`hv.SparseOperation(rng_hint=…)`.** Keyword-only selection of the RNG backend
   at the SparseOperation level (parity with Go/Rust), matching the four
   bit-identical backends from v4.10.
-
-## v4.10.0 (2026-08-11)
-
-### Breaking changes
-
-- **`HyperBinary.hint()` removed.** The per-vector type-tag accessor (and its
-  `.hint()` Python binding) is gone from every hypervector type — a vector's type
-  is known from how it was constructed. The `hv.HINT_*` constants stay for
-  wire-format work.
-- **Learner & identity serialization changed (persisted-data break).**
-
-### New features
-
-- **Two more RNG backends** — Philox-4×64-10 and xoroshiro128++ join
-  xoshiro256++ (default) and PCG-DXSM, all bit-identical across engines. Select
-  via the `KONGMING_RNG` environment variable.
