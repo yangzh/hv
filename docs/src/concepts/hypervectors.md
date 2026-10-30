@@ -55,6 +55,37 @@ This is what near-orthogonality looks like: two vectors drawn independently from
 a $65{,}536$-dimensional space, agreeing by coincidence on a single segment out
 of $256$ — and nowhere else.
 
+### Lee distance: the graded alternative
+
+Both measures above are **binary** per segment: two offsets either agree or they
+do not, and an offset one step away counts exactly like one on the far side of
+the ring. That is the honest reading for a `Sparkle`, whose offsets are
+independent random draws — "how far apart" is noise.
+
+But recall the phasor view: an offset is a discretized phase. Where an offset
+carries an **ordinal** meaning, the gap between two of them is real information,
+and **Lee distance** reads it — the circular gap $\min(d, W-d)$ for a segment of
+$W$ positions, averaged over the $M$ segments:
+
+$$L(A, B) = \frac{1}{M} \sum_{i} \min\left(|o_i^A - o_i^B|,\ W - |o_i^A - o_i^B|\right)$$
+
+Reported per segment, so it is comparable across models: chance is $W/4$ and the
+maximum $W/2$ whatever $M$ is. Two offsets one step apart contribute $1$, where
+Hamming would already charge the full penalty.
+
+Lee is NOT a restatement of overlap the way Hamming is. Overlap pins it only
+within $(M-O) \le L_{\text{sum}} \le (M-O)\lfloor W/2 \rfloor$ — a span of
+$W/2$ — because overlap cannot see magnitude. Which measure to reach for:
+
+| | overlap / Hamming | Lee |
+|---|---|---|
+| `Sparkle`, `Learner`, composites | **yes** | no — the gaps are noise |
+| `Point` (fractional-power encoding) | collapses as positions separate | **yes** — graded in the coordinate gap |
+| phasor bundles | no — one step apart shares no offset | **yes** — the native metric |
+
+The trade is resolution: averaging truncates, so a gap confined to a few
+segments reads $0$.
+
 ## Supported Models
 
 A [Model](../api/hv/common/models.md) determines the total number of dimensions (width), how those dimensions are divided into segments (cardinality and sparsity), and therefore implies critical storage and compute characteristics.
