@@ -30,6 +30,8 @@
         - [Knot 🪢](api/hv/knot.md)
         - [Parcel 🎁](api/hv/parcel.md)
         - [Dart 🎯](api/hv/dart.md)
+        - [Point 📍](api/hv/point.md)
+        - [Cyclone 🌀](api/hv/cyclone.md)
         - [HyperPhaser & Phasers 🧭](api/hv/phasers.md)
     - [Operators](api/hv/operators.md)
     - [Customizing Run-time Behavior](api/hv/runtime.md)

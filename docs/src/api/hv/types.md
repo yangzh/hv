@@ -34,7 +34,8 @@ v.hint()         # HINT_* constant — the type this vector serializes as
 | `HINT_KNOT` | [Knot 🪢](knot.md) |
 | `HINT_PARCEL` | [Parcel 🎁](parcel.md) |
 | `HINT_DART` | [Dart 🎯](dart.md) |
-| `HINT_CYCLONE` | Cyclone 🌀 |
+| `HINT_POINT` | [Point 📍](point.md) |
+| `HINT_CYCLONE` | [Cyclone 🌀](cyclone.md) |
 | `HINT_PHASERS` | [Phasers 🧭](phasers.md) |
 
 It is the tag `hv.from_message` dispatches on, so it also names the type a
