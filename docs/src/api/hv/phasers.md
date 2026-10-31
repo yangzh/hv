@@ -121,6 +121,84 @@ cosine, so no read needs it.
 > The magnitude-carrying form cannot be serialized yet: `proto_bytes()` on it
 > raises rather than quietly publishing unit magnitudes in place of real ones.
 
+## Raising to a power
+
+Both forms answer `power(num, den)`, and they mean different things because the
+two representations differ.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+ph.power(2)         # the accumulator: the FULL complex power
+ph.power(1, 2)      # a root
+ph.power(-1)        # the true inverse, 1/z
+
+v = ph.export()
+v.power(5, 4)       # the export: the phases, scaled — DEFERRED
+```
+{{#endtab}}
+{{#endtabs}}
+
+### On the accumulator: the full complex power
+
+`HyperPhaser.power` is `z**a = r**a * exp(i*a*theta)` — the **magnitude is
+raised alongside the phase**.
+
+A materialized vector's `power` scales only offsets because every one of its
+segments is unit; there is no magnitude to raise. An accumulator's are not
+unit, so stopping at the phase would be a *different operation* that merely
+coincides with the power when `r == 1`. Which is also why `power(-1)` here is
+the genuine `1/z` rather than only a conjugation.
+
+Raising the magnitude **reshapes the per-segment confidence**: above 1 sharpens,
+so already-confident segments pull further ahead, and below 1 flattens. That is
+what the power means rather than a side effect — but note the consequence: the
+result is no longer the accumulator of any weight vector, so the cosine estimate
+described above no longer applies to it. Phase-only scaling would not preserve
+it either.
+
+Two edges worth knowing: a cancelled segment (`magnitude == 0`) stays zero
+rather than taking `0**a`, which would be infinite for a negative exponent; and
+`z**0` is 1, so `power(0)` gives the unit phasor in every live segment, not the
+all-zero vector.
+
+### On the export: deferred, so chains compose
+
+`Phasers.power` scales the phases exactly as it would any `SparseSegmented`'s
+offsets. What differs is *when*: the exponent is **recorded** and applied when
+the vector is next read, so a chain of powers composes on the rational and is
+applied once.
+
+That is not cosmetic. Scaling step by step disagrees with the single equivalent
+power once an intermediate **wraps past `W`** — wrapping then scaling is not
+scaling then wrapping:
+
+| chain | step by step | deferred |
+|---|---|---|
+| `1/2` then `1/2` | agrees with `1/4` | agrees |
+| `3/7` then `2/5` | agrees with `6/35` | agrees |
+| **`5/4` then `7/3`** | **tens of ring steps off `35/12`** | **agrees** |
+
+The size of that gap depends on the vector — it is wherever the wrapped
+segments happen to land, measured in the 60–80 range on two different
+codebooks — but the deferred column is exactly zero every time, which is the
+part that is a property of the operation rather than of the instance.
+
+Contracting exponents agree either way, because `floor(floor(x/a)/b)` really is
+`floor(x/(a*b))` and nothing wraps on the way down. Expanding ones are the
+regime fractional-power encoding actually uses — [Point](point.md) keeps its
+exponents at or above 1 — so this is the common case, not an exotic one.
+
+Deferral is also why `Phasers` is recipe-backed: the cell holds the unscaled
+angles plus the exponent, and the fill applies it. `compact()` drops the
+materialized angles and keeps the base and the hash, recomputing identically on
+the next read.
+
+`power` on a magnitude-carrying `Phasers` **raises**: rotation does not change a
+segment's confidence, so carrying the block through unchanged is the likely
+answer, but it is unsettled and a wrong guess would silently mis-weight every
+later read.
+
 ## Comparing
 
 {{#tabs global="lang"}}
