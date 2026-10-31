@@ -3,6 +3,70 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v8.0.0 (2026-10-30)
+
+### Breaking changes
+
+- **`hv.lee_distance(a, b)` returns the per-segment MEAN, where it returned the
+  SUM before.** Divide the old value by `cardinality()` to get the new one.
+
+  The readout no longer scales with the model: chance is `W/4` and the diameter
+  `W/2` whatever `M` is, so two models can finally be compared. The old sum ran
+  to `M*W/2`, which for the 4G/16-bit vector was 2^31 — one past `int32`, so it
+  had to saturate rather than wrap, and that cliff is now gone entirely.
+
+  THIS BREAKS SILENTLY. Nothing raises, and no signature changed; a threshold
+  tuned against the old number simply means something else now. Multiply by
+  `a.cardinality()` to recover the previous value. Concretely, shifting every
+  offset by one used to read `M` and now reads `1`.
+
+### New features
+
+- **`hv.HyperPhaser` and `hv.Phasers` — bundling by PHASE rather than by
+  label.** A `SparseSegmented` vector is already a list of phasors: the ON
+  bit's offset within its segment is a discretized phase. A `HyperPhaser`
+  takes that literally, superposing unit phasors and keeping the resulting
+  angle, which is FHRR's bundle operator inside kongming's existing
+  representation. `export()` materializes it to a `Phasers`, a `HyperBinary`
+  under the new `HINT_PHASERS`, read with `lee()`.
+
+  Comparing two of them estimates the cosine between the underlying weight
+  vectors with standard error `~1/sqrt(M)` — it is a random projection, whose
+  basis is the codebook you feed it. Which is why the readout is scale-free
+  (re-presenting data changes only magnitude), flat in the number of distinct
+  observations, and sharper at larger `M`.
+
+  Against a `Learner` the trade is concrete: writes are deterministic and
+  exactly order-independent, duplicates only rescale, and shares below `1/M`
+  stay representable where a reservoir sample loses them. The cost is
+  resumability — a phasor needs all `M` magnitudes, where a Learner resumes
+  from its offsets plus one age scalar.
+
+  `overlap()` and `hamming()` RAISE on a `Phasers`, deliberately: two phasors
+  one ring step apart are maximally similar yet share no exact offset, so the
+  label metric would return a plausible-looking wrong answer. That is also why
+  it carries its own hint — the bytes are indistinguishable from any other
+  hypervector's, so nothing but the type can warn you.
+
+- **A `Point` can carry its coordinates without its frame.** Many Points
+  usually share one frame, and a copy per record is waste, so
+  `hv.Point(frame, coords, keep_frame=False)` keeps the coordinates and drops
+  the frame. `is_ready()` reports whether the frame is held,
+  `attach_frame(frame)` returns a new Point with it, and `detach_frame()` goes
+  the other way. `rank()` answers either way.
+
+  The frame argument stays required and validated even when it is not kept —
+  it supplies the model, the axis count and the seed `attach_frame` later
+  checks, so a mismatched frame is caught rather than silently decoding a
+  different position. A non-ready Point's content reads as the IDENTITY rather
+  than the position: it is for writing, not computing.
+
+- **`LeeDistance` joins the `HyperBinary` interface** in Go and Rust,
+  implemented from the raw offsets, so every type answers it rather than only
+  the free function. `Point` and `Phasers` are what it is for; for a `Sparkle`
+  or a composite the offsets are unrelated random draws and Hamming remains
+  the honest measure.
+
 ## v7.1.0 (2026-10-27)
 
 ### Breaking changes
@@ -539,25 +603,3 @@ Headline: LearnerPool write path reworked.
 - Overlap uses portable SIMD (`wide`) for the byte-aligned models (8-/16-bit).
 - NNS candidate tally switched to a fast integer hasher, and `CircleReadResult`
   reuses a read-session bind buffer — both trim decode CPU.
-
-## v4.11.0 (2026-08-15)
-
-Headline: `LearnerPool` becomes a first-class Python type, and the resident-pool
-substrate format is finalized.
-
-### Breaking changes
-
-- **`memory.similar_composite` → `memory.similar`.** The composite-similarity
-  search is renamed; `similar_composite` shipped in v4.8 only as a transitional
-  alias and is now removed. Update `memory.similar_composite(...)` →
-  `memory.similar(...)`.
-
-### New features
-
-- **`hv.LearnerPool`.** A Python binding for the resident learner pool:
-  build/size a pool, iterate its members, hydrate it from a substrate's pool
-  sentinel, and read its capacity stats — the read-side counterpart to trained
-  pools.
-- **`hv.SparseOperation(rng_hint=…)`.** Keyword-only selection of the RNG backend
-  at the SparseOperation level (parity with Go/Rust), matching the four
-  bit-identical backends from v4.10.
