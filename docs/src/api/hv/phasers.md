@@ -79,47 +79,64 @@ recoverable from the state as $\sqrt{M} \cdot \mathrm{rms}(r_i)$.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-ph.angle(seg)       # accumulated phase in radians, [0, 2*pi)
-ph.magnitude(seg)   # resultant length r_i
-ph.offset(seg)      # the phase quantized to the ring — what export() writes
+ph.angle(seg)            # accumulated phase in radians, [0, 2*pi)
+ph.magnitude_at(seg)     # resultant length r_i, one segment
+ph.offset(seg)           # the phase quantized to the ring — what export() writes
+
+ph.magnitude_squared()   # the whole vector: sum_i |z_i|**2
 ```
 {{#endtab}}
 {{#endtabs}}
 
-`magnitude()` is a **per-segment confidence, not a length**. Within one vector it
-varies by roughly 8x, and it says how much the contributing phases cancelled
+`magnitude_at()` is a **per-segment confidence, not a length**. Within one vector
+it varies by roughly 8x, and it says how much the contributing phases cancelled
 there — a near-zero resultant means the stored angle is decided by rounding
 residuals and carries no information. A segment with a large resultant also
 resists new observations, which makes it per-segment plasticity where a Learner
 has only a scalar age.
 
 A cancelled segment reports angle `0.0`, which is indistinguishable from a
-genuine zero phase: read `magnitude()` to tell them apart.
+genuine zero phase: read `magnitude_at()` to tell them apart.
+
+`magnitude_squared()` is the whole-vector reading, and it is **squared** rather
+than a norm on purpose: that is the moment with an exact law. The cross terms
+vanish for independent phases, so $E[|z_i|^2] = \|w\|_2^2$ per segment and the
+sum estimates $M \|w\|_2^2$ — linear in the accumulated mass. The norm itself
+carries a per-segment Rayleigh factor (0.886) that the second moment does not,
+which is why rms derives from here rather than from averaging `magnitude_at()`.
+
+It has exact values worth checking against: one unit observation gives
+`magnitude_squared() == M`, and the same observation `n` times gives `n**2 * M`.
 
 ## Exporting
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-v = ph.export()                   # angle only: a true hypervector
-v = ph.export_with_magnitudes()   # plus one 4-bit magnitude per segment
+v = ph.export()                  # a Phasers: ANGLES ONLY
+
+block = ph.quantized_magnitudes()   # the confidences, to keep yourself
 ```
 {{#endtab}}
 {{#endtabs}}
 
 `export()` gives one quantized phase per segment — the same bytes, packing and
-footprint as any `SparseSegmented`, exactly $\sqrt{M}$ long. Dropping the
-magnitudes costs roughly 10% on similarity and all of *distributional* analogy
-(`b - a + c`), which needs the radial component; it buys a vector that composes
-under bind and permute like any other.
+footprint as any `SparseSegmented`, exactly $\sqrt{M}$ long. That makes it a
+vector which composes under bind and permute like any other.
 
-`export_with_magnitudes()` keeps a 4-bit normalized magnitude per segment, two
-per byte. They are normalized by the vector's **own** rms onto a fixed grid, and
-the scale is not stored — a global per-vector factor cancels in both Lee and
-cosine, so no read needs it.
+**A `Phasers` carries angles only.** Reading it as unit phasors costs roughly
+10% on similarity and all of *distributional* analogy (`b - a + c`), which needs
+the radial component. The magnitudes stay on the accumulator, where
+`quantized_magnitudes()` packs them onto a fixed 4-bit grid, two per byte — so a
+caller who wants the per-segment confidences keeps that block beside the export
+themselves.
 
-> The magnitude-carrying form cannot be serialized yet: `proto_bytes()` on it
-> raises rather than quietly publishing unit magnitudes in place of real ones.
+They are normalized by the accumulator's **own** rms, and the scale is not
+included: a global per-vector factor cancels in both Lee and cosine, so no
+comparison needs it, and what survives is the confidence *ordering*. Four bits
+is the knee — measured, it matches fp32 on both similarity and analogy, and the
+grid is a compile-time constant because the normalized magnitude's distribution
+depends on neither the word, its support, nor the model.
 
 ## Raising to a power
 
@@ -194,10 +211,9 @@ angles plus the exponent, and the fill applies it. `compact()` drops the
 materialized angles and keeps the base and the hash, recomputing identically on
 the next read.
 
-`power` on a magnitude-carrying `Phasers` **raises**: rotation does not change a
-segment's confidence, so carrying the block through unchanged is the likely
-answer, but it is unsettled and a wrong guess would silently mis-weight every
-later read.
+Note the asymmetry between the two forms. The accumulator's power reshapes the
+confidences, since raising `r` is part of what `z**a` means. The export has no
+confidences to reshape, so its power is purely a rotation of the phases.
 
 ## Comparing
 
@@ -207,11 +223,9 @@ later read.
 v.lee(other)              # the metric this type exists for
 hv.lee_distance(v, other) # same reading, via the free function
 
-v.has_magnitudes()
-v.magnitude(seg)          # normalized, in units of the vector's own rms
 v.offset(seg)             # the stored phase
 v.offsets()               # every phase, in segment order
-v.equal(other)            # phases AND magnitudes
+v.equal(other)            # content equality, Phasers against Phasers
 
 v.overlap(other)          # raises
 v.hamming(other)          # raises
@@ -234,11 +248,21 @@ you. Note `core()` deliberately hands back a plain `SparseSegmented`, which has
 
 ### `equal()` is deliberately strict
 
-`stable_hash()` covers the **phases alone**, so two exports of one accumulator —
-one with magnitudes, one without — hash alike and sit at Lee distance 0. Only
-`equal()` separates them, and it accepts another `Phasers` only: a
-`SparseSegmented` holding identical bytes is *not* equal, because those offsets
-are labels rather than phases.
+It accepts another `Phasers` only. A `SparseSegmented` holding byte-identical
+offsets is **not** equal, because those offsets are labels rather than phases —
+and since both carry the same `stable_hash()`, nothing but the type
+distinguishes them.
+
+So the method and the free function disagree, on purpose:
+
+```python
+v.equal(v.core())        # False — only this method separates the metrics
+hv.equal(v, v.core())    # True  — the free function compares content hashes
+```
+
+`hv.equal` is documented as "identical ON bits", and by that definition it is
+right: the bytes *are* identical. It just cannot see that one side reads them as
+phases. Treat `Phasers.equal()` as the authoritative check for a phasor.
 
 ## See also
 
