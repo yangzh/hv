@@ -3,6 +3,74 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v9.0.0 (2026-11-01)
+
+### Breaking changes
+
+- **A `Phasers` carries angles ONLY; the magnitude block is gone.** Removed
+  `Phasers.has_magnitudes()` and `Phasers.magnitude(seg)`, along with
+  `HyperPhaser.export_with_magnitudes()` — `export()` is now the only way
+  across, and it writes one quantized angle per segment.
+
+  The magnitudes were never the published vector's business. Every other
+  subclass hashes its offsets alone, and a `Phasers` that sometimes carried a
+  second block made the wire format conditional on how it had been built. The
+  per-segment confidences stay on the accumulator, where
+  `quantized_magnitudes()` hands you the same 4-bit block to keep beside the
+  export yourself.
+
+  All three raise `AttributeError` rather than failing quietly, and none of
+  them appeared in the v8.0.0 release notes — they shipped in that wheel but
+  were never documented.
+
+- **`HyperPhaser.magnitude(seg)` is now `magnitude_at(seg)`.** A plain rename,
+  which frees the shorter name and keeps the per-segment reading explicit
+  beside the new whole-vector one.
+
+### New features
+
+- **`power(numerator, denominator=1)` on both phasor forms**, meaning
+  different things on each because the two representations differ.
+
+  On the accumulator it is the FULL complex power, `z**a = r**a * exp(i*a*t)`:
+  the magnitude is raised alongside the phase. A materialized vector's `power`
+  scales only offsets because every one of its segments is unit; an
+  accumulator's are not, so stopping at the phase would be a different
+  operation that merely coincides when `r == 1`. It is also why `power(-1)`
+  here is the genuine `1/z` rather than a conjugation. Raising the magnitude
+  reshapes the per-segment confidence — above 1 sharpens, below 1 flattens —
+  so the result is no longer the accumulator of any weight vector, and the
+  cosine estimate stops describing it.
+
+  On the export it scales the phases, and it DEFERS: the exponent is recorded
+  and applied at the next read, so a chain composes on the rational and
+  truncates once. That is not cosmetic. Scaling step by step disagrees with
+  the single equivalent power as soon as an intermediate WRAPS past `W`,
+  because wrapping then scaling is not scaling then wrapping — `power(5, 4)`
+  then `power(7, 3)` lands tens of ring steps away from `power(35, 12)` done
+  eagerly. Contracting exponents agree either way; expanding ones are the
+  regime fractional-power encoding actually uses.
+
+  Two edges: a cancelled segment (`magnitude_at == 0`) stays zero rather than
+  taking `0**a`, which a negative exponent would send to infinity; and `z**0`
+  is 1, so `power(0)` gives the unit phasor in every live segment, not the
+  all-zero vector.
+
+- **`HyperPhaser.magnitude_squared()`** — the whole-vector reading,
+  `sum_i |z_i|**2`. Squared on purpose, because that is the moment with an
+  exact law: cross terms vanish for independent phases, so it estimates
+  `M * ||w||_2**2` and is linear in the accumulated mass, where the norm
+  itself carries a per-segment Rayleigh factor that the second moment does
+  not. Exact values to check against — one unit observation gives `M`, and the
+  same observation `n` times gives `n**2 * M`.
+
+- **`HyperPhaser.quantized_magnitudes()`** — the per-segment confidences on a
+  fixed 4-bit grid, two per byte, for a caller who wants them beside the
+  export. They are normalized by the accumulator's own rms and the scale is
+  omitted, since a global per-vector factor cancels in both Lee and cosine;
+  what survives is the confidence ORDERING. Four bits is the knee, measured to
+  match fp32 on both similarity and analogy.
+
 ## v8.0.0 (2026-10-30)
 
 ### Breaking changes
@@ -581,25 +649,3 @@ Headline: hypervectors become lazy — content is computed on first use.
   benchmark: resident memory −45%, and stored substrates shrink ~39%.
 - **Cheaper training.** The pool's member-open check no longer divides
   per member: full-corpus training −5%.
-
-## v4.12.0 (2026-08-17)
-
-Headline: LearnerPool write path reworked.
-
-### Breaking changes
-
-- **`UniformSet.inner_prod()` / `WeightedSet.inner_prod()` removed.** The
-  set-vs-vector inner product is gone from the set types; the frame helpers
-  (`frame_inner_product`, `frame_coefficient`, …) fold it over the members
-  internally.
-
-### New features
-
-- **`hv.LearnerPool.unique_estimated()`.** Estimated unique-item count across the
-  whole pool (Σ 1/diversity_margin over the written members).
-
-### Performance
-
-- Overlap uses portable SIMD (`wide`) for the byte-aligned models (8-/16-bit).
-- NNS candidate tally switched to a fast integer hasher, and `CircleReadResult`
-  reuses a read-session bind buffer — both trim decode CPU.
