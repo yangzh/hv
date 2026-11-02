@@ -54,7 +54,7 @@ Output:
 | tree |   1 |   1 |    0 |    1 |  256 |    1 |
 | rock |   1 |   2 |    1 |    0 |    1 |  256 |
 
-The diagonal is 256 (cardinality = perfect self-overlap). Off-diagonal values are near 0-2 (random noise), confirming the vectors are near-orthogonal.
+The diagonal is 256 (cardinality = perfect self-overlap). Off-diagonal values are near 0-2 (random noise), confirming the vectors are nearly orthogonal.
 
 ## Learning from Observations
 

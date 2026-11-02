@@ -2,7 +2,10 @@
 
 The original idea came from a random bump into the [stanza](https://stanfordnlp.github.io/stanza/) NLP package (from Stanford) and its web-based rendering.
 
-![Stanford's stanza](images/stanza_snapshot.png)
+<figure>
+  <img src="images/stanza_snapshot.png" alt="Stanza's web rendering of a dependency parse">
+  <figcaption><strong>Fig. 1</strong>: stanza's web rendering — tokens, part-of-speech tags, and labeled head edges</figcaption>
+</figure>
 
 What the website shows is a **dependency parse** for human languages: the sentence split into tokens, each token tagged with its part of speech, lemma, and named-entity type, and, for the interesting part, every token is attached to a **head** token by a labeled edge (subject-of, object-of, modifier-of, …). The nodes and edges form a dependency tree representing the sentence's grammatical structure.
 

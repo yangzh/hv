@@ -4,23 +4,23 @@
 
 Hyperdimensional computing (HDC) represents concepts as high-dimensional vectors (also called hypervectors) and manipulates them with algebraic operations, typically the dimension (of vectors) can be as high as thousands or millions.
 
-The key insight is that random vectors in high-dimensional spaces are **nearly orthogonal**: giving each concept a unique, robust representation that tolerates potential ambiguity and interference, all without central orchestration. 
+The key insight is that random vectors in high-dimensional spaces are **nearly orthogonal**: giving each concept a unique, robust representation that tolerates potential ambiguity and interference, all without central orchestration.
 
 In that sense, the traditional mantra of curse of dimensionality becomes the **blessing of dimensionality**.
 
-Motivated readers should perform their own background research on this topic and make judgement of their own. There are quite a few introductory papers covering this topic.
+Motivated readers should perform their own background research on this topic and make judgement of their own. There are many introductory papers covering this topic of hyperdimensional computing, or equivalently VSA (Vector Symbolic Architecture).
 
 ## Sparse Binary Representation
 
 `kongming` specializes in **sparse binary** hypervectors. Each vector has a fixed, large number of dimensions (e.g., 65,536/64K or 1,048,576/1M), but only a very small fraction of them are "on" (set to 1). The sparsity is controlled by the [Model](../api/hv/common/models.md) configuration.
 
-Furthermore, we focus on a special sparse binary configuration: **SparseSegmented** where each vector is divided into equal-sized *segments*, and exactly one bit is ON per segment. For example, each of the 8bit-model hypervectors will have total dimension of $2^{16}=65536$, divided into $256$ segments, where each segment of $256$ dimension will have one (and only one) ON bit.
+Furthermore, we focus on a special sparse binary arrangement, where each vector is divided into equal-sized *segments*, and exactly one bit is ON per segment. For example, each of the 8bit-model hypervectors will have total dimension of $2^{16}=65536$, divided into $256$ segments, where each segment of $256$ dimension will have one (and only one) ON bit.
 
-Alternatively you can imagine each **SparseSegmented** hypervector as a list of phasors, where the offset of ON bit (within the host segment) represents the discretized phase. For the above-mentioned 8bit models, each hypervector will have $256$ such phasers, each with $256$ discrete phase around the unit circle.
+Alternatively you can imagine each hypervector as a list of phasors, where the offset of ON bit (within the host segment) represents the discretized phase of a unit circle. For the above-mentioned 8bit models, each hypervector will have $256$ such phasors, each with $256$ discrete phases around the unit circle, ranging over $[0, 2\pi)$.
 
 In general, this unique constraint enables:
-- **Compact storage**: only the offsets of ON bit are needed, which is the bare entropy for the presentation;
-- **Efficient operations**: Unlike neural nets where weights are recorded in float-point numbers, binary operations can be performed very efficiently with modern memory / CPUs, and without the need of GPU for either float-point operations or matrix manipulations.
+- **Compact storage**: only the offsets of ON bit are needed, which is exactly the minimal entropy for the representation;
+- **Efficient operations**: Unlike neural nets where weights are recorded in float-point numbers, binary/integer operations can be performed very efficiently with modern memory / CPUs, and without the need of GPU for either float-point operations or matrix manipulations.
 
 ## Similarity and distance measure
 
@@ -28,28 +28,26 @@ Two vectors are compared via **overlap** — the count of segments with the same
 
 For a model (for example, 8bit model), with dimension $N=2^{16}=65536$ and sparsity $s=1/256$:
 
-naturally, a vector's overlap with itself equals its cardinality $M=Ns=256$.
+Naturally, a vector's overlap with itself equals its cardinality $M=Ns=256$.
 
-the expected overlap between two random vectors $A$ and $B$:
+The overlap (of random vectors $A$ and $B$) follows a Poisson distribution with $\lambda=Ns^2=1$, so the expectation follows:
 
-$$\text{E}[O(A, B)] = Ns^2 = 1$$
+$$\text{E}[O(A, B)] = \lambda = 1$$
 
-Actually, the overlap (of random vectors) follows a Poisson distribution with $\lambda=1$.
+The commonly-used distance measure (or dis-similar measure) for binary vectors is Hamming distance, equivalent to a bitwise XOR operation.
 
-The commonly-used distance measure (or dis-similar measure) for binary vectors is Hamming Distance, equivalent to a bitwise XOR operation. As we discussed (and proved) in [the paper](https://arxiv.org/abs/2310.18316), the **overlap** and **Hamming distance** for **sparse binary** hypervectors are two sides of the same coin, with the following equation:
+As we discussed (and proved) in [the paper](https://arxiv.org/abs/2310.18316), the **overlap** and **Hamming distance** for **sparse binary** hypervectors are two sides of the same coin, with the following equation:
 
 $$2 \times O(A, B) + H(A, B) = 2M$$
 
 the more overlap they have, the closer two vectors in Hamming space.
 
-To visualize this with concrete example, we have two random 64K/8-bit hypervectors drawn over the same grid. Each of the $256$ segments contributes one dot, placed inside its own segment group at the offset
-of that segment's ON bit — **red** for the first vector, **blue** for the second. The heavy grid lines delimit the segment groups; the fine ones are individual offsets.
+To visualize this, we have two random 64K/8-bit hypervectors drawn over the same grid. Each of the $256$ segments contributes one dot, placed inside its own segment group at the offset of that segment's ON bit — **red** for the first vector, **blue** for the second. The heavy grid lines delimit the segment groups, while the fine ones are individual offsets.
 
-<div style="text-align: center">
+<figure>
   <img src="images/sparkle_overlap.png" alt="Two random 8-bit hypervectors overlaid; they share exactly one segment">
-</div>
-
-The two random hypervector overlaps on exactly **one** segment, marked in **black** : $O(A,B) = 1$.
+  <figcaption><strong>Fig. 1</strong>: two random 64K/8-bit hypervectors over one grid, agreeing on exactly one segment</figcaption>
+</figure>
 
 This is what near-orthogonality looks like: two vectors drawn independently from
 a $65{,}536$-dimensional space, agreeing by coincidence on a single segment out
@@ -69,28 +67,15 @@ $W$ positions, averaged over the $M$ segments:
 
 $$L(A, B) = \frac{1}{M} \sum_{i} \min\left(|o_i^A - o_i^B|,\ W - |o_i^A - o_i^B|\right)$$
 
-Reported per segment, so it is comparable across models: chance is $W/4$ and the
-maximum $W/2$ whatever $M$ is. Two offsets one step apart contribute $1$, where
-Hamming would already charge the full penalty.
+Like Hamming distance, Lee distance is also a distance metric. Reported per segment, so it is comparable across models: chance is $W/4$ and the maximum $W/2$ whatever $M$ is. Two offsets one step apart contribute $1$, where Hamming would already charge the full penalty.
 
-Lee is NOT a restatement of overlap the way Hamming is. Overlap pins it only
-within $(M-O) \le L_{\text{sum}} \le (M-O)\lfloor W/2 \rfloor$ — a span of
-$W/2$ — because overlap cannot see magnitude. Which measure to reach for:
-
-| | overlap / Hamming | Lee |
-|---|---|---|
-| `Sparkle`, `Learner`, composites | **yes** | no — the gaps are noise |
-| `Point` (fractional-power encoding) | collapses as positions separate | **yes** — graded in the coordinate gap |
-| phasor bundles | no — one step apart shares no offset | **yes** — the native metric |
-
-The trade is resolution: averaging truncates, so a gap confined to a few
-segments reads $0$.
+Lee is NOT a restatement of overlap the way Hamming is. Overlap only ever asks whether two offsets match, never *how far apart* they are, so it constrains Lee only loosely — two vectors of identical overlap can sit at very different Lee distances.
 
 ## Supported Models
 
 A [Model](../api/hv/common/models.md) determines the total number of dimensions (width), how those dimensions are divided into segments (cardinality and sparsity), and therefore implies critical storage and compute characteristics.
 
-| Model | Width/Dimension | Sparsity Bits | Cardinality (ON bits)  | Segment Size |
+| Model | Width $N$ | Sparsity Bits | Cardinality $M$  | Segment Size $W$ |
 |-------|-------|---------------|-------------|----------------------|
 | `MODEL_64K_8BIT` | 65,536 | 8 | 256 | 256 |
 | `MODEL_1M_10BIT` | 1,048,576 | 10 | 1,024 | 1,024 |
@@ -111,10 +96,10 @@ For simplicity, we use function names from Python. The counterparts from Go / Ru
 
 | Function | Description |
 |----------|-------------|
-| `width` | Total dimension count (`2^width_bits`) |
-| `cardinality` | Number of ON bits (= number of segments) |
+| `width` | Total dimension count $N$ (`2^width_bits`) |
+| `cardinality` | Number of ON bits $M$ (= number of segments) |
 | `sparsity` | Fraction of ON bits (`1 / segment_size`) |
-| `segment_size` | Dimensions per segment |
+| `segment_size` | Dimensions per segment $W$ |
 
 ### How to Choose a Model
 
@@ -128,7 +113,7 @@ In general, larger models provide more orthogonal space (lower collision probabi
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-The storage consideration above applies to **SparseSegmented**, the one type containing raw offsets. There are other types of **sparse binary hypervector**,  typically defined by a **recipe**: a seed, or a seed plus members, and carries only that instead of raw offsets. For example, **Sparkle** stores its seed and derives its offsets on demand; composites such as **Set** and **Sequence** hold references to their members, so they cost far less than a materialized vector both in memory and on the wire.
+The storage consideration above applies to **SparseSegmented**, the particular type containing raw offsets. There are other types of **sparse binary hypervector**, typically defined by a **recipe**: a seed, or a seed plus members, and carries only that instead of raw offsets. For example, **Sparkle** stores its seed and derives its offsets on demand; composites such as **Set** and **Sequence** hold references to their members, so they cost far less than a materialized vector both in memory and on the wire.
 
 Additionally, the bits are computed on first observation and cached, then released again on `compact()`. Constructing a vector you never observe therefore costs almost nothing — see [lazy materialization](../api/hv/types.md#lazy-materialization).
 

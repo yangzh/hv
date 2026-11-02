@@ -16,7 +16,10 @@ The text is split into individual sentences up front, and each sentence is hande
 
 ### Bootstrapping the parsed trees
 
-![Stanford's stanza](images/stanza_snapshot.png)
+<figure>
+  <img src="images/stanza_snapshot.png" alt="Stanza's annotation of a sentence">
+  <figcaption><strong>Fig. 1</strong>: the teacher parser's annotation — tokens, part of speech, lemma, entities, and the head arcs forming the dependency tree</figcaption>
+</figure>
 
 A teacher parser (i.e., stanza) annotates each incoming sentence: tokens, part of speech, lemma, morphological features, named-entity spans, and the head arc that makes the dependency tree. The annotated sentences are stored as compact per-language archives, which can be loaded when needed: development or production of the training pipeline doesn't need the live parser or the raw text, for efficiency reasons.
 

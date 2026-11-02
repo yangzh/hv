@@ -14,7 +14,7 @@ site-url = "/hv/"
 no-section-label = true
 default-theme = "light"
 preferred-dark-theme = "ayu"
-additional-css = ["theme/tabs.css", "theme/last-changed.css", "theme/callouts.css"]
+additional-css = ["theme/tabs.css", "theme/last-changed.css", "theme/callouts.css", "theme/figure.css"]
 additional-js = ["theme/tabs.js", "theme/sponsor.js"]
 
 [output.html.search]

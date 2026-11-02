@@ -20,7 +20,7 @@ The internal "orchestration" (or rewiring) is mathematically sound, stable, and 
 
 ### Fixed resource consumption
 
-Unlike the naive arrangement of one Learner per learning task which can grow unbounded, a LearnerPool uses a fixed amount of resources: entities of varying fan-out intelligently share the same pool.
+Unlike the naive arrangement of one Learner per learning task which can grow unbounded for new tasks, a LearnerPool uses a fixed amount of resources: entities of varying fan-out intelligently share the same pool.
 
 The roster size is set at pool creation and won't grow afterwards: there is currently no incremental expansion short of a full retrain. When every member a write could reach is full, the pool refuses the write rather than degrade what it already holds.
 

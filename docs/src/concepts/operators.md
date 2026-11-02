@@ -12,7 +12,7 @@ For $K$ codes $C_0, C_1, \ldots, C_{K-1}$, bind is **segment-wise modular additi
 
 $$B = C_0 \otimes C_1 \otimes \cdots \otimes C_{K-1}$$
 
-$$B_i = \Big( \sum_k C_{k,i} \Big) \bmod M \qquad (0 \le i < M)$$
+$$B_i = \Big( \sum_k C_{k,i} \Big) \bmod W \qquad (0 \le i < M)$$
 
 where $C_{k,i}$ is the offset of the ON bit in the $i$-th segment of $C_k$. Each
 segment is handled independently, so the result keeps exactly one ON bit per
@@ -30,7 +30,7 @@ $$A \otimes A^{-1} = I \quad \text{(inverse)}$$
 
 $$O(A \otimes B, A) \approx O(A \otimes B, B) \approx \text{noise} \quad \text{(dissimilarity)}$$
 
-**Implementation**: segment-wise offset addition modulo segment size.
+**Implementation**: segment-wise offset addition modulo segment size $W$.
 
 Check out [original paper](../introduction.md#reference) for details.
 

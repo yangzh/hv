@@ -9,6 +9,7 @@
     - [Near-neighbor search](concepts/near_neighbor_search.md)
     - [Learner](concepts/learner.md)
     - [LearnerPool](concepts/learner_pool.md)
+    - [HyperPhaser](concepts/hyper_phaser.md)
 
 # API Reference
 

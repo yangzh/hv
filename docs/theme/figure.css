@@ -1,0 +1,27 @@
+/* Figures: centered image with a numbered caption below.
+   Numbering is manual and restarts per page. */
+figure {
+    margin: 1.5em 0;
+    text-align: center;
+}
+
+figure img {
+    max-width: 100%;
+    height: auto;
+}
+
+figcaption {
+    margin-top: 0.6em;
+    font-size: 0.9em;
+    line-height: 1.4;
+    color: #4a4a4a;
+}
+
+figcaption strong {
+    font-weight: 600;
+}
+
+/* Dark themes */
+.ayu figcaption, .coal figcaption, .navy figcaption {
+    color: #b5b5b5;
+}

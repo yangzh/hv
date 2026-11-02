@@ -17,3 +17,4 @@ Hyperdimensional Computing (HDC) and **Vector Symbolic Architectures (VSA)** are
 | [Near-neighbor search](near_neighbor_search.md) | Highly efficient retrieval of relevant entries |
 | [Learner](learner.md) | Hebbian learning over a stream of experience: bedrock for intelligent behaviors |
 | [LearnerPool](learner_pool.md) | Pooled Learners sharing a fixed budget elastically |
+| [HyperPhaser](hyper_phaser.md) | Bundling offsets as phases rather than labels: FHRR in the offset representation |
