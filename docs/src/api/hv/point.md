@@ -1,13 +1,32 @@
 # Point 📍
 
 A position in the space a **frame** of basis vectors spans. Given bases
-$b_0 \ldots b_{n-1}$ and coordinates $c_0 \ldots c_{n-1}$:
+$b_0 \ldots b_{n-1}$, coordinates $c_0 \ldots c_{n-1}$, and an **anchor**
+$S = \text{Sparkle}(\text{domain}, \text{pod})$:
 
-$$\text{Point} = b_0^{c_0} \otimes b_1^{c_1} \otimes \cdots \otimes b_{n-1}^{c_{n-1}}$$
+$$\text{Point} = S \otimes b_0^{c_0} \otimes b_1^{c_1} \otimes \cdots \otimes b_{n-1}^{c_{n-1}}$$
 
 The coordinates are **exponents**, so a Point is the fractional-power encoding of
 an $n$-tuple on one shared frame. Two Points on the same frame are comparable;
 the same offsets under a different frame mean a different position.
+
+The anchor is the Point's **own** identity, supplied by the caller and unrelated
+to the frame's. It keeps the origin off the identity vector: without it every
+frame shares one origin, `Point(0, …, 0)` is the all-zero-offset vector — the
+single cell not drawn like the others — and unrelated frames collide there.
+Anchored, the origin is just another sparkle, and distinct anchors separate
+distinct frames.
+
+<div class="callout callout-warning">
+<div class="callout-title">Breaking change</div>
+
+`domain` and `pod` are new leading arguments on `Point` and on all three
+`recover_point*` functions, and the anchor changes every Point's content —
+**Points stored before the anchor decode to different vectors**. See the
+[changelog](https://github.com/yangzh/hv/blob/main/CHANGELOG.md) for the release
+this landed in.
+
+</div>
 
 ## Why the coordinates are kept
 
@@ -29,16 +48,18 @@ materialization. A Point that keeps its coordinates can do that; a bare
 {{#tab name="Python"}}
 ```python
 frame = [hv.Sparkle(model, d, hv.Pod("b0")), hv.Sparkle(model, d, hv.Pod("b1"))]
+anchor_d, anchor_p = hv.Domain("grid"), hv.Pod("origin")
 
-p = hv.Point(frame, [5, 9])                      # integer coordinates
+p = hv.Point(anchor_d, anchor_p, frame, [5, 9])   # integer coordinates
 
 # Fractional: each coordinate an int or a (numerator, denominator) pair.
-p = hv.Point(frame, [(4100, 4096), (4096, 4096)])
+p = hv.Point(anchor_d, anchor_p, frame, [(4100, 4096), (4096, 4096)])
 
 # A short list pads with zeros — the origin on the remaining axes.
-p = hv.Point(frame, [5])
+p = hv.Point(anchor_d, anchor_p, frame, [5])
 
-p = hv.Point(frame, [5, 9], keep_frame=False)    # the STORAGE shape, below
+# The STORAGE shape, below.
+p = hv.Point(anchor_d, anchor_p, frame, [5, 9], keep_frame=False)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -66,7 +87,7 @@ Many Points usually share one frame, and storing a copy per record is waste.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-stored = hv.Point(frame, [5, 9], keep_frame=False)
+stored = hv.Point(anchor_d, anchor_p, frame, [5, 9], keep_frame=False)
 stored.is_ready()           # False
 stored.rank()               # 2 — the coordinates are still there
 
@@ -79,13 +100,22 @@ stored = live.detach_frame()        # the same thing from an existing Point
 {{#endtabs}}
 
 The frame argument is **still required and validated** when `keep_frame=False`
-— it supplies the model, the axis count, and the seed `attach_frame` later
-checks, so a mismatched frame is caught rather than silently decoding a
-different position.
+— it supplies the model and the axis count to pad to — it is simply not
+retained.
 
-A non-ready Point's content reads as the **identity**, not the position: it is
-for writing, not computing. Comparing one against a genuine origin Point is the
-one place to be careful — they are different things that both read as identity.
+<div class="callout callout-warning">
+<div class="callout-title">attach_frame takes the frame on trust</div>
+
+It cannot check what you hand it. The anchor is the Point's own domain/pod, so
+it fingerprints nothing about the bases, and attaching the **wrong** frame
+silently reads a different position rather than raising. Only the axis count is
+verified. If that matters, materialize and confirm with `recover_point`.
+
+</div>
+
+A non-ready Point's content reads as the **bare anchor**, not the position: it
+is for writing, not computing. Use `is_ready()` to tell the two apart — a
+genuine origin Point reads as the anchor too, so content alone cannot.
 
 ## Recovering coordinates from raw offsets
 
@@ -95,12 +125,14 @@ Three functions, in increasing cost and tolerance:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-hv.recover_point(frame, raw)                    # integer, an exact solve
-hv.recover_point_fractional(frame, raw, 12)     # on the 1 / 2**12 grid
+# The anchor must match the one the vector was built with: it is RELEASED from
+# raw before the solve, and a wrong anchor leaves noise the solver rejects.
+hv.recover_point(anchor_d, anchor_p, frame, raw)                 # exact solve
+hv.recover_point_fractional(anchor_d, anchor_p, frame, raw, 12)  # 1 / 2**12 grid
 
 # Integer, tolerating up to max_bad corrupted segments. Returns the Point AND
 # how many segments disagreed; max_bad=0 is exactly recover_point.
-point, bad = hv.recover_point_noisy(frame, raw, 8)
+point, bad = hv.recover_point_noisy(anchor_d, anchor_p, frame, raw, 8)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -146,6 +178,12 @@ separate.
 The gradation has the same floor as recovery, though — a coordinate delta inside
 the plateau reads Lee 0, because no segment moved.
 
+**The anchor does not disturb any of this.** Bind is an isometry, so binding the
+same anchor into both sides shifts them together: Lee and overlap between two
+Points sharing an anchor are exactly what they were without one. What the anchor
+changes is comparison against the *identity* — and against a Point on a
+different anchor, which now reads as unrelated rather than as the same position.
+
 ## Hazards
 
 Both inherited from fractional-power encoding, and both easy to trip:
@@ -168,6 +206,13 @@ Both inherited from fractional-power encoding, and both easy to trip:
 2. **Bind is not additive** on fractional powers — the reason the coordinates
    are kept at all. Do arithmetic on `coords()`, build a new Point, and let it
    truncate once.
+3. **The anchor is part of the position.** Reuse the same `(domain, pod)` for
+   every Point you intend to compare or recover. A different anchor is a
+   different vector, so two Points at identical coordinates on identical frames
+   do not match, and `recover_point` raises rather than returning the wrong
+   answer — it releases the anchor you pass before solving, and a wrong one
+   leaves noise that fails the all-segments check. Store the anchor alongside
+   the frame.
 
 ## See also
 
