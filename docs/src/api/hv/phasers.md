@@ -108,6 +108,69 @@ which is why rms derives from here rather than from averaging `magnitude_at()`.
 It has exact values worth checking against: one unit observation gives
 `magnitude_squared() == M`, and the same observation `n` times gives `n**2 * M`.
 
+## Reading back what went in
+
+`match()` scores a candidate against the accumulator and returns **the weight it
+was bundled at** — not a similarity:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+ph.bundle(cat); ph.bundle(cat); ph.bundle(dog)
+
+ph.match(cat)        # ~2.0  — bundled twice
+ph.match(dog)        # ~1.0  — bundled once
+ph.match(fish)       # ~0.0  — never bundled
+```
+{{#endtab}}
+{{#endtabs}}
+
+It works because the scoring rule gives **partial credit**. Compare the two:
+
+| | rule |
+|---|---|
+| overlap | count the segments where the two offsets are **equal** |
+| `match()` | add up $\cos(\text{angle difference})$ over the segments, then divide by $M$ |
+
+Overlap is all-or-nothing per segment. `match()` scores two offsets one ring
+step apart at $\cos(2\pi/W)$, just under 1, where overlap scores them **0** —
+and scores a half-turn at $-1$, which overlap cannot express at all.
+
+That is also why the weight comes back. A member's own phases line up, each
+contributing $\cos(0) = 1$, so $n$ copies sum to $n$; every other member sits at
+an unrelated angle, and cosines of scattered angles average to **zero**. The
+estimate is unbiased, with the usual $\sim\!\|w\|_2/\sqrt{M}$ wobble from that
+cancellation being imperfect — so a non-member reads *near* 0, not exactly 0.
+
+`match()` reads its argument as unit phasors, exactly as `bundle()` does, so a
+`Phasers` works too and costs only the magnitudes it dropped.
+
+### It scores; it does not search
+
+`match()` needs you to name a candidate, which raises the obvious question: how
+do you find one without trying the whole codebook? The answer is that **the
+search is ordinary [near-neighbor search](../memory/selectors/near_neighbor.md)**,
+and it needs nothing new:
+
+| the question | HyperBinary | HyperPhaser |
+|---|---|---|
+| how close are **these two**? | `hv.overlap(a, b)` | `ph.match(c)` |
+| which stored vector is **my probe**? | NNS over the index | **the same NNS** |
+| what is **inside** this bundle? | NNS over the index | no index — enumerate |
+
+Row 2 is the one that surprises. A noisy probe is a corrupted *code*, not a
+superposition, so most of its segments still carry exact offsets and the
+overlap-keyed index finds it — measured correct at rank 1 through **95%**
+corrupted segments. So retrieval is two steps, neither of them a scan: let the
+**probe** drive NNS over the codebook, then let `match()` say whether the
+accumulator has actually seen the winner, and how often.
+
+Row 3 is the real gap. A `Learner`'s offsets *are* member offsets — reservoir
+sampling copies them, so exact matches survive and the index can see them. Every
+offset in a phasor bundle is a vector *sum*, so no member's offset survives
+intact and the index is blind to it. Asking "what is in this bundle" with no
+probe to narrow it therefore costs one `match()` per candidate.
+
 ## Exporting
 
 {{#tabs global="lang"}}
