@@ -42,6 +42,29 @@ arithmetic has to happen on the rationals and truncate **once**, at
 materialization. A Point that keeps its coordinates can do that; a bare
 `SparseSegmented` has already spent its exponent into the offsets and cannot.
 
+### A Point's exponent is always 1
+
+`power()` scales the **coordinates**; it never touches the core exponent, so
+`exponent()` reads `(1, 1)` on every Point:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+p = hv.Point(anchor_d, anchor_p, frame, [3, 5])
+p.exponent()                  # (1, 1)
+p.power(2, 1).exponent()      # (1, 1) — still
+p.power(2, 1).coords()        # [(6, 1), (10, 1)] — the power went here
+```
+{{#endtab}}
+{{#endtabs}}
+
+That is an **invariant, not an accident**, and the anchor is why. `power()`
+scales the coordinates and leaves the anchor at 1, whereas a core exponent
+applies *after* the bind and would raise the anchor too — two routes that
+disagree about whether the anchor participates. A decoded payload carrying a
+non-unit exponent is therefore **refused** rather than interpreted one way or
+the other.
+
 ## Constructors
 
 {{#tabs global="lang"}}
@@ -75,6 +98,7 @@ p.rank()        # axis count — len(coords), whether or not the frame is held
 p.coords()      # [(numerator, denominator), ...] in lowest terms
 p.frame()       # the basis vectors, empty when not retained
 p.is_ready()    # bool: whether the frame is held
+p.exponent()    # always (1, 1) — powers live in the coordinates, see above
 ```
 {{#endtab}}
 {{#endtabs}}
