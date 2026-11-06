@@ -3,6 +3,60 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v10.0.0 (2026-11-06)
+
+### Breaking changes
+
+- **A `Point` rides on an explicit ANCHOR: `domain` and `pod` now lead its
+  constructor and all three `recover_point*` functions.** See [Point](https://yangzh.github.io/hv/api/hv/point.html).
+
+- **Integer and fractional `Point` coordinates are now separate constructors,
+  and both are strict about count.** `Point(domain, pod, frame, coords)` takes
+  one INTEGER per axis and rejects a `(numerator, denominator)` pair; the new
+  `Point.fractional(domain, pod, frame, numerators, denominator)` takes one
+  shared denominator, which must be a positive power of two. See [Point](https://yangzh.github.io/hv/api/hv/point.html).
+
+### New features
+
+- **`HyperPhaser.match(observed)` returns the WEIGHT an observation was bundled
+  at**, not a similarity — it gives partial credit per segment where overlap
+  scores only exact agreement. `match_score` in Rust, where `match` is a
+  keyword; see [HyperPhaser](https://yangzh.github.io/hv/api/hv/phasers.html).
+
+- **`hermitian_inner(x, y)` reads a hypervector pair in CHARACTER space**,
+  mapping each offset to `exp(2*pi*i*o/W)` on the unit circle and returning a
+  complex inner product. `abs()` is the projection length and the real part
+  over `M` is a true cosine, so unlike overlap it gives partial credit for
+  near-miss offsets instead of scoring only exact agreement.
+
+- **Bulk offset export, for numpy and PyTorch.**
+  `SparseSegmented.offsets_buffer()` returns every offset as one
+  little-endian buffer, and `codes_buffer(vectors)` does a whole batch in one
+  call, row-major. `offsets_dtype(model)` (also a method) gives the matching
+  numpy dtype — `"uint8"` at 8-bit, `"<u2"` above it. Read either with
+  `numpy.frombuffer(buf, dtype=...)`, which is zero-copy because `bytes` is
+  immutable.
+
+  This replaces iterating `offsets()`, which built one Python `int` per segment
+  and cost ~27x more. The buffer is a SNAPSHOT, not a view: exporting a mutable
+  vector — a `Learner` above all — freezes its content at the call, and a later
+  `bundle()` is invisible to an array already returned. Composites are accepted
+  and materialized, so a `Point`'s coordinates or a `Learner`'s weights do not
+  survive the trip. See
+  [SparseSegmented](https://yangzh.github.io/hv/api/hv/sparse_segmented.html).
+
+### Improvements
+
+- **`recover_point`, `recover_point_noisy` and `recover_point_fractional` take
+  any `HyperBinary` as `raw`**, not just a `SparseSegmented`, so a recovered
+  position no longer has to be unwrapped to its core first.
+
+### Notes
+
+- A `Point`'s exponent is always `(1, 1)` and a payload carrying a non-unit one
+  is now refused: `power()` scales the coordinates and leaves the anchor at 1,
+  where a core exponent would raise the anchor too.
+
 ## v9.0.0 (2026-11-01)
 
 ### Breaking changes
@@ -611,41 +665,3 @@ Only the latest 10 releases are shown.
 - `Revitalize` rescales correctly in list mode; blank-learner age/weights
   stay in sync.
 - Empty-prefix scans work again (the reject guard had broken export).
-
-## v5.0.0 (2026-08-22)
-
-Headline: hypervectors become lazy — content is computed on first use.
-
-### Breaking changes
-
-- **Stored substrates from v4.x cannot be read.** Three independent format /
-  content changes land together, so a substrate written by an older release
-  will not round-trip. Retrain, or pin the old wheel:
-  - **Philox-4×64 is now the default RNG** (was xoshiro256++). Every seeded
-    vector generates different offsets, so *all* stored content differs.
-    `KONGMING_RNG=xoshiro++` restores the previous generator.
-  - **`Dart` storage and content changed.** A Dart is now `Inv(tail) ⊗ head`
-    with compact member storage.
-  - **The `Learner` wire form changed.**
-- **`Learner.support()` is noise-subtracted now: the chance floor moved into member reads, so values saturate at 0 rather than starting at chance.
-- **`KONGMING_REPR_FORMAT` is gone.** `repr()` always renders YAML.
-
-### New features
-
-- **`compact()` on every hypervector.** Releases cached content, recursively
-  through members; the next observation recomputes exactly the same bits.
-- **`equal_lazy()` and `equal()`.** Two levels of content equality:
-  `equal_lazy` compares recipes and already-known hashes without ever
-  materializing (a `False` may mean "not provable cheaply"), while `equal` is
-  exact and materializes only when it must.
-- **`Learner.has_cached_data()` / `Learner.cached_data()`.** Inspect the
-  observations a young learner is still holding verbatim.
-- **`Learner.age()` accepts and reports values beyond 2^32** (widened to u64).
-
-### Performance
-
-- **Lazy materialization.** Vectors are recipes until observed, so constructing
-  candidates you never look at is nearly free. Measured on the decode
-  benchmark: resident memory −45%, and stored substrates shrink ~39%.
-- **Cheaper training.** The pool's member-open check no longer divides
-  per member: full-corpus training −5%.
