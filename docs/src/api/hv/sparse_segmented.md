@@ -49,6 +49,52 @@ ss.offset(seg) # the ON offset within one segment
 {{#endtab}}
 {{#endtabs}}
 
+## Bulk export to numpy
+
+`offsets()` builds one Python `int` per segment, which is the wrong shape for
+an array library. `offsets_buffer()` returns the same offsets as a single
+little-endian buffer, and `codes_buffer` does a whole batch in one call —
+about **27x faster** than iterating, and close to a memory copy.
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+import numpy as np
+
+a = np.frombuffer(ss.offsets_buffer(), dtype=ss.offsets_dtype())   # (M,)
+
+# One call for a whole codebook, row-major.
+buf = hv.codes_buffer([v0, v1, v2])
+codes = np.frombuffer(buf, dtype=hv.offsets_dtype(model)).reshape(3, -1)
+```
+{{#endtab}}
+{{#endtabs}}
+
+`offsets_dtype` is `"uint8"` at 8-bit and `"<u2"` for every wider model — one
+element per segment, since every model's offset fits 16 bits. `frombuffer` is
+zero-copy, because the returned `bytes` is immutable.
+
+The byte order is **fixed little-endian**, not the host's, so the same vector
+exports to the same bytes everywhere.
+
+<div class="callout callout-warning">
+<div class="callout-title">The buffer is a snapshot, not a view</div>
+
+The export copies, so the array freezes the content at the moment of the call.
+For an immutable vector that never matters. For a **`Learner`** it does:
+bundling after an export does not reach the array you already hold, and nothing
+warns you — re-export after every change you need reflected.
+
+A view is not an option. The offsets are bit-packed below 16-bit, the buffer
+mutates and can move underneath an alias, and an identity vector holds no
+buffer at all.
+
+</div>
+
+Composites are accepted and materialized to their core first, so they
+contribute only their offsets: a `Point`'s coordinates and frame, or a
+`Learner`'s weight distribution, do **not** survive the trip.
+
 ## The exponent is always 1
 
 A `SparseSegmented` **never carries an exponent other than 1**, and this is

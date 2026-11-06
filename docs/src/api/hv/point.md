@@ -22,7 +22,10 @@ distinct frames.
 
 `domain` and `pod` are new leading arguments on `Point` and on all three
 `recover_point*` functions, and the anchor changes every Point's content —
-**Points stored before the anchor decode to different vectors**. See the
+**Points stored before the anchor decode to different vectors**.
+
+Separately, fractional coordinates moved to `Point.fractional`, `coords` became
+required, and short coordinate lists no longer pad with the origin. See the
 [changelog](https://github.com/yangzh/hv/blob/main/CHANGELOG.md) for the release
 this landed in.
 
@@ -52,11 +55,11 @@ anchor_d, anchor_p = hv.Domain("grid"), hv.Pod("origin")
 
 p = hv.Point(anchor_d, anchor_p, frame, [5, 9])   # integer coordinates
 
-# Fractional: each coordinate an int or a (numerator, denominator) pair.
-p = hv.Point(anchor_d, anchor_p, frame, [(4100, 4096), (4096, 4096)])
+# Fractional: ONE denominator for every axis, a positive power of two.
+p = hv.Point.fractional(anchor_d, anchor_p, frame, [4100, 4096], 4096)
 
-# A short list pads with zeros — the origin on the remaining axes.
-p = hv.Point(anchor_d, anchor_p, frame, [5])
+# The origin is spelled 0 on every axis.
+p = hv.Point(anchor_d, anchor_p, frame, [0, 0])
 
 # The STORAGE shape, below.
 p = hv.Point(anchor_d, anchor_p, frame, [5, 9], keep_frame=False)
@@ -65,6 +68,13 @@ p = hv.Point(anchor_d, anchor_p, frame, [5, 9], keep_frame=False)
 {{#endtabs}}
 
 The frame must share a model and be pairwise distinct and non-identity.
+
+**One coordinate per axis, always.** Both constructors raise when the count
+disagrees with the frame; there is no padding, because filling in a forgotten
+axis with the origin is a silent wrong answer rather than a convenience. The
+integer form takes plain `int`s and rejects a `(numerator, denominator)` pair —
+a grid is one shared step, which is the only case fractional-power encoding
+uses, so the denominator belongs to the call and not to each axis.
 
 ## Inspection
 
@@ -205,7 +215,9 @@ Both inherited from fractional-power encoding, and both easy to trip:
    caller's to get right.
 2. **Bind is not additive** on fractional powers — the reason the coordinates
    are kept at all. Do arithmetic on `coords()`, build a new Point, and let it
-   truncate once.
+   truncate once. `coords()` hands back per-axis pairs in lowest terms, so
+   rebuilding through `Point.fractional` means putting them over a common
+   power-of-two denominator first.
 3. **The anchor is part of the position.** Reuse the same `(domain, pod)` for
    every Point you intend to compare or recover. A different anchor is a
    different vector, so two Points at identical coordinates on identical frames

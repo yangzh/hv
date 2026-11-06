@@ -27,9 +27,10 @@ and this script exercises each separately:
 See point_2d.py for the fundamentals: what a frame is, why the surplus
 equations matter, and why coordinates are only ever modulo W.
 
-NOTE: `Point` and the `recover_point*` functions are newer than the published
-kongming-rs-hv release. If `hv.Point` raises AttributeError, your installed
-wheel predates them.
+NOTE: the ANCHOR and the integer/fractional constructor split are newer than
+the published kongming-rs-hv release. If `hv.Point` rejects the leading
+(domain, pod) arguments, or `Point.fractional` is missing, your installed wheel
+predates them.
 """
 
 import random
@@ -40,6 +41,10 @@ MODEL = hv.MODEL_1M_10BIT
 W = hv.cardinality(MODEL)  # 1024 segments, and the modulus coordinates live in
 RANK = 3
 FAILED = []
+
+# One anchor for every Point here. It is PART OF THE POSITION: two Points are
+# comparable, and recoverable, only under the same (domain, pod).
+ANCHOR = (hv.Domain("space"), hv.Pod("origin"))
 
 
 def check(claim, ok, detail):
@@ -68,10 +73,14 @@ def claim_is_the_bind():
     print("\nA rank-3 Point is the bind of three powers")
     a, b, c = axes()
 
-    p = hv.Point([a, b, c], [11, 28, 45])
-    by_hand = hv.bind(hv.bind(a.power(11), b.power(28)), c.power(45))
+    p = hv.Point(*ANCHOR, [a, b, c], [11, 28, 45])
+    # The anchor sparkle binds in alongside the three raised bases.
+    by_hand = hv.bind(
+        hv.Sparkle(MODEL, *ANCHOR),
+        hv.bind(hv.bind(a.power(11), b.power(28)), c.power(45)),
+    )
     check(
-        "Point(frame,[11,28,45]) == bind of the three powers",
+        "Point(anchor,frame,[11,28,45]) == bind(S, three powers)",
         p.stable_hash() == by_hand.stable_hash(),
         "rank=%d  hash 0x%016x" % (p.rank(), p.stable_hash()),
     )
@@ -97,8 +106,8 @@ def claim_recover_point():
     # so each segment gives one exact linear equation mod W. 1024 equations,
     # 3 unknowns: Gaussian elimination solves it, the surplus verifies.
     for coords in ([11, 28, 45], [0, 0, 1], [1, 0, 0], [W - 1, 1, W - 2], [512, 512, 512]):
-        p = hv.Point([a, b, c], coords)
-        got = hv.recover_point([a, b, c], p.core())
+        p = hv.Point(*ANCHOR, [a, b, c], coords)
+        got = hv.recover_point(*ANCHOR, [a, b, c], p.core())
         check(
             "coords %-18s recovered exactly" % (coords,),
             got.coords() == p.coords() and hv.equal(got, p),
@@ -112,8 +121,8 @@ def claim_recover_point():
         m = getattr(hv, name)
         f = axes(RANK, "m", m)
         want = [3, 7, 11]
-        p = hv.Point(f, want)
-        got = hv.recover_point(f, p.core())
+        p = hv.Point(*ANCHOR, f, want)
+        got = hv.recover_point(*ANCHOR, f, p.core())
         check(
             "%-14s exact at rank 3" % name.replace("MODEL_", ""),
             got.coords() == p.coords(),
@@ -139,8 +148,8 @@ def claim_recover_point_fractional():
     for level in (8, 10, 12):
         den = 1 << level
         vals = [137 % den, 901 % den, 55 % den]
-        p = hv.Point([a, b, c], [(den + v, den) for v in vals])
-        got = hv.recover_point_fractional([a, b, c], p.core(), level)
+        p = hv.Point.fractional(*ANCHOR, [a, b, c], [den + v for v in vals], den)
+        got = hv.recover_point_fractional(*ANCHOR, [a, b, c], p.core(), level)
         check(
             "level=%-2d  A=%-16s recovered" % (level, vals),
             hv.equal(got, p),
@@ -159,7 +168,7 @@ def claim_recover_point_fractional():
     # The lattice runs in 64-bit integers, so level + the model's sparsity bits
     # is capped at 28. Past that it refuses rather than overflowing silently.
     try:
-        hv.recover_point_fractional([a, b, c], hv.Point([a, b, c], [1, 1, 1]).core(), 19)
+        hv.recover_point_fractional(*ANCHOR, [a, b, c], hv.Point(*ANCHOR, [a, b, c], [1, 1, 1]).core(), 19)
         check("level past the 28-bit lattice budget is refused", False, "accepted anyway")
     except ValueError as e:
         check(
@@ -176,14 +185,14 @@ def claim_recover_point_noisy():
     print("\nrecover_point_noisy — RANSAC over the solve, rank 3")
     rng = random.Random(11)
     a, b, c = axes()
-    p = hv.Point([a, b, c], [11, 28, 45])
+    p = hv.Point(*ANCHOR, [a, b, c], [11, 28, 45])
     raw = p.core()
 
     # The exact solve is brittle on purpose. Coordinates live in a modular
     # group with no notion of "close", so a corrupted offset among the three
     # the elimination pivots on does not perturb the answer — it randomizes it.
     try:
-        hv.recover_point([a, b, c], corrupt(raw, 1, rng))
+        hv.recover_point(*ANCHOR, [a, b, c], corrupt(raw, 1, rng))
         check("one bad offset defeats recover_point", False, "recovered anyway")
     except ValueError:
         check("one bad offset defeats recover_point", True, "1 of %d segments is enough" % W)
@@ -193,7 +202,7 @@ def claim_recover_point_noisy():
     # best. A draw is usable when its pivot rows are clean — probability
     # (1-f)**rank for a corrupted fraction f.
     for bad in (1, 50, 200, 400):
-        got, reported = hv.recover_point_noisy([a, b, c], corrupt(raw, bad, rng), bad)
+        got, reported = hv.recover_point_noisy(*ANCHOR, [a, b, c], corrupt(raw, bad, rng), bad)
         check(
             "%3d/%d (%2d%%) corrupted: exact" % (bad, W, 100 * bad // W),
             got.coords() == p.coords() and reported == bad,
@@ -205,7 +214,7 @@ def claim_recover_point_noisy():
     # Which also means a foreign vector cannot pass as "merely very corrupted":
     # its best score sits at chance, about W/segment_size = 1 segment.
     try:
-        hv.recover_point_noisy([a, b, c], hv.Sparkle(MODEL, hv.d0(), "stranger"), 600)
+        hv.recover_point_noisy(*ANCHOR, [a, b, c], hv.Sparkle(MODEL, hv.d0(), "stranger"), 600)
         check("a foreign vector is not mistaken for corruption", False, "recovered anyway")
     except ValueError as e:
         check(
@@ -226,9 +235,9 @@ def claim_recover_point_noisy():
         ok = 0
         for _ in range(trials):
             coords = [rng.randrange(1, W) for _ in range(rank)]
-            q = hv.Point(f, coords)
+            q = hv.Point(*ANCHOR, f, coords)
             try:
-                got, _ = hv.recover_point_noisy(f, corrupt(q.core(), bad, rng), bad)
+                got, _ = hv.recover_point_noisy(*ANCHOR, f, corrupt(q.core(), bad, rng), bad)
                 ok += got.coords() == q.coords()
             except ValueError:
                 pass
@@ -284,7 +293,8 @@ def claim_why_coords_are_kept():
     # lowest terms, so 4396/4096 comes back as 1099/1024. Same rational, no
     # rounding — compare by cross-multiplying rather than by the digits.
     a, b, c = axes()
-    p = hv.Point([a, b, c], [(den + 300, den), 1, 2])
+    # One shared denominator, so the integer axes scale up to it: 1 -> den/den.
+    p = hv.Point.fractional(*ANCHOR, [a, b, c], [den + 300, den, 2 * den], den)
     num, d = p.coords()[0]
     check(
         "a Point stores the exact rational (reduced, not rounded)",
@@ -299,7 +309,7 @@ def claim_why_coords_are_kept():
 def claim_power_scales_coordinates():
     print("\nPoint.power scales every coordinate exactly — (b**c)**k == b**(ck)")
     a, b, c = axes()
-    p = hv.Point([a, b, c], [11, 28, 45])
+    p = hv.Point(*ANCHOR, [a, b, c], [11, 28, 45])
 
     # Folding k into the materialized vector's exponent would truncate a SECOND
     # time. Scaling the rational coordinates instead is exact, and the result
@@ -313,7 +323,7 @@ def claim_power_scales_coordinates():
     check("the result is still a Point", isinstance(doubled, hv.Point), "rank=%d" % doubled.rank())
     check(
         "and recovers on the same frame",
-        hv.recover_point([a, b, c], doubled.core()).coords() == doubled.coords(),
+        hv.recover_point(*ANCHOR, [a, b, c], doubled.core()).coords() == doubled.coords(),
         "round trip holds after scaling",
     )
 
@@ -326,11 +336,18 @@ def claim_power_scales_coordinates():
         "%s" % (halved.coords(),),
     )
 
-    # power(0) is the typed identity — every coordinate at the origin.
+    # power(0) puts every coordinate at the origin, which is the bare ANCHOR —
+    # not the identity vector, which is exactly what the anchor exists to avoid.
+    origin = p.power(0)
     check(
         "power(0) is the origin",
-        p.power(0).core().is_identity(),
-        "all coordinates zero",
+        origin.coords() == [(0, 1)] * RANK,
+        "%s" % (origin.coords(),),
+    )
+    check(
+        "and the origin is the bare anchor, not the identity",
+        origin.stable_hash() == hv.Sparkle(MODEL, *ANCHOR).stable_hash() and not origin.core().is_identity(),
+        "anchored",
     )
 
 
