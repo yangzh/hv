@@ -19,7 +19,8 @@ There are two types because the trainable and published forms differ:
 | role | accumulate | compare, store |
 | metric | — | **Lee**, never overlap |
 
-`HyperPhaser.export()` crosses from one to the other, one way.
+`HyperPhaser.quantize()` crosses from one to the other, one way — the name
+says the cost: it rounds each phase to the ring.
 
 ## What it estimates
 
@@ -81,7 +82,7 @@ recoverable from the state as $\sqrt{M} \cdot \mathrm{rms}(r_i)$.
 ```python
 ph.angle(seg)            # accumulated phase in radians, [0, 2*pi)
 ph.magnitude_at(seg)     # resultant length r_i, one segment
-ph.offset(seg)           # the phase quantized to the ring — what export() writes
+ph.offset(seg)           # the phase rounded to the ring — what quantize() writes
 
 ph.magnitude_squared()   # the whole vector: sum_i |z_i|**2
 ```
@@ -176,14 +177,14 @@ probe to narrow it therefore costs one `match()` per candidate.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-v = ph.export()                  # a Phasers: ANGLES ONLY
+v = ph.quantize()                # a Phasers: ANGLES ONLY
 
 block = ph.quantized_magnitudes()   # the confidences, to keep yourself
 ```
 {{#endtab}}
 {{#endtabs}}
 
-`export()` gives one quantized phase per segment — the same bytes, packing and
+`quantize()` gives one phase per segment — the same bytes, packing and
 footprint as any `SparseSegmented`, exactly $\sqrt{M}$ long. That makes it a
 vector which composes under bind and permute like any other.
 
@@ -191,7 +192,7 @@ vector which composes under bind and permute like any other.
 10% on similarity and all of *distributional* analogy (`b - a + c`), which needs
 the radial component. The magnitudes stay on the accumulator, where
 `quantized_magnitudes()` packs them onto a fixed 4-bit grid, two per byte — so a
-caller who wants the per-segment confidences keeps that block beside the export
+caller who wants the per-segment confidences keeps that block beside the quantized form
 themselves.
 
 They are normalized by the accumulator's **own** rms, and the scale is not
@@ -213,8 +214,8 @@ ph.power(2)         # the accumulator: the FULL complex power
 ph.power(1, 2)      # a root
 ph.power(-1)        # the true inverse, 1/z
 
-v = ph.export()
-v.power(5, 4)       # the export: the phases, scaled — DEFERRED
+v = ph.quantize()
+v.power(5, 4)       # the quantized form: the phases, scaled — DEFERRED
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -242,7 +243,7 @@ rather than taking `0**a`, which would be infinite for a negative exponent; and
 `z**0` is 1, so `power(0)` gives the unit phasor in every live segment, not the
 all-zero vector.
 
-### On the export: deferred, so chains compose
+### On the quantized form: deferred, so chains compose
 
 `Phasers.power` scales the phases exactly as it would any `SparseSegmented`'s
 offsets. What differs is *when*: the exponent is **recorded** and applied when
@@ -275,7 +276,7 @@ materialized angles and keeps the base and the hash, recomputing identically on
 the next read.
 
 Note the asymmetry between the two forms. The accumulator's power reshapes the
-confidences, since raising `r` is part of what `z**a` means. The export has no
+confidences, since raising `r` is part of what `z**a` means. A Phasers has no
 confidences to reshape, so its power is purely a rotation of the phases.
 
 ## Comparing
