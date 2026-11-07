@@ -44,12 +44,14 @@ ph = hv.HyperPhaser(model, hv.d0(), hv.p0())
 
 ph.bundle(a)            # one whole observation
 
-# Below one observation: weights are numerators over cardinality, so a
-# quarter-observation is that count // 4.
-ph.bundle_fractional(b, ph.cardinality() // 4)
+# Any signed float: 1.0 is one whole observation, so a quarter is 0.25.
+ph.bundle_fractional(b, 0.25)
 
-ph.age()                # how many bundle calls, whatever weight they carried
-ph.blank()              # bool: nothing bundled yet
+# NEGATIVE SUBTRACTS, which is what makes match-and-subtract work in place.
+ph.bundle_fractional(b, -0.25)
+
+ph.dimension()          # how many phasors: one per segment
+ph.magnitude_squared()  # 0.0 iff nothing is accumulated
 ph.clone_phaser()       # deep copy; the accumulator IS the storage
 ```
 {{#endtab}}
@@ -111,7 +113,7 @@ It has exact values worth checking against: one unit observation gives
 
 ## Reading back what went in
 
-`match()` scores a candidate against the accumulator and returns **the weight it
+`align()` scores a candidate against the accumulator and returns **the weight it
 was bundled at** — not a similarity:
 
 {{#tabs global="lang"}}
@@ -119,9 +121,9 @@ was bundled at** — not a similarity:
 ```python
 ph.bundle(cat); ph.bundle(cat); ph.bundle(dog)
 
-ph.match(cat)        # ~2.0  — bundled twice
-ph.match(dog)        # ~1.0  — bundled once
-ph.match(fish)       # ~0.0  — never bundled
+ph.align(cat)        # ~2.0  — bundled twice
+ph.align(dog)        # ~1.0  — bundled once
+ph.align(fish)       # ~0.0  — never bundled
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -155,7 +157,7 @@ and it needs nothing new:
 
 | the question | HyperBinary | HyperPhaser |
 |---|---|---|
-| how close are **these two**? | `hv.overlap(a, b)` | `ph.match(c)` |
+| how close are **these two**? | `hv.overlap(a, b)` | `ph.align(c)` |
 | which stored vector is **my probe**? | NNS over the index | **the same NNS** |
 | what is **inside** this bundle? | NNS over the index | no index — enumerate |
 
@@ -180,6 +182,10 @@ probe to narrow it therefore costs one `match()` per candidate.
 v = ph.quantize()                # a Phasers: ANGLES ONLY
 
 block = ph.quantized_magnitudes()   # the confidences, to keep yourself
+
+# LOSSLESS, unlike quantize(): the accumulator as complex64, and back.
+z = hv.hyper_phaser_to_np(ph)                       # (M,) complex64
+ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z)
 ```
 {{#endtab}}
 {{#endtabs}}

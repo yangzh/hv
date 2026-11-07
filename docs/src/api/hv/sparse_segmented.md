@@ -52,27 +52,29 @@ ss.offset(seg) # the ON offset within one segment
 ## Bulk export to numpy
 
 `offsets()` builds one Python `int` per segment, which is the wrong shape for
-an array library. `offsets_buffer()` returns the same offsets as a single
-little-endian buffer, and `codes_buffer` does a whole batch in one call —
-about **27x faster** than iterating, and close to a memory copy.
+an array library. `hv.code_to_np()` hands back the same offsets as a numpy
+array, and `hv.codes_to_np` does a whole batch in one call — about **27x
+faster** than iterating, and close to a memory copy.
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-import numpy as np
+a = hv.code_to_np(v0)                     # (M,), uint8 or <u2
 
-a = np.frombuffer(ss.offsets_buffer(), dtype=ss.offsets_dtype())   # (M,)
+# One call for a whole codebook: row i is vectors[i].
+codes = hv.codes_to_np([v0, v1, v2])      # (3, M)
 
-# One call for a whole codebook, row-major.
-buf = hv.codes_buffer([v0, v1, v2])
-codes = np.frombuffer(buf, dtype=hv.offsets_dtype(model)).reshape(3, -1)
+# And back. An array carries no identity, so (domain, pod) come from you.
+ss = hv.code_from_np(model, domain, pod, a)
+vs = hv.codes_from_np(model, domain, pod, codes)
 ```
 {{#endtab}}
 {{#endtabs}}
 
-`offsets_dtype` is `"uint8"` at 8-bit and `"<u2"` for every wider model — one
-element per segment, since every model's offset fits 16 bits. `frombuffer` is
-zero-copy, because the returned `bytes` is immutable.
+The dtype is `uint8` at 8-bit and `<u2` for every wider model — one element per
+segment, since every model's offset fits 16 bits. The export is zero-copy,
+reading over immutable `bytes`; an offset wider than the segment is masked into
+it on the way back, as every write path does.
 
 The byte order is **fixed little-endian**, not the host's, so the same vector
 exports to the same bytes everywhere.
