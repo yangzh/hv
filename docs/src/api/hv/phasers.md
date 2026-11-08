@@ -42,13 +42,13 @@ buys ranking resolution rather than fidelity.
 ```python
 ph = hv.HyperPhaser(model, hv.d0(), hv.p0())
 
-ph.bundle(a)            # one whole observation
+ph.bundle(a, 1.0)       # one whole observation
 
 # Any signed float: 1.0 is one whole observation, so a quarter is 0.25.
-ph.bundle_fractional(b, 0.25)
+ph.bundle(b, 0.25)
 
 # NEGATIVE SUBTRACTS, which is what makes match-and-subtract work in place.
-ph.bundle_fractional(b, -0.25)
+ph.bundle(b, -0.25)
 
 ph.dimension()          # how many phasors: one per segment
 ph.magnitude_squared()  # 0.0 iff nothing is accumulated
@@ -84,7 +84,6 @@ recoverable from the state as $\sqrt{M} \cdot \mathrm{rms}(r_i)$.
 ```python
 ph.angle(seg)            # accumulated phase in radians, [0, 2*pi)
 ph.magnitude_at(seg)     # resultant length r_i, one segment
-ph.offset(seg)           # the phase rounded to the ring — what quantize() writes
 
 ph.magnitude_squared()   # the whole vector: sum_i |z_i|**2
 ```
