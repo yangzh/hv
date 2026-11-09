@@ -70,12 +70,14 @@ drawn, so:
 
 The cost is resumability. A Learner resumes from its offsets plus one age
 scalar; a phasor needs all $M$ magnitudes, because accumulated mass is
-per-segment. There is deliberately **no accumulated-mass counter** beside
-`age()` — nothing on the write path consults one, and the L2 mass is already
-recoverable from the state as $\sqrt{M} \cdot \mathrm{rms}(r_i)$.
+per-segment. There is deliberately **no counter of any kind** — neither a call
+count nor an accumulated-mass total. Nothing on the write path consults one, and
+the L2 mass is already recoverable from the state as $\sqrt{M} \cdot \mathrm{rms}(r_i)$.
 
-> Note `age()` counts *calls*, so with fractional writes it is not a weight
-> total: eight quarter-weight calls read as age 8, like eight whole ones.
+> A counter would also have been the wrong emptiness test. A blank accumulator
+> simply *is* zero in every segment, so `magnitude_squared() == 0` is the whole
+> question — and unlike a call count it stays honest for an accumulator that was
+> bundled and then subtracted back to **exactly** zero.
 
 ## Reading the accumulator
 
