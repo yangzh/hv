@@ -132,9 +132,9 @@ It works because the scoring rule gives **partial credit**. Compare the two:
 | | rule |
 |---|---|
 | overlap | count the segments where the two offsets are **equal** |
-| `match()` | add up $\cos(\text{angle difference})$ over the segments, then divide by $M$ |
+| `align()` | add up $\cos(\text{angle difference})$ over the segments, then divide by $M$ |
 
-Overlap is all-or-nothing per segment. `match()` scores two offsets one ring
+Overlap is all-or-nothing per segment. `align()` scores two offsets one ring
 step apart at $\cos(2\pi/W)$, just under 1, where overlap scores them **0** —
 and scores a half-turn at $-1$, which overlap cannot express at all.
 
@@ -144,12 +144,12 @@ an unrelated angle, and cosines of scattered angles average to **zero**. The
 estimate is unbiased, with the usual $\sim\!\|w\|_2/\sqrt{M}$ wobble from that
 cancellation being imperfect — so a non-member reads *near* 0, not exactly 0.
 
-`match()` reads its argument as unit phasors, exactly as `bundle()` does, so a
+`align()` reads its argument as unit phasors, exactly as `bundle()` does, so a
 `Phasers` works too and costs only the magnitudes it dropped.
 
 ### It scores; it does not search
 
-`match()` needs you to name a candidate, which raises the obvious question: how
+`align()` needs you to name a candidate, which raises the obvious question: how
 do you find one without trying the whole codebook? The answer is that **the
 search is ordinary [near-neighbor search](../memory/selectors/near_neighbor.md)**,
 and it needs nothing new:
@@ -164,14 +164,79 @@ Row 2 is the one that surprises. A noisy probe is a corrupted *code*, not a
 superposition, so most of its segments still carry exact offsets and the
 overlap-keyed index finds it — measured correct at rank 1 through **95%**
 corrupted segments. So retrieval is two steps, neither of them a scan: let the
-**probe** drive NNS over the codebook, then let `match()` say whether the
+**probe** drive NNS over the codebook, then let `align()` say whether the
 accumulator has actually seen the winner, and how often.
 
 Row 3 is the real gap. A `Learner`'s offsets *are* member offsets — reservoir
 sampling copies them, so exact matches survive and the index can see them. Every
 offset in a phasor bundle is a vector *sum*, so no member's offset survives
 intact and the index is blind to it. Asking "what is in this bundle" with no
-probe to narrow it therefore costs one `match()` per candidate.
+probe to narrow it therefore costs one `align()` per candidate.
+
+## Binding and releasing
+
+`bind()` multiplies the accumulator segment by segment, and `release()` divides
+back. The pair is what lets you put a **key** on a bundle and take it off again:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+ph.bundle(cat, 2.0)
+ph.bundle(dog, 1.0)
+
+ph.bind(key)            # every term now carries the key
+ph.release(key)         # and back: align() reads 2.0 and 1.0 again
+```
+{{#endtab}}
+{{#endtabs}}
+
+**It distributes over `bundle()`**, which is the whole reason it is useful on an
+accumulator: binding a sum binds every term in it. So the interesting direction
+is the other one — release a key off a superposition and `align()` reads what
+that key was bound to, without ever enumerating the bundle:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+ph = hv.HyperPhaser(model, hv.d0(), hv.p0())
+ph.bundle(hv.bind(role, filler), 1.0)
+
+ph.release(role)
+ph.align(filler)        # ~1.0 — the filler, recovered
+```
+{{#endtab}}
+{{#endtabs}}
+
+### The operand picks the arithmetic
+
+| operand | contributes | magnitudes |
+|---|---|---|
+| a `HyperPhaser` | its **exact** phase *and* its magnitude | **multiply** |
+| any `HyperBinary` | a phase off the model's ring, read as a **unit** phasor | untouched |
+
+A hypervector operand is therefore a pure rotation: it moves the accumulator
+around the torus without changing how much evidence any segment carries. An
+accumulator operand is the full complex product, so a half-weight key halves the
+magnitudes it touches.
+
+`release()` is a true inverse in both cases: it divides, computing
+$z_i / w_i = z_i \overline{w_i} / |w_i|^2$, so whatever magnitude `bind()`
+multiplied in divides back out. Two consequences worth knowing:
+
+- **A segment whose operand is exactly zero stays zero.** `bind()` took its
+  content to zero and there is nothing left to restore, so `release()` leaves it
+  alone rather than returning a `NaN` that `angle()`, `magnitude_squared()` and
+  `align()` would all then spread silently.
+- **Small operands amplify.** That is the correct inverse of an attenuating
+  `bind()`, not a bug, and it is deliberately not clamped — clamping would make
+  `release()` quietly stop being an inverse in exactly the regime where you would
+  not notice.
+
+> **Python alone is polymorphic here.** Go and Rust split the two arithmetics
+> into `Bind`/`BindQuantized` and `Release`/`ReleaseQuantized`, because they are
+> genuinely different operations and the choice is a compile-time one there.
+> Python picks the arm from the operand's type, and raises `TypeError` for
+> anything that is neither.
 
 ## Exporting
 
