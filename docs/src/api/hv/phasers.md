@@ -114,7 +114,7 @@ It has exact values worth checking against: one unit observation gives
 
 ## Reading back what went in
 
-`align()` scores a candidate against the accumulator and returns **the weight it
+`alignment()` scores a candidate against the accumulator and returns **the weight it
 was bundled at** — not a similarity:
 
 {{#tabs global="lang"}}
@@ -122,9 +122,9 @@ was bundled at** — not a similarity:
 ```python
 ph.bundle(cat); ph.bundle(cat); ph.bundle(dog)
 
-ph.align(cat)        # ~2.0  — bundled twice
-ph.align(dog)        # ~1.0  — bundled once
-ph.align(fish)       # ~0.0  — never bundled
+ph.alignment(cat)        # ~2.0  — bundled twice
+ph.alignment(dog)        # ~1.0  — bundled once
+ph.alignment(fish)       # ~0.0  — never bundled
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -134,9 +134,9 @@ It works because the scoring rule gives **partial credit**. Compare the two:
 | | rule |
 |---|---|
 | overlap | count the segments where the two offsets are **equal** |
-| `align()` | add up $\cos(\text{angle difference})$ over the segments, then divide by $M$ |
+| `alignment()` | add up $\cos(\text{angle difference})$ over the segments, then divide by $M$ |
 
-Overlap is all-or-nothing per segment. `align()` scores two offsets one ring
+Overlap is all-or-nothing per segment. `alignment()` scores two offsets one ring
 step apart at $\cos(2\pi/W)$, just under 1, where overlap scores them **0** —
 and scores a half-turn at $-1$, which overlap cannot express at all.
 
@@ -146,19 +146,19 @@ an unrelated angle, and cosines of scattered angles average to **zero**. The
 estimate is unbiased, with the usual $\sim\!\|w\|_2/\sqrt{M}$ wobble from that
 cancellation being imperfect — so a non-member reads *near* 0, not exactly 0.
 
-`align()` reads its argument as unit phasors, exactly as `bundle()` does, so a
+`alignment()` reads its argument as unit phasors, exactly as `bundle()` does, so a
 `Phasers` works too and costs only the magnitudes it dropped.
 
 ### It scores; it does not search
 
-`align()` needs you to name a candidate, which raises the obvious question: how
+`alignment()` needs you to name a candidate, which raises the obvious question: how
 do you find one without trying the whole codebook? The answer is that **the
 search is ordinary [near-neighbor search](../memory/selectors/near_neighbor.md)**,
 and it needs nothing new:
 
 | the question | HyperBinary | HyperPhaser |
 |---|---|---|
-| how close are **these two**? | `hv.overlap(a, b)` | `ph.align(c)` |
+| how close are **these two**? | `hv.overlap(a, b)` | `ph.alignment(c)` |
 | which stored vector is **my probe**? | NNS over the index | **the same NNS** |
 | what is **inside** this bundle? | NNS over the index | no index — enumerate |
 
@@ -166,14 +166,14 @@ Row 2 is the one that surprises. A noisy probe is a corrupted *code*, not a
 superposition, so most of its segments still carry exact offsets and the
 overlap-keyed index finds it — measured correct at rank 1 through **95%**
 corrupted segments. So retrieval is two steps, neither of them a scan: let the
-**probe** drive NNS over the codebook, then let `align()` say whether the
+**probe** drive NNS over the codebook, then let `alignment()` say whether the
 accumulator has actually seen the winner, and how often.
 
 Row 3 is the real gap. A `Learner`'s offsets *are* member offsets — reservoir
 sampling copies them, so exact matches survive and the index can see them. Every
 offset in a phasor bundle is a vector *sum*, so no member's offset survives
 intact and the index is blind to it. Asking "what is in this bundle" with no
-probe to narrow it therefore costs one `align()` per candidate.
+probe to narrow it therefore costs one `alignment()` per candidate.
 
 ## Binding and releasing
 
@@ -187,14 +187,14 @@ ph.bundle(cat, 2.0)
 ph.bundle(dog, 1.0)
 
 ph.bind(key)            # every term now carries the key
-ph.release(key)         # and back: align() reads 2.0 and 1.0 again
+ph.release(key)         # and back: alignment() reads 2.0 and 1.0 again
 ```
 {{#endtab}}
 {{#endtabs}}
 
 **It distributes over `bundle()`**, which is the whole reason it is useful on an
 accumulator: binding a sum binds every term in it. So the interesting direction
-is the other one — release a key off a superposition and `align()` reads what
+is the other one — release a key off a superposition and `alignment()` reads what
 that key was bound to, without ever enumerating the bundle:
 
 {{#tabs global="lang"}}
@@ -204,7 +204,7 @@ ph = hv.HyperPhaser(model, hv.d0(), hv.p0())
 ph.bundle(hv.bind(role, filler), 1.0)
 
 ph.release(role)
-ph.align(filler)        # ~1.0 — the filler, recovered
+ph.alignment(filler)        # ~1.0 — the filler, recovered
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -228,7 +228,7 @@ multiplied in divides back out. Two consequences worth knowing:
 - **A segment whose operand is exactly zero stays zero.** `bind()` took its
   content to zero and there is nothing left to restore, so `release()` leaves it
   alone rather than returning a `NaN` that `angle()`, `magnitude_squared()` and
-  `align()` would all then spread silently.
+  `alignment()` would all then spread silently.
 - **Small operands amplify.** That is the correct inverse of an attenuating
   `bind()`, not a bug, and it is deliberately not clamped — clamping would make
   `release()` quietly stop being an inverse in exactly the regime where you would
