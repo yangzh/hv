@@ -34,7 +34,7 @@ this landed in.
 ## Why the coordinates are kept
 
 A Point carries its coordinates rather than folding them into the vector,
-because **bind is not additive on these codes**:
+because **bind is not exactly additive on these codes** due to roundoff errors:
 
 $$K^x \otimes K^y \neq K^{x+y}$$
 
@@ -42,8 +42,7 @@ The two disagree on about half the segments, because
 $\lfloor u \rfloor + \lfloor v \rfloor$ loses 1 against
 $\lfloor u + v \rfloor$. So coordinate
 arithmetic has to happen on the rationals and truncate **once**, at
-materialization. A Point that keeps its coordinates can do that; a bare
-`SparseSegmented` has already spent its exponent into the offsets and cannot.
+materialization. A Point keeps one coordinate per axis and can do that.
 
 ## Constructors
 
@@ -230,5 +229,5 @@ Both inherited from fractional-power encoding, and both easy to trip:
 
 - [Utilities](common/utilities.md#similarity) — `lee_distance`, the graded read.
 - [Operators](operators.md) — `power`, and what fractional exponents mean.
-- [HyperPhaser & Phasers 🧭](phasers.md) — the other type whose offsets are
-  ordinal rather than labels.
+- [HyperPhaser 🧭](hyper_phaser.md) — the accumulator, and the other place offsets
+  are read as ordinal rather than as labels.

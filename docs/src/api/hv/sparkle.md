@@ -100,31 +100,27 @@ an unreduced pair.
 
 The two forms produce identical results, but the power-of-two computation can be cheaper, as the scaling runs on an integer path. On the wire it encodes as a small shift rather than a full integer as well.
 
-<div class="callout callout-warning">
-<div class="callout-title">Fractional powers are lossy once materialized</div>
+<div class="callout callout-note">
+<div class="callout-title">Fractional powers truncate, but a chain truncates once</div>
 
 Scaling truncates toward zero, so a fractional power discards information that a
-later power cannot restore. Whether that loss actually happens depends on when
-the vector is computed:
+later power cannot restore. What both forms guarantee is that the loss is never
+*compounded*:
 
 ```python
 s  = hv.Sparkle.from_word(model, "pos", "step")   # lazy
 ss = s.core()                                     # materialized
 
-hv.overlap(s,  s.power(1, 2).power(2, 1))    # full — exact round trip
-hv.overlap(ss, ss.power(1, 2).power(2, 1))   # ≈ half — offsets were truncated
+hv.equal(s,  s.power(1, 2).power(2, 1))    # True
+hv.equal(ss, ss.power(1, 2).power(2, 1))   # True
 ```
 
-`Sparkle` and the composites are lazy: `power()` folds the exponent into the
-recipe, so `1/2` then `2/1` cancels to `1/1` *before* anything is computed, and
-the round trip is exact. `SparseSegmented` is materialized, so each `power()`
-rewrites the offsets immediately and the truncation is permanent.
+Both hold because chaining composes the exponents and scales once, rather than
+scaling at each step. See
+[chained powers are exact](sparse_segmented.md#chained-powers-are-exact).
 
-Prefer composing exponents on a lazy vector and materializing once at the end.
-
-Note that `core()` is that materialization step: it computes the offsets with
-every pending exponent folded in, so the result reports `exponent() == (1, 1)`.
-See [the exponent is always 1](sparse_segmented.md#the-exponent-is-always-1).
+Note that `core()` is the materialization step: it computes the offsets with
+every exponent folded in, so what it returns reports `exponent() == (1, 1)`.
 </div>
 
 ## Pretty-printing

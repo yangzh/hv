@@ -29,24 +29,24 @@ The contrast with a Learner is the useful way to hold this. A Learner is a **sam
 | write | reservoir sampling, draws randomness | deterministic and linear |
 | repeated observation | a fresh draw | identical to one write at double weight |
 | a member owning less than $1/M$ | invisible, it won no segments | still moves every segment |
-| compared by | Hamming distance | [Lee distance](hypervectors.md#lee-distance-the-graded-alternative) |
+| compared by | Hamming distance | [Lee distance](hypervectors.md#lee-distance-the-graded-alternative), or alignment |
 
 Determinism and linearity are what make the small shares survive. Because a Learner is a sample, a member too faint to win a single segment is simply absent from it; because a phasor accumulates, even a tiny weight nudges every angle a little, and the bundle as a whole still carries it.
 
-## Why Lee, and never overlap
+## Which distance to ask for
 
 Treating offsets as phases changes which [distance measure](hypervectors.md#similarity-and-distance-measure) is meaningful, and this is the sharpest practical consequence of the whole idea.
 
-Two phasors one ring step apart are *maximally similar*, yet they share no exact offset. Overlap and Hamming distance are blind to that: they are binary per segment, so they read those two phasors as no more related than a pair on opposite sides of the circle. **Lee distance** reads the circular gap instead, and on unit phasors it induces the same ranking as the complex cosine, being monotone in the phase gap over the half-period.
+Two phasors one ring step apart are *maximally similar*, yet they share no exact offset. Overlap and Hamming distance are blind to that: they are binary per segment, so they read those two phasors as no more related than a pair on opposite sides of the circle. **Lee distance** reads the circular gap instead, and on unit phasors it induces the same ranking as the complex cosine, being monotone in the phase gap over the half-period. **Alignment** reads the cosine directly.
 
-So a phasor bundle must be compared by Lee, and must **not** be fed to the overlap-keyed [near-neighbor search](near_neighbor_search.md) — the index would answer at chance. Because the bytes of a phasor vector are indistinguishable from any other sparse-segmented vector's, nothing but its type can carry that warning, which is why the published form gets its own hint rather than borrowing an existing one.
+Every hypervector answers all of them, so the choice is yours to make and yours to get wrong. A bundle you intend to read as phases must **not** be fed to the overlap-keyed [near-neighbor search](near_neighbor_search.md) — the index would answer at chance. The bytes of a quantized phasor vector are indistinguishable from any other sparse-segmented vector's, so nothing can carry that warning for you at the call site.
 
 ## Two forms, one direction
 
-The accumulator and the thing you store are deliberately separate.
+The accumulator and the thing you store are deliberately separate — and only the accumulator is a distinct type, because **every** hypervector is already a vector of phasors.
 
 A **HyperPhaser** is the trainable form: a dense complex accumulator holding $M$ components, each with an angle *and* a magnitude. It is not itself a hypervector and has no wire format. The magnitude matters while training — it is a per-segment **confidence**, recording how much the contributing phases reinforced or cancelled there, and a segment whose phases nearly cancelled holds an angle decided by rounding residuals rather than by evidence. It also behaves as per-segment plasticity.
 
-**Phasers** is the published form: one quantized angle per segment, the same size and packing as any other sparse-segmented vector. Exporting crosses from one to the other, **one way** and keeping angles only — so the per-segment confidences live on the accumulator, and a caller who wants them keeps them alongside deliberately.
+`quantize()` crosses to the published form: one angle per segment, an ordinary sparse-segmented vector. It goes **one way** and keeps angles only — so the per-segment confidences live on the accumulator, and a caller who wants them keeps them alongside deliberately.
 
-Jump to the API reference for [HyperPhaser & Phasers](../api/hv/phasers.md).
+Jump to the API reference for [HyperPhaser](../api/hv/hyper_phaser.md).

@@ -120,4 +120,3 @@ Here are some of the important subtypes of hypervectors supported in this packag
 | **Dart** | Release | Directional | One-directional references |
 | [**Learner**](learner.md) | Online bundling | No | Learning distributions: frequencies, co-occurrence |
 | **Point** | Fractional Power Encoding | — | Positions in a continuous frame |
-| **Phasers** | Phasor superposition, exported from a HyperPhaser | No | Comparing bundles by [Lee distance](hypervectors.md#lee-distance-the-graded-alternative) |

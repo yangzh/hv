@@ -21,7 +21,7 @@ Only the latest 10 releases are shown.
 - **`HyperPhaser.match(observed)` returns the WEIGHT an observation was bundled
   at**, not a similarity — it gives partial credit per segment where overlap
   scores only exact agreement. `match_score` in Rust, where `match` is a
-  keyword; see [HyperPhaser](https://yangzh.github.io/hv/api/hv/phasers.html).
+  keyword; see [HyperPhaser](https://yangzh.github.io/hv/api/hv/hyper_phaser.html).
 
 - **`hermitian_inner(x, y)` reads a hypervector pair in CHARACTER space**,
   mapping each offset to `exp(2*pi*i*o/W)` on the unit circle and returning a

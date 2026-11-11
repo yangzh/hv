@@ -1,8 +1,9 @@
-# HyperPhaser 🧭 & Phasers 🧭
+# HyperPhaser 🧭
 
 A second way to bundle a stream of observations. A [Learner 💫](learner.md) reads
 each offset as a **label** and compares by overlap; a phasor bundle reads it as a
-**phase** and compares by [Lee distance](common/utilities.md#similarity).
+**phase** and compares by [Lee distance](common/utilities.md#similarity) or
+[alignment](common/utilities.md#similarity).
 
 Recall from [concepts](../../concepts/hypervectors.md) that a SparseSegmented
 vector is already a list of phasors — the ON bit's offset within its segment is
@@ -10,17 +11,20 @@ a discretized phase. A `HyperPhaser` takes that literally: it superposes unit
 phasors and keeps the resulting angle, which is FHRR's bundle operator living
 inside kongming's existing representation.
 
-There are two types because the trainable and published forms differ:
+So there is no separate "phasor vector" type: **every hypervector already is
+one.** What a `HyperPhaser` adds is the accumulator — the one form that is NOT a
+hypervector:
 
-| | `HyperPhaser` | `Phasers` |
+| | `HyperPhaser` | any `HyperBinary` |
 |---|---|---|
 | state | dense complex, $M$ components | one offset per segment |
-| is a `HyperBinary`? | **no** — no wire form | **yes**, hint `HINT_PHASERS` |
+| is a `HyperBinary`? | **no** — no wire form | **yes** |
 | role | accumulate | compare, store |
-| metric | — | **Lee**, never overlap |
+| magnitudes | kept, per segment | dropped — angle only |
 
-`HyperPhaser.quantize()` crosses from one to the other, one way — the name
-says the cost: it rounds each phase to the ring.
+`HyperPhaser.quantize()` crosses from the accumulator to a
+[SparseSegmented 🎞️](sparse_segmented.md), one way — the name says the cost: it
+rounds each phase to the ring and drops the magnitudes.
 
 ## What it estimates
 
@@ -147,7 +151,7 @@ estimate is unbiased, with the usual $\sim\!\|w\|_2/\sqrt{M}$ wobble from that
 cancellation being imperfect — so a non-member reads *near* 0, not exactly 0.
 
 `alignment()` reads its argument as unit phasors, exactly as `bundle()` does, so a
-`Phasers` works too and costs only the magnitudes it dropped.
+quantized vector works too and costs only the magnitudes it dropped.
 
 ### It scores; it does not search
 
@@ -245,7 +249,7 @@ multiplied in divides back out. Two consequences worth knowing:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-v = ph.quantize()                # a Phasers: ANGLES ONLY
+v = ph.quantize()                # a SparseSegmented: ANGLES ONLY
 
 block = ph.quantized_magnitudes()   # the confidences, to keep yourself
 
@@ -260,7 +264,7 @@ ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z)
 footprint as any `SparseSegmented`, exactly $\sqrt{M}$ long. That makes it a
 vector which composes under bind and permute like any other.
 
-**A `Phasers` carries angles only.** Reading it as unit phasors costs roughly
+**The quantized form carries angles only.** Reading it as unit phasors costs roughly
 10% on similarity and all of *distributional* analogy (`b - a + c`), which needs
 the radial component. The magnitudes stay on the accumulator, where
 `quantized_magnitudes()` packs them onto a fixed 4-bit grid, two per byte — so a
@@ -317,10 +321,10 @@ all-zero vector.
 
 ### On the quantized form: deferred, so chains compose
 
-`Phasers.power` scales the phases exactly as it would any `SparseSegmented`'s
-offsets. What differs is *when*: the exponent is **recorded** and applied when
-the vector is next read, so a chain of powers composes on the rational and is
-applied once.
+`SparseSegmented.power` scales the phases, which are the offsets. What differs
+from a step-by-step scaling is *when*: the vector keeps the **unscaled** offsets
+plus the exponent applied to them, so a chain of powers composes on the rational
+and the scaling is applied **once**, from the base.
 
 That is not cosmetic. Scaling step by step disagrees with the single equivalent
 power once an intermediate **wraps past `W`** — wrapping then scaling is not
@@ -342,63 +346,72 @@ Contracting exponents agree either way, because `floor(floor(x/a)/b)` really is
 regime fractional-power encoding actually uses — [Point](point.md) keeps its
 exponents at or above 1 — so this is the common case, not an exotic one.
 
-Deferral is also why `Phasers` is recipe-backed: the cell holds the unscaled
-angles plus the exponent, and the fill applies it. `compact()` drops the
-materialized angles and keeps the base and the hash, recomputing identically on
-the next read.
+An **unpowered** vector carries no base and pays nothing: its offsets *are* the
+base, and only a `power()` call that leaves a non-unit exponent records one. A
+chain that scales back to unit — `power(2)` then `power(1, 2)` — hands back the
+base itself and drops the recipe again.
 
 Note the asymmetry between the two forms. The accumulator's power reshapes the
-confidences, since raising `r` is part of what `z**a` means. A Phasers has no
-confidences to reshape, so its power is purely a rotation of the phases.
+confidences, since raising `r` is part of what `z**a` means. The quantized form
+has no confidences to reshape, so its power is purely a rotation of the phases.
 
 ## Comparing
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-v.lee(other)              # the metric this type exists for
-hv.lee_distance(v, other) # same reading, via the free function
+hv.lee_distance(v, other) # how far around the ring, per segment
+hv.alignment(v, other)    # the true cosine, in angle space
+hv.overlap(v, other)      # exact-offset agreement — see the warning below
 
 v.offset(seg)             # the stored phase
 v.offsets()               # every phase, in segment order
-v.equal(other)            # content equality, Phasers against Phasers
-
-v.overlap(other)          # raises
-v.hamming(other)          # raises
+hv.equal(v, other)        # content equality
 ```
 {{#endtab}}
 {{#endtabs}}
 
 Lower Lee is closer; chance is `W/4` and the maximum `W/2`, per segment.
 
-**The label metric is refused, not merely discouraged.** Two phasors one ring
-step apart are maximally similar yet share no exact offset, so overlap reads
-them as unrelated — which is why `overlap()` and `hamming()` raise rather than
-return a plausible-looking number, and why a `Phasers` must not be fed to the
-overlap-keyed [near-neighbor index](../memory/selectors/near_neighbor.md).
+**Every metric answers, and the choice is yours.** A quantized vector is an
+ordinary hypervector, so nothing raises — which means the hazard is now a fact
+about the *question* rather than about the type. Two vectors one ring step apart
+in every segment are nearly identical as phasors and share no exact offset at
+all, so the three metrics disagree completely (measured at $M = 1024$, ring
+$W = 1024$):
 
-That hazard is the whole reason `PHASERS` is its own hint: the bytes are
-indistinguishable from any other hypervector's, so nothing but the type can warn
-you. Note `core()` deliberately hands back a plain `SparseSegmented`, which has
-**lost** that warning — overlap on it answers quietly and wrongly. Prefer `lee()`.
+| reading | one step apart | unrelated pair | range |
+|---|---|---|---|
+| `hv.overlap` | **0** | 0 | 0 … 1024, higher is closer |
+| `hamming()` | **2048** — the maximum | 2048 | 0 … 2048, lower is closer |
+| `hv.lee_distance` | **1** | 253 | 0 … 512, lower is closer |
+| `hv.alignment` | **0.99998** | 0.012 | −1 … 1, higher is closer |
 
-### `equal()` is deliberately strict
+Read that top-left column as the warning it is: the label metrics call the
+closest possible pair the *furthest*, because they ask whether the offsets are
+**equal** and nothing more. That is exactly right for exact-match retrieval and
+useless for a near-miss.
 
-It accepts another `Phasers` only. A `SparseSegmented` holding byte-identical
-offsets is **not** equal, because those offsets are labels rather than phases —
-and since both carry the same `stable_hash()`, nothing but the type
-distinguishes them.
+So a vector you intend to compare as phases **must not** be fed to the
+overlap-keyed [near-neighbor index](../memory/selectors/near_neighbor.md). The
+bytes are indistinguishable from any other hypervector's, so nothing can warn
+you at the call — pick `lee_distance` or `alignment` deliberately.
 
-So the method and the free function disagree, on purpose:
+### Lee or alignment?
 
-```python
-v.equal(v.core())        # False — only this method separates the metrics
-hv.equal(v, v.core())    # True  — the free function compares content hashes
-```
+Both read the same per-segment quantity — the ring gap $\theta_i = 2\pi
+\cdot \text{lee}_i / W$ — and then **aggregate it differently**:
 
-`hv.equal` is documented as "identical ON bits", and by that definition it is
-right: the bytes *are* identical. It just cannot see that one side reads them as
-phases. Treat `Phasers.equal()` as the authoritative check for a phasor.
+- `lee_distance` averages the gaps. It is a true metric, it is integer, and it
+  is what the near-neighbor machinery can be made to bound.
+- `alignment` averages their cosines and is therefore the exact cosine
+  similarity: every segment is a unit phasor, so both norms are exactly
+  $\sqrt{M}$ and the $1/M$ *is* the normalization. Use it when you want an
+  inner product rather than a distance.
+
+Neither determines the other — a mean of angles and a mean of cosines are
+different statistics — so they can rank a pair differently, and that is not a
+bug in either.
 
 ## See also
 

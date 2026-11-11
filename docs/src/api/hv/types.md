@@ -36,7 +36,6 @@ v.hint()         # HINT_* constant — the type this vector serializes as
 | `HINT_DART` | [Dart 🎯](dart.md) |
 | `HINT_POINT` | [Point 📍](point.md) |
 | `HINT_CYCLONE` | [Cyclone 🌀](cyclone.md) |
-| `HINT_PHASERS` | [Phasers 🧭](phasers.md) |
 
 It is the tag `hv.from_message` dispatches on, so it also names the type a
 round-trip gives back — which is why it reads the wire form rather than the
@@ -74,9 +73,9 @@ This is invisible to callers: the vector holds the same semantic content wheneve
 `compact()` releases the cached content again, recursively through members. The recipe is retained, so the next observation recomputes exactly the same bits.
 
 `core()` is the explicit crossing from recipe to bits: it computes the offsets
-with any pending exponent folded in, and hands back a `SparseSegmented`, which
-by construction reports `exponent() == (1, 1)`. See
-[SparseSegmented](sparse_segmented.md#the-exponent-is-always-1).
+with any exponent folded in, and hands back a `SparseSegmented` reporting
+`exponent() == (1, 1)`. That holds for every type. See
+[SparseSegmented](sparse_segmented.md#chained-powers-are-exact).
 
 ## The tale of two equalities
 

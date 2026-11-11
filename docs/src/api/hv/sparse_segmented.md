@@ -10,7 +10,7 @@ The most foundational vector type — a sparse binary hypervector where each seg
 | `offsets` | Packed bit array of per-segment ON offsets. `nil`/`None` = identity vector |
 | `hash` | Lazy-computed stable hash for equality checks |
 | `domain` / `pod` | The identifier for these offsets; serialized, so it survives a round trip |
-| `exponent` | **Always 1.** See below |
+| `exponent` | The accumulated power, 1 if unpowered. See below |
 
 The offsets are bit-packed according to the model's sparsity bits — they do **not** align to byte boundaries. This trades a small CPU cost for compact, uniform storage that works both in memory and on disk.
 
@@ -97,35 +97,44 @@ Composites are accepted and materialized to their core first, so they
 contribute only their offsets: a `Point`'s coordinates and frame, or a
 `Learner`'s weight distribution, do **not** survive the trip.
 
-## The exponent is always 1
+## Chained powers are exact
 
-A `SparseSegmented` **never carries an exponent other than 1**, and this is
-structural rather than a convention you could accidentally violate.
-
-Every other type is defined by a *recipe*, and an exponent there is a pending
-instruction: "when you compute these offsets, scale them by this much". A
-`SparseSegmented` holds no recipe — the offsets *are* the value. So `power()`
-scales them on the spot and leaves the exponent at 1; there is nothing left
-pending.
+`power()` reports the exponent you asked for, and `core()` folds it into the
+offsets:
 
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-s = hv.Sparkle.from_word(model, "pos", "step")
+ss = hv.Sparkle.from_word(model, "pos", "step").core()
 
-s.power(3).exponent()          # (3, 1) — lazy, the exponent is pending
-s.core().power(3).exponent()   # (1, 1) — materialized, already spent
-
-ss = s.core()
-ss.power(1, 2).exponent()      # (1, 1) — the offsets were scaled instead
+ss.exponent()                  # (1, 1) — unpowered
+ss.power(3).exponent()         # (3, 1)
+ss.power(3).core().exponent()  # (1, 1) — core() folds it in
 ```
 {{#endtab}}
 {{#endtabs}}
 
-That is also why the exponent never appears on the wire for this type: writing
-it alongside offsets that already carry it would apply the scaling a second
-time on read. Domain and pod *are* written — they identify the offsets rather
-than transform them.
+Chaining composes on the rational, so a chain of powers agrees exactly with the
+single equivalent power — scaling truncates only once however long the chain:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+hv.equal(ss.power(5, 4).power(7, 3), ss.power(35, 12))   # True
+hv.equal(ss.power(1, 2).power(2, 1), ss)                 # True
+```
+{{#endtab}}
+{{#endtabs}}
+
+That matters for EXPANDING exponents, which is what
+[fractional-power encoding](point.md) uses: scaling step by step instead would
+disagree as soon as an intermediate wraps past the ring — measured 70 Lee steps
+apart for `5/4` then `7/3` at 10-bit. Contracting chains agree either way,
+since `floor(floor(x/a)/b)` really is `floor(x/(a*b))` and nothing wraps on the
+way down.
+
+A powered vector survives the wire with that exactness intact, and domain and
+pod are written too — they identify the offsets rather than transform them.
 
 ## `core()` returns eagerly-applied offsets
 
@@ -147,14 +156,17 @@ So `core()` is the boundary where a lazy vector becomes concrete bits. Reading
 it forces the computation, and the result is self-contained: no exponent left to
 apply, nothing further to resolve.
 
-<div class="callout callout-warning">
-<div class="callout-title">Which is why fractional powers truncate here</div>
+<div class="callout callout-note">
+<div class="callout-title">Fractional powers still truncate — once</div>
 
-Because `power()` rewrites the offsets immediately, a fractional power
-truncates toward zero and the loss is permanent —
-`ss.power(1, 2).power(2, 1)` does **not** recover `ss`. On a lazy `Sparkle` the
-same pair of calls cancels in the exponent *before* anything is computed, so it
-is exact. Compose on the lazy value and call `core()` once at the end. See
+Scaling truncates toward zero, so once a fractional power is applied the
+scaled offsets have lost that information for good. What the retained base buys
+is that the loss is never compounded: a chain re-scales from the base, so
+`ss.power(1, 2).power(2, 1)` **does** recover `ss` exactly, and a three-deep
+chain truncates no more than a one-step one.
+
+A lazy `Sparkle` reaches the same place by a different route — the exponents
+cancel in the recipe before anything is computed. See
 [Sparkle](sparkle.md#fractional-powers).
 </div>
 

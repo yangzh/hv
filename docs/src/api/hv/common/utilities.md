@@ -11,6 +11,8 @@ hv.hamming(a, b)        # Hamming distance: 2 * (M - overlap), 0..2M
 
 hv.lee_distance(a, b)   # Lee distance: mean circular gap, 0..W/2
 
+hv.alignment(a, b)      # Cosine similarity in angle space, -1..1
+
 hv.equal(a, b)          # Equality check
 ```
 {{#endtab}}
@@ -30,7 +32,7 @@ carries an **ordinal** meaning:
 |---|---|---|
 | `Sparkle`, `Learner`, composites | **yes** — offsets are unrelated random draws, so "how far" is noise | no |
 | `Point` (fractional-power encoding) | yes, but it collapses to noise as positions separate | **yes** — graded in the coordinate gap |
-| `Phasers` | **never** — raises, two phasors one step apart share no offset yet are nearly identical | **yes** — it is the native metric |
+| a `HyperPhaser.quantize()` result | **no** — two phasors one step apart share no offset yet are nearly identical | **yes** — the offsets are phases |
 
 Lee is reported **per segment**: the sum divided by `M`. That keeps it
 comparable across models — chance is `W/4` and the diameter `W/2` whatever `M`
@@ -40,6 +42,18 @@ is. Two consequences worth knowing:
 - the division truncates, so a gap confined to a handful of segments reads `0`.
   The resolution is one ring step, which suits a population readout and not the
   separation of near-identical vectors.
+
+`alignment` reads the same ring gap as Lee and aggregates it the other way —
+cosines rather than angles:
+
+$$\text{alignment}(x, y) = \frac{1}{M} \sum_i \text{Re}\big(\chi(x_i)\,
+\overline{\chi(y_i)}\big), \qquad \chi(o) = e^{2\pi i o / W}$$
+
+It is **cosine similarity exactly**: every segment contributes a unit phasor, so $\|x\| = \|y\| = \sqrt{M}$ and the $1/M$ is precisely the normalization $1/(\|x\|\|y\|)$. From there, `1 - alignment` is cosine distance (not a metric) and $\arccos(\text{alignment})/\pi$ is the angular distance (which is). Use it when the natural answer is an inner product rather than a distance; `lee_distance` stays the integer metric.
+
+Being a mean of cosines rather than a mean of angles, it does not determine Lee
+and Lee does not determine it — the two can order a pair differently, and
+neither is wrong.
 
 ## Identity Check
 
