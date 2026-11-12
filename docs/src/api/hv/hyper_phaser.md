@@ -328,6 +328,9 @@ block = ph.quantized_magnitudes()   # the confidences, to keep yourself
 
 # LOSSLESS, unlike quantize(): the accumulator as complex64, and back.
 z = hv.hyper_phaser_to_np(ph)                       # (M,) complex64
+# (re, im) per segment instead — the same bytes, for torch layers that
+# reject complex dtypes. hyper_phaser_from_np takes this shape back.
+r = hv.hyper_phaser_to_np(ph, real=True)            # (M, 2) float32
 # The array carries no mass, so pass it: without it coherence() reads 0.
 ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z, ph.mass())
 ```

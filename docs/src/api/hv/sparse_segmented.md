@@ -79,6 +79,50 @@ it on the way back, as every write path does.
 The byte order is **fixed little-endian**, not the host's, so the same vector
 exports to the same bytes everywhere.
 
+### Offsets are ring angles, so lift before you compute
+
+An exported offset is an **angle on the segment's ring**, not a coordinate.
+Euclidean array math on it is meaningless, and silently so: two vectors each
+exactly one ring step from a base read $L_2$ distances of **32.0** and
+**32736.0** at 10-bit, for the identical true relation, because one of them
+wraps. Nothing in numpy or torch will stop you.
+
+`hv.phasor_table(model)` is the lift. It returns the ring's
+`segment_size(model)` **unit phasors** as `complex64`, so turning offsets into
+something you can do linear algebra on is a gather:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+O = hv.codes_to_np(vectors)         # (n, M) ring offsets
+Z = hv.phasor_table(model)[O]       # (n, M) complex64 — one gather
+
+# All-pairs similarity is then one matmul, and it IS hv.alignment.
+S = (Z @ Z.conj().T).real / hv.cardinality(model)
+
+# For torch layers that reject complex dtypes: (W, 2) float32 instead.
+table = hv.phasor_table(model, real=True)
+```
+{{#endtab}}
+{{#endtabs}}
+
+Measured **10x faster** than `exp(2j*pi*O/W)` per element at (512, 1024), and
+bit-identical — the table holds every value that exponential can take, so there
+is nothing to approximate. The matmul reproduces `hv.alignment` to better than
+1e-5. The table itself is built once per model inside the library and handed out
+zero-copy.
+
+<div class="callout callout-note">
+<div class="callout-title">Which dtype a network wants</div>
+
+`complex64` is the compute dtype: torch accepts it with no conversion. The raw
+offsets are `uint16`, which torch will convert to a tensor and then refuse to do
+arithmetic on — but that only matters if you meant to do the algebra there.
+Bind, release and power belong in `kongming`; the array boundary is for the
+numbers a network consumes, and those want the lift.
+
+</div>
+
 <div class="callout callout-warning">
 <div class="callout-title">The buffer is a snapshot, not a view</div>
 
