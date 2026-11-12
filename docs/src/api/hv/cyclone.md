@@ -29,7 +29,7 @@ $b$ exists and the constructor refuses with `impossible periodic vector`.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-# W = 1024 for the 1M/10-bit model, so the period must divide 1024.
+# W = 1024 for the 10-bit model, so the period must divide 1024.
 c = hv.Cyclone(model, hv.Seed128(hv.Domain("clock"), hv.Pod("hour")), 64)
 
 c.period()      # 64

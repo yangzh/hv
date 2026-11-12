@@ -42,11 +42,11 @@ $$2 \times O(A, B) + H(A, B) = 2M$$
 
 the more overlap they have, the closer two vectors in Hamming space.
 
-To visualize this, we have two random 64K/8-bit hypervectors drawn over the same grid. Each of the $256$ segments contributes one dot, placed inside its own segment group at the offset of that segment's ON bit — **red** for the first vector, **blue** for the second. The heavy grid lines delimit the segment groups, while the fine ones are individual offsets.
+To visualize this, we have two random 8-bit hypervectors drawn over the same grid. Each of the $256$ segments contributes one dot, placed inside its own segment group at the offset of that segment's ON bit — **red** for the first vector, **blue** for the second. The heavy grid lines delimit the segment groups, while the fine ones are individual offsets.
 
 <figure>
   <img src="images/sparkle_overlap.png" alt="Two random 8-bit hypervectors overlaid; they share exactly one segment">
-  <figcaption><strong>Fig. 1</strong>: two random 64K/8-bit hypervectors over one grid, agreeing on exactly one segment</figcaption>
+  <figcaption><strong>Fig. 1</strong>: two random 8-bit hypervectors over one grid, agreeing on exactly one segment</figcaption>
 </figure>
 
 This is what near-orthogonality looks like: two vectors drawn independently from
@@ -73,15 +73,15 @@ Lee is NOT a restatement of overlap the way Hamming is. Overlap only ever asks w
 
 ## Supported Models
 
-A [Model](../api/hv/common/models.md) determines the total number of dimensions (width), how those dimensions are divided into segments (cardinality and sparsity), and therefore implies critical storage and compute characteristics.
+A [Model](../api/hv/common/models.md) is named for its one free parameter: the segment size in bits. Cardinality equals the segment size, so an $n$-bit model carries $2^n$ offsets of $n$ bits each — and a [HyperPhaser](../api/hv/hyper_phaser.md) carries $2^n$ phasors on a ring of $2^n$. The binary width $N = 2^{2n}$ follows from that one choice and matters only to the binary form; the storage and compute characteristics follow from all three.
 
 | Model | Width $N$ | Sparsity Bits | Cardinality $M$  | Segment Size $W$ |
 |-------|-------|---------------|-------------|----------------------|
-| `MODEL_64K_8BIT` | 65,536 | 8 | 256 | 256 |
-| `MODEL_1M_10BIT` | 1,048,576 | 10 | 1,024 | 1,024 |
-| `MODEL_16M_12BIT` | 16,777,216 | 12 | 4,096 | 4,096 |
-| `MODEL_256M_14BIT` | 268,435,456 | 14 | 16,384 | 16,384 |
-| `MODEL_4G_16BIT` | 4,294,967,296 | 16 | 65,536 | 65,536 |
+| `MODEL_8BIT` | 65,536 | 8 | 256 | 256 |
+| `MODEL_10BIT` | 1,048,576 | 10 | 1,024 | 1,024 |
+| `MODEL_12BIT` | 16,777,216 | 12 | 4,096 | 4,096 |
+| `MODEL_14BIT` | 268,435,456 | 14 | 16,384 | 16,384 |
+| `MODEL_16BIT` | 4,294,967,296 | 16 | 65,536 | 65,536 |
 
 ### Model properties
 
@@ -103,10 +103,10 @@ For simplicity, we use function names from Python. The counterparts from Go / Ru
 
 ### How to Choose a Model
 
-- **`MODEL_64K_8BIT`**: Fast prototyping, with minimal memory footprint and high performance (due to SIMD). Good for tests, experiments and production.
-- **`MODEL_1M_10BIT`**: General-purpose, balances performance and storage.
-- **`MODEL_16M_12BIT`**: General-purpose, for the adventurous.
-- **`MODEL_256M_14BIT` / `MODEL_4G_16BIT`**: Very high capacity, not there yet.
+- **`MODEL_8BIT`**: Fast prototyping, with minimal memory footprint and high performance (due to SIMD). Good for tests, experiments and production.
+- **`MODEL_10BIT`**: General-purpose, balances performance and storage.
+- **`MODEL_12BIT`**: General-purpose, for the adventurous.
+- **`MODEL_14BIT` / `MODEL_16BIT`**: Very high capacity, not there yet.
 
 In general, larger models provide more orthogonal space (lower collision probability) at the cost of more memory per vector.
 

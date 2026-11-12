@@ -42,7 +42,7 @@ predates them.
 
 from kongming import hv
 
-MODEL = hv.MODEL_1M_10BIT
+MODEL = hv.MODEL_10BIT
 W = hv.cardinality(MODEL)  # 1024 segments, and the modulus coordinates live in
 FAILED = []
 
@@ -335,7 +335,7 @@ def claim_noisy():
 
 
 def main():
-    print("model=1M/10BIT  M=cardinality=%d  segment_size=%d  width=%d" % (W, hv.segment_size(MODEL), hv.width(MODEL)))
+    print("model=10BIT  M=cardinality=%d  segment_size=%d  width=%d" % (W, hv.segment_size(MODEL), hv.width(MODEL)))
 
     claim_frame_rules()
     claim_is_the_bind()

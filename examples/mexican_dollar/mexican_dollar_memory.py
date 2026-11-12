@@ -10,7 +10,7 @@ See docs: https://yangzh.github.io/hv/examples/mexican_dollar/index.html
 
 from kongming import hv, memory
 
-model = hv.MODEL_64K_8BIT
+model = hv.MODEL_8BIT
 store = memory.InMemory(model)
 
 keys = ["capital", "currency", "country_code"]

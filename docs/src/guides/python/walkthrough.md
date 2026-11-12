@@ -7,7 +7,7 @@ A deeper exploration of the Python API, covering vector creation, similarity, ra
 ```python
 from kongming import hv
 
-model = hv.MODEL_64K_8BIT
+model = hv.MODEL_8BIT
 
 # Create sparkles (atomic vectors) from words
 cat = hv.Sparkle.from_word(model, "animals", "cat")

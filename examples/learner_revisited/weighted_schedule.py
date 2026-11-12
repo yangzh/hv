@@ -12,7 +12,7 @@ WHAT THIS FILE IS
 
 BACKGROUND, FOR A READER NEW TO HYPERVECTORS
     A hypervector here is a SPARSE BINARY vector: a large address space (1M at
-    MODEL_1M_10BIT) of which only M = 1024 positions are set. Picture it as M
+    MODEL_10BIT) of which only M = 1024 positions are set. Picture it as M
     "segments", each holding one address. Two unrelated vectors share almost no
     addresses; two related ones share many. OVERLAP -- how many addresses two
     vectors have in common -- is the only similarity notion used below.
@@ -134,7 +134,7 @@ except ImportError:
 
 PLOT_DIR = None  # set by --plot; stays None when plotting is off
 
-MODEL = hv.MODEL_1M_10BIT
+MODEL = hv.MODEL_10BIT
 M = hv.cardinality(MODEL)  # segment count
 CARD = hv.mass_denominator(MODEL)  # weight units per whole observation
 GAMMA = 0.5772156649015329
@@ -1323,7 +1323,7 @@ def main():
         print("(matplotlib found: pass --plot to also write the figures)")
     t = 25 if a.quick else 200
 
-    print("model=64K/8BIT  M=%d  Cardinality=%d  observations=%d  trials=%d" % (M, CARD, len(N), t))
+    print("model=8BIT  M=%d  Cardinality=%d  observations=%d  trials=%d" % (M, CARD, len(N), t))
     claim_telescoping()
     claim_schedule_table(t)
     claim_log_is_a_log(t)

@@ -11,7 +11,7 @@ A step-by-step introduction to Kongming HV in a notebook, cell by cell.
 from kongming import hv
 import pandas as pd
 
-model = hv.MODEL_64K_8BIT
+model = hv.MODEL_8BIT
 so = hv.SparseOperation(model, 0, 1)
 ```
 

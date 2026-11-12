@@ -21,7 +21,7 @@ from pathlib import Path
 
 from kongming import hv, memory
 
-MODEL = hv.MODEL_1M_10BIT
+MODEL = hv.MODEL_10BIT
 # Domain/Pod arguments to memory.* factories accept str directly — no
 # need to wrap in hv.Domain.from_name(...) / hv.Pod.from_word(...).
 LETTER_DOMAIN = "letters"

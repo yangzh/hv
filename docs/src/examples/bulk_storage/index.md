@@ -40,6 +40,6 @@ python bulk_storage.py --backend embedded --path /dev/shm/my_bench
 # Custom count
 python bulk_storage.py -n 100000
 
-# Different model, 1 implies MODEL_64K_8BIT model, etc.
+# Different model, 1 implies MODEL_8BIT model, etc.
 python bulk_storage.py -n 10000 --model 1
 ```

@@ -37,7 +37,7 @@ import random
 
 from kongming import hv
 
-MODEL = hv.MODEL_1M_10BIT
+MODEL = hv.MODEL_10BIT
 W = hv.cardinality(MODEL)  # 1024 segments, and the modulus coordinates live in
 RANK = 3
 FAILED = []
@@ -117,7 +117,7 @@ def claim_recover_point():
     # The solve is model-independent: it only needs offsets and the modulus, so
     # it is exact from 8-bit through 16-bit.
     print("  -- and on every model --")
-    for name in ("MODEL_64K_8BIT", "MODEL_1M_10BIT", "MODEL_16M_12BIT", "MODEL_256M_14BIT", "MODEL_4G_16BIT"):
+    for name in ("MODEL_8BIT", "MODEL_10BIT", "MODEL_12BIT", "MODEL_14BIT", "MODEL_16BIT"):
         m = getattr(hv, name)
         f = axes(RANK, "m", m)
         want = [3, 7, 11]
@@ -353,7 +353,7 @@ def claim_power_scales_coordinates():
 
 def main():
     print(
-        "model=1M/10BIT  M=cardinality=%d  segment_size=%d  width=%d  rank=%d"
+        "model=10BIT  M=cardinality=%d  segment_size=%d  width=%d  rank=%d"
         % (W, hv.segment_size(MODEL), hv.width(MODEL), RANK)
     )
 

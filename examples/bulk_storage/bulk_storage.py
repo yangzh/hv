@@ -24,8 +24,8 @@ def main():
     parser.add_argument(
         "--model",
         type=int,
-        default=hv.MODEL_1M_10BIT,
-        help="HV model (default: MODEL_1M_10BIT)",
+        default=hv.MODEL_10BIT,
+        help="HV model (default: MODEL_10BIT)",
     )
     parser.add_argument(
         "--domain",

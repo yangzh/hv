@@ -21,7 +21,7 @@ import kongming
 print(kongming.__version__)  # e.g. "5.0.0", as of Aug. 2026. Yours should be newer.
 
 from kongming import hv
-print(hv.MODEL_64K_8BIT)  # should print 1
+print(hv.MODEL_8BIT)  # should print 1
 ```
 
 ## Import Paths
@@ -36,11 +36,11 @@ from kongming import memory   # storage and selectors
 Model constants are available directly on `hv`:
 
 ```python
-hv.MODEL_64K_8BIT      # 1
-hv.MODEL_1M_10BIT      # 2
-hv.MODEL_16M_12BIT     # 3
-hv.MODEL_256M_14BIT    # 4
-hv.MODEL_4G_16BIT      # 5
+hv.MODEL_8BIT      # 1
+hv.MODEL_10BIT      # 2
+hv.MODEL_12BIT     # 3
+hv.MODEL_14BIT    # 4
+hv.MODEL_16BIT      # 5
 ```
 
 ## Docker

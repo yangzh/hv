@@ -9,7 +9,7 @@ All HyperBinary types have a compact, emoji-prefixed string representation for q
 **`__str__`** (triggered by `print()`) returns the compact emoji form:
 
 ```python
->>> a = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
+>>> a = hv.Sparkle.from_word(hv.MODEL_8BIT, hv.d0(), "hello")
 >>> print(a)
 ✨:🌐0x..c862,🫛0x..80e4
 ```
@@ -19,7 +19,7 @@ All HyperBinary types have a compact, emoji-prefixed string representation for q
 ```python
 >>> a
 hint: SPARKLE
-model: MODEL_64K_8BIT
+model: MODEL_8BIT
 stable_hash: 12345678
 domain:
   id: ...

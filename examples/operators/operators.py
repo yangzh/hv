@@ -135,7 +135,7 @@ def pure_python_bundle(model, so, vectors, weights=None):
 
 
 def main():
-    model = hv.MODEL_1M_10BIT
+    model = hv.MODEL_10BIT
     so = hv.SparseOperation(model, 0, 42)
 
     a = hv.Sparkle.random("test", so)
@@ -145,11 +145,11 @@ def main():
     cardinality = hv.cardinality(model)
     seg_size = hv.segment_size(model)
     MODEL_NAMES = {
-        1: "MODEL_64K_8BIT",
-        2: "MODEL_1M_10BIT",
-        3: "MODEL_16M_12BIT",
-        4: "MODEL_256M_14BIT",
-        5: "MODEL_4G_16BIT",
+        1: "MODEL_8BIT",
+        2: "MODEL_10BIT",
+        3: "MODEL_12BIT",
+        4: "MODEL_14BIT",
+        5: "MODEL_16BIT",
     }
     print(f"Model: {MODEL_NAMES.get(model, model)} ({a.width()} bits, {cardinality} segments, {seg_size} bits/segment)")
     print()

@@ -6,8 +6,8 @@ A minimal example showing the core operations:
 from kongming import hv
 
 # Create hypervectors
-a = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "hello")
-b = hv.Sparkle.from_word(hv.MODEL_64K_8BIT, hv.d0(), "world")
+a = hv.Sparkle.from_word(hv.MODEL_8BIT, hv.d0(), "hello")
+b = hv.Sparkle.from_word(hv.MODEL_8BIT, hv.d0(), "world")
 print(f'Overlap: {hv.overlap(a, b)}')  # Near orthogonal (~1)
 
 # Bind: result is dissimilar to both inputs

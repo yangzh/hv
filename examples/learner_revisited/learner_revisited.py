@@ -37,7 +37,7 @@ import random
 
 from kongming import hv
 
-MODEL = hv.MODEL_64K_8BIT
+MODEL = hv.MODEL_8BIT
 M = hv.cardinality(MODEL)  # segment count; the doc's M
 FAILED = []
 
@@ -62,7 +62,7 @@ def learner(domain, pod):
 # --------------------------------------------------------------------------
 def claim_random_overlap():
     print("\nRandomOverlap == 1 for every model, because M = 1/sparsity")
-    for name in ("MODEL_64K_8BIT", "MODEL_1M_10BIT", "MODEL_16M_12BIT", "MODEL_256M_14BIT", "MODEL_4G_16BIT"):
+    for name in ("MODEL_8BIT", "MODEL_10BIT", "MODEL_12BIT", "MODEL_14BIT", "MODEL_16BIT"):
         m = getattr(hv, name)
         card, spars, ro = hv.cardinality(m), hv.sparsity(m), hv.random_overlap(m)
         check(
@@ -322,7 +322,7 @@ def main():
     t = 20 if a.quick else 200
 
     print(
-        "model=64K/8BIT  M=cardinality=%d  segment_size=%d  width=%d  trials=%d"
+        "model=8BIT  M=cardinality=%d  segment_size=%d  width=%d  trials=%d"
         % (M, hv.segment_size(MODEL), hv.width(MODEL), t)
     )
 

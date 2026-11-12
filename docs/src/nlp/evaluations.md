@@ -4,7 +4,7 @@
 
 > **Note**: the numbers below were measured on the **Rust engine** over the full held-out validation tier (the Go and Rust engines are kept at bit-parity and decode identically).
 
-Combined corpus of 4231 English + 4231 Chinese sentences for training; the statistics live in a unified LearnerPool (`MODEL_64K_8BIT`) per language. 
+Combined corpus of 4231 English + 4231 Chinese sentences for training; the statistics live in a unified LearnerPool (`MODEL_8BIT`) per language. 
 
 **Validation tier**: 950 held-out sentences — 484 English (5.8K tokens) and 466 Chinese (5.1K tokens), never seen in training.
 

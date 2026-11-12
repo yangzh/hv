@@ -9,7 +9,7 @@ See docs: https://yangzh.github.io/hv/examples/mexican_dollar/index.html
 
 from kongming import hv
 
-model = hv.MODEL_64K_8BIT
+model = hv.MODEL_8BIT
 
 # Create role markers
 country_code = hv.Sparkle.from_word(model, "role", "country_code")

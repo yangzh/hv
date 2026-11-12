@@ -7,11 +7,11 @@ A SparseOperation instance wraps a Model, a random number generator, and potenti
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
+so = hv.SparseOperation(hv.MODEL_10BIT, 0, 42)
 
 # Explicit RNG backend (keyword-only; omit for the KONGMING_RNG default, hv.RNG_PHILOX_4X64)
 # Constants: hv.RNG_PHILOX_4X64, hv.RNG_XOSHIRO_256PP, hv.RNG_PCG_DXSM, hv.RNG_XOROSHIRO_128PP.
-so2 = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42, rng_hint=hv.RNG_XOSHIRO_256PP)
+so2 = hv.SparseOperation(hv.MODEL_10BIT, 0, 42, rng_hint=hv.RNG_XOSHIRO_256PP)
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -42,7 +42,7 @@ so.rng_hint()     # RNG backend (an hv.RNG_* constant)
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
+so = hv.SparseOperation(hv.MODEL_10BIT, 0, 42)
 sparkle = hv.Sparkle.random(hv.Domain("domain"), so)
 ```
 {{#endtab}}

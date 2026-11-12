@@ -30,15 +30,15 @@ class LispEnv:
 
     def __init__(
         self,
-        model: int = hv.MODEL_64K_8BIT,
+        model: int = hv.MODEL_8BIT,
         namespace: str | None = None,
         path: str | None = None,
     ) -> None:
         """Construct a fresh LISP environment.
 
         Args:
-            model (int, optional): Model constant (e.g. ``hv.MODEL_64K_8BIT``).
-                Defaults to ``hv.MODEL_64K_8BIT``.
+            model (int, optional): Model constant (e.g. ``hv.MODEL_8BIT``).
+                Defaults to ``hv.MODEL_8BIT``.
             namespace (str, optional): User namespace for the cons / fn
                 domains. Defaults to ``"default"``.
             path (str, optional): If given, use disk-backed storage at this

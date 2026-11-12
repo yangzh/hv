@@ -13,7 +13,7 @@ as needed while light addresses keep a nearly-private one. See
 {{#tab name="Python"}}
 ```python
 # model, member domain, roster size
-pool = hv.LearnerPool(hv.MODEL_64K_8BIT, "pool", 65536)
+pool = hv.LearnerPool(hv.MODEL_8BIT, "pool", 65536)
 pool.init()          # fill the still-empty roster with fresh Learners
 ```
 {{#endtab}}

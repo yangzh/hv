@@ -22,7 +22,7 @@ s2 = hv.Sparkle.from_prewired(model, "animals", hv.PREWIRED_SET_MARKER)
 s3 = hv.Sparkle.identity(model)
 
 # Random (from SparseOperation)
-so = hv.SparseOperation(hv.MODEL_1M_10BIT, 0, 42)
+so = hv.SparseOperation(hv.MODEL_10BIT, 0, 42)
 s4 = hv.Sparkle.random("animals", so)
 
 # From domain + pod directly — primary constructor
@@ -135,7 +135,7 @@ print(s0)
 # More detailed information, or s.__repr__()
 s
 # hint: SPARKLE
-# model: MODEL_1M_10BIT
+# model: MODEL_10BIT
 # stable_hash: 9725717137035622833
 # domain:
 #   name: animals

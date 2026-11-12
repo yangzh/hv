@@ -47,7 +47,7 @@ Volatile, in-process storage. All data lost on exit. Best for testing and epheme
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-storage = memory.InMemory(hv.MODEL_64K_8BIT, "my_store")
+storage = memory.InMemory(hv.MODEL_8BIT, "my_store")
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -59,7 +59,7 @@ Persistent, single-machine storage backed by an embedded key-value store. Suitab
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-storage = memory.Embedded(hv.MODEL_64K_8BIT, "/path/to/store")
+storage = memory.Embedded(hv.MODEL_8BIT, "/path/to/store")
 ```
 {{#endtab}}
 {{#endtabs}}

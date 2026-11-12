@@ -59,7 +59,7 @@ After the first install, Colab requires a **runtime restart**:
 ```python
 # Cell 2 — after restart
 from kongming import hv
-model = hv.MODEL_64K_8BIT
+model = hv.MODEL_8BIT
 ```
 
 Subsequent sessions on the same notebook will need the install cell again — Colab does not persist pip packages across sessions.
