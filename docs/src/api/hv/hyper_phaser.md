@@ -333,9 +333,43 @@ z = hv.hyper_phaser_to_np(ph)                       # (M,) complex64
 r = hv.hyper_phaser_to_np(ph, real=True)            # (M, 2) float32
 # The array carries no mass, so pass it: without it coherence() reads 0.
 ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z, ph.mass())
+
+# Or let numpy coerce it: an accumulator IS an array where numpy looks.
+same = numpy.asarray(ph)                            # (M,) complex64, == z
+pair = numpy.array([ph, ph2])                       # (2, M), no call per item
 ```
 {{#endtab}}
 {{#endtabs}}
+
+### An accumulator is a numpy array
+
+`HyperPhaser` implements numpy's `__array__`, so it needs no conversion call
+to be one: `np.asarray(ph)` is the `complex64` vector, `np.array([...])` over a
+list is an `(n, M)` block, and `np.abs`, `np.angle` or a matmul take it
+directly. All-pairs is then one `B @ B.conj().T`, whose off-diagonal entries
+are exactly `hv.hermitian_inner(a, b)` and whose diagonal is
+`magnitude_squared()`. Note it is **not** a cosine: an accumulator's segments
+are not unit-magnitude, so normalize by `magnitude_squared()` if that is what
+you want. `dtype=` and numpy 2's `copy=` are both honored — the default
+is the same read-only zero-copy view `hyper_phaser_to_np` returns, and
+`copy=True` hands you a writable one.
+
+<div class="callout callout-note">
+<div class="callout-title">Hypervectors deliberately do NOT coerce</div>
+
+`np.asarray(vector)` stays opaque, and that is the design. A vector's array
+would be its **ring offsets**, where offset 0 and $W-1$ are one step apart yet
+read as maximally distant — and `np.asarray` is reached *implicitly*, from
+inside libraries you never see the inside of, so there would be no line of
+your own code to suspect. [`code_to_np()`](sparse_segmented.md#bulk-export-to-numpy)
+keeps the export explicit, and
+[`phasor_table()`](sparse_segmented.md#offsets-are-ring-angles-so-lift-before-you-compute)
+is the lift that makes the numbers mean what they look like.
+
+An accumulator carries no such ambiguity: it already *is* the complex vector,
+and distance on it is the distance.
+
+</div>
 
 `quantize()` gives one phase per segment — the same bytes, packing and
 footprint as any `SparseSegmented`, exactly $\sqrt{M}$ long. That makes it a
