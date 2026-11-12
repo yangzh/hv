@@ -55,8 +55,9 @@ ph.bundle(b, 0.25)
 ph.bundle(b, -0.25)
 
 ph.dimension()          # how many phasors: one per segment
+ph.mass()               # total weight bundled: 1.25 after the three above
 ph.magnitude_squared()  # 0.0 iff nothing is accumulated
-ph.clone_phaser()       # deep copy; the accumulator IS the storage
+ph.copy()               # deep copy; the accumulator IS the storage
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -74,14 +75,48 @@ drawn, so:
 
 The cost is resumability. A Learner resumes from its offsets plus one age
 scalar; a phasor needs all $M$ magnitudes, because accumulated mass is
-per-segment. There is deliberately **no counter of any kind** — neither a call
-count nor an accumulated-mass total. Nothing on the write path consults one, and
-the L2 mass is already recoverable from the state as $\sqrt{M} \cdot \mathrm{rms}(r_i)$.
+per-segment.
+
+There is no **call count** — nothing on the write path consults one, and
+`magnitude_squared() == 0` already answers "has anything been accumulated".
+There *is* an accumulated-weight total, `mass()`, and it is state rather than
+bookkeeping: $\sqrt{M} \cdot \mathrm{rms}(r_i)$ does **not** recover it. That
+quantity estimates $\sqrt{M\left(N + N(N-1)\rho^2\right)}$, which is
+$\sqrt{MN}$ when the observations are mutually unrelated and $N\sqrt{M}$ when
+they agree — so the magnitudes fix neither the weight $N$ nor the agreement
+$\rho$ on their own. `mass()` supplies $N$, and `coherence()` then solves for
+$\rho$.
 
 > A counter would also have been the wrong emptiness test. A blank accumulator
 > simply *is* zero in every segment, so `magnitude_squared() == 0` is the whole
 > question — and unlike a call count it stays honest for an accumulator that was
 > bundled and then subtracted back to **exactly** zero.
+
+### Merging two accumulators
+
+`merge()` adds another accumulator in, segment by segment, masses included:
+
+{{#tabs global="lang"}}
+{{#tab name="Python"}}
+```python
+# Two shards trained apart, combined into the state one would have reached.
+left.merge(right)       # z_i += w_i; mass() adds
+```
+{{#endtab}}
+{{#endtabs}}
+
+That is the whole point: vector addition of two resultants is the maximum-
+likelihood fusion of the two estimates, so sharded training combines exactly
+rather than approximately. It is exact to float rounding — addition does not
+associate, so the two groupings sum in different orders — and bit-exact where
+the grouping does line up, a one-observation operand contributing the very
+product `bundle()` would add.
+
+`bundle()` cannot stand in for it. Its operand is a hypervector, so folding an
+accumulator in that way means `quantize()`ing it first, which gives every
+segment the same weight and discards what each one actually knew: measured,
+$|z|$ correlates 0.717 against the true sum, and at weight 1.0 it silently
+drops 31 of 32 observations. Identity stays the receiver's, as under `bind()`.
 
 ## Reading the accumulator
 
@@ -92,6 +127,7 @@ ph.angle(seg)            # accumulated phase in radians, [0, 2*pi)
 ph.magnitude_at(seg)     # resultant length r_i, one segment
 
 ph.magnitude_squared()   # the whole vector: sum_i |z_i|**2
+ph.coherence()           # rho in [0, 1]: the share of mass that agrees
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -107,14 +143,45 @@ A cancelled segment reports angle `0.0`, which is indistinguishable from a
 genuine zero phase: read `magnitude_at()` to tell them apart.
 
 `magnitude_squared()` is the whole-vector reading, and it is **squared** rather
-than a norm on purpose: that is the moment with an exact law. The cross terms
-vanish for independent phases, so $E[|z_i|^2] = \|w\|_2^2$ per segment and the
-sum estimates $M \|w\|_2^2$ — linear in the accumulated mass. The norm itself
-carries a per-segment Rayleigh factor (0.886) that the second moment does not,
-which is why rms derives from here rather than from averaging `magnitude_at()`.
+than a norm on purpose: that is the moment with an exact law,
 
-It has exact values worth checking against: one unit observation gives
-`magnitude_squared() == M`, and the same observation `n` times gives `n**2 * M`.
+$$E\left[|z_i|^2\right] = N + N(N-1)\rho^2$$
+
+at weight $N$ and coherence $\rho$, so the sum estimates $M$ times it. The norm
+itself carries a per-segment Rayleigh factor (0.886) that the second moment does
+not, which is why rms derives from here rather than from averaging
+`magnitude_at()`.
+
+**It is not a stand-in for the mass.** The law is linear in $N$ only for
+mutually unrelated observations and quadratic once they agree, which the two
+exact values make plain: one unit observation gives `magnitude_squared() == M`,
+and the *same* observation `n` times gives `n**2 * M`, not `n * M`.
+
+### Coherence: how much of the mass agrees
+
+`coherence()` inverts that law for $\rho$, the share of the accumulated mass
+pointing one way:
+
+$$\rho^2 = \frac{\frac{1}{M}\sum_i |z_i|^2 - N}{N(N-1)}, \qquad N = \texttt{mass()}$$
+
+It reads 1 when every observation wrote the same angle and 0 when the angles
+were unrelated. It is the parameter the magnitudes cannot give up alone, because
+$N$ unrelated observations and $\sqrt{N}$ agreeing ones both read
+$|z_i| \sim \sqrt{N}$:
+
+| content | `mass()` | mean $r_i$ | `coherence()` |
+|---|---|---|---|
+| 1024 unrelated words | 1024 | 27.3 | 0.00 |
+| 32 identical observations | 32 | 32.0 | 1.00 |
+| 40 observations, jittered | 40 | 33.6 | 0.84 |
+
+All three look the same from `magnitude_at()`; $\sqrt{1024} = 32$ is why. It
+derives from the **second** moment rather than from averaging `magnitude_at()`
+because the cross terms vanish there — the mean magnitude keeps a Rayleigh
+$0.886\sqrt{N}$ floor and so never reads 0 on junk, as the 27.3 above shows.
+
+A mass of 1.0 or less reads 1: one observation agrees with itself, and
+de-biasing is then a no-op.
 
 ## Reading back what went in
 
@@ -132,6 +199,12 @@ ph.alignment(fish)       # ~0.0  — never bundled
 ```
 {{#endtab}}
 {{#endtabs}}
+
+Those readings assume the observations **agreed**. In general `alignment()`
+returns $N\rho$ — `mass()` times [`coherence()`](#coherence-how-much-of-the-mass-agrees)
+— so 40 noisy observations of one thing at $\rho = 0.84$ read 33.5, not 40.
+Divide by `coherence()` to recover the count; that quotient is exact to ~0.1%
+over $\rho \in [0.6, 1]$ and $N \in [8, 128]$.
 
 It works because the scoring rule gives **partial credit**. Compare the two:
 
@@ -255,7 +328,8 @@ block = ph.quantized_magnitudes()   # the confidences, to keep yourself
 
 # LOSSLESS, unlike quantize(): the accumulator as complex64, and back.
 z = hv.hyper_phaser_to_np(ph)                       # (M,) complex64
-ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z)
+# The array carries no mass, so pass it: without it coherence() reads 0.
+ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z, ph.mass())
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -274,9 +348,18 @@ themselves.
 They are normalized by the accumulator's **own** rms, and the scale is not
 included: a global per-vector factor cancels in both Lee and cosine, so no
 comparison needs it, and what survives is the confidence *ordering*. Four bits
-is the knee — measured, it matches fp32 on both similarity and analogy, and the
-grid is a compile-time constant because the normalized magnitude's distribution
-depends on neither the word, its support, nor the model.
+is the knee — measured, it matches fp32 on both similarity and analogy.
+
+**The fixed grid serves incoherent content only.** It is parameter-free there,
+the normalized magnitude being Rayleigh with scale $1/\sqrt{2}$ whatever the
+word, its support or the model. Once the observations agree the block carries
+nothing: measured at 10-bit, 32 unrelated words use 11 of the 16 levels as
+intended, while 32 jittered copies of one word put **every** segment on a single
+level. The per-segment spread is $\mathrm{sd}(r)/\mathrm{mean}(r) \sim
+(1-\rho)\sqrt{2N}/N$, which *shrinks* as evidence accumulates — 0.0116 at
+$\rho = 0.956$ against a grid step of $4/15$ — so no renormalization recovers
+it. Skip the block when `coherence()` runs high; that reading is what carries
+the information instead.
 
 ## Raising to a power
 
