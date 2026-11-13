@@ -3,6 +3,215 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v11.0.0 (2026-11-12)
+
+### Breaking changes
+
+- **Every `Model` constant drops the width: `MODEL_64K_8BIT` → `MODEL_8BIT`,
+  and so on through `MODEL_4G_16BIT` → `MODEL_16BIT`.** The segment size is the
+  model's one free parameter; the binary width follows from it and means nothing
+  to a `HyperPhaser`. Enum NUMBERS are unchanged, so the wire format and every
+  persisted substrate load as before. See
+  [Supported Models](https://yangzh.github.io/hv/concepts/hypervectors.html#supported-models).
+
+- **`Phasers` is gone as a type, and `HINT_PHASERS` with it.
+  `HyperPhaser.quantize()` returns a `SparseSegmented`.** Every hypervector
+  already IS a vector of phasors — an offset per segment is an angle on the
+  model's ring — so a separate class carried no content the others lack. Its
+  whole surface is already on every subclass: `offsets()`, `offset(seg)`,
+  `power()`, `bind()`, `release()`, and both metrics.
+
+  WHAT CHANGES FOR A READER. `hamming()` and `lee_distance()` are both
+  available on every vector and neither is privileged, where a `Phasers`
+  refused `hamming` outright. Pick by what you are asking: Hamming counts
+  segments that DISAGREE AT ALL, so two vectors one ring step apart in every
+  segment score as maximally distant — which is correct for exact-match
+  retrieval and useless for a near-miss. Lee sums how far around the ring each
+  segment sits, so the same pair scores near zero. For an angle-space answer
+  use `hv.alignment(x, y)`, the true cosine.
+
+  The `PHASERS` wire hint is RESERVED, not reused. An old payload carrying it
+  no longer loads; nothing in the library wrote one as a persisted form.
+
+  `Phasers.random(...)` is gone with no replacement needed —
+  `hv.Sparkle.random(d, so).core()` is the same vector, and any subclass
+  serves.
+
+- **`HyperPhaser` weights are plain signed floats.** `bundle_fractional` takes
+  `weight float32` where `1.0` is one whole observation, replacing an unsigned
+  numerator over `MassDenominator`. The integer form was inherited from
+  `Learner`, where it is load-bearing; here it was converted to a float on the
+  next line and used nowhere else.
+
+  NEGATIVE WEIGHTS SUBTRACT, which is the point: `alignment()` reads the top
+  atom's weight, bundling it back negated removes it, and the next `alignment()` finds the
+  atom below — match-and-subtract decoding, in place, with no rounding. From
+  zero, adding then subtracting the same weight returns to exactly zero.
+
+  A non-finite weight is REFUSED. It would poison every segment it touched and
+  nothing downstream could tell: `angle`, `magnitude_squared` and `align` would
+  all read NaN forever. That guarantee came free with an integer numerator and
+  now costs one check.
+
+- **`HyperPhaser.age()` and `.blank()` are gone, and `.cardinality()` is now
+  `.dimension()`.** Age counted calls and nothing read it; a blank accumulator
+  simply IS zero in every segment, so `magnitude_squared() == 0` is the whole
+  test — and unlike the old `age == 0` it answers honestly for an accumulator
+  subtracted back to zero.
+
+  `dimension()` is how many phasors there are, one per segment. It is neither
+  `cardinality` (an ON-bit count, meaningless for a complex accumulator) nor
+  `width` (the bit width of the space, a different number — a `Phasers` still
+  reports 1048576 where its accumulator reports 1024).
+
+- **`HyperPhaser.from_state_buffer` takes `mass`, not `age`.** Age counted
+  calls; mass is the total weight bundled, and `coherence()` reads it. Pass
+  `0.0` when unknown.
+
+- **`hermitian_inner(x, y)` takes two `HyperPhaser`s**, not two hypervectors,
+  and reads `sum_i z_i^x * conj(z_i^y)` — so it carries magnitude as well as
+  phase. To read two CODES, bundle each into an accumulator at weight `1.0`
+  first: one whole observation of a code IS that code's unit phasors, which is
+  what the old form assumed. `<x, x>` is now `magnitude_squared()` exactly,
+  rather than always `M`.
+
+- **`HyperPhaser.bundle(observed, weight)` replaces `bundle_fractional`.** One
+  method, with the weight always explicit — `bundle(v, 1.0)` where `bundle(v)`
+  used to do. `Learner` and `LearnerPool` keep their own `bundle_fractional`,
+  whose weights are integer numerators and a different thing.
+
+- **`HyperPhaser.offset(seg)` is gone.** It rounded a phase to the ring, which
+  is what `quantize()` does for every segment at once: use
+  `ph.quantize().offset(seg)`.
+
+- **The raw offset buffers are no longer API.** `offsets_buffer`,
+  `from_offsets_buffer`, `codes_buffer`, `from_codes_buffer` and
+  `offsets_dtype` (all v10.0.0) are underscored; reach for the numpy functions
+  instead. The layout is an in-memory handoff with no version stamp, so nothing
+  should persist or depend on it.
+
+- **`HyperPhaser.export()` is now `HyperPhaser.quantize()`.** A plain rename,
+  and the name is the point: it ROUNDS each phase to the model's ring and drops
+  the magnitudes, so it is the lossy step back to storage rather than a
+  faithful handoff. Measured loss: up to 50% of a ring step on the angles, and
+  magnitudes have been absent from a `Phasers` since v9.0.0.
+
+  This fixes a name that told the wrong story. `HyperBinary` is the STORAGE
+  form and `HyperPhaser` the COMPUTE form; you quantize when the compute is
+  done. For the lossless direction out, use `state_buffer()` /
+  `export_to_np()`.
+
+- **`HyperPhaser.match()` is now `HyperPhaser.alignment()`.** Two reasons.
+  `match` was never a free choice — it is a Rust keyword, so Rust had to spell
+  it `match_score` and Python recovered `match()` only through a PyO3
+  attribute; `alignment` needs no workaround and one name serves all three
+  languages. And it is a NOUN: the call does not perform an alignment, it
+  returns the alignment value, which is also how the new free function
+  `hv.alignment(x, y)` reads.
+
+- **`SelectorExtra.weight` is now `SelectorExtra.overlap`, and `weight` is a
+  signed float.** The integer overlap a near-neighbour scan scores keeps its
+  meaning under the name that says it, while `weight` carries the signed,
+  fractional weight a selector picked a chunk with. Proto field numbers are
+  unchanged so the wire stays compatible, but `extra.weight` now reads a float
+  where it read an int.
+
+### New features
+
+- **`np.asarray(accumulator)` just works** — `HyperPhaser` implements numpy's
+  `__array__`, so it is the `complex64` array wherever numpy is, and
+  `np.array([ph1, ph2])` is an `(n, M)` block. Hypervectors deliberately do
+  not coerce: their array would be ring offsets, and a Euclidean metric over
+  those is wrong silently. See
+  [Exporting](https://yangzh.github.io/hv/api/hv/hyper_phaser.html#exporting).
+
+- **`hv.bind(*operands)` and `hv.release(x, y)`** — the algebra as package-level
+  functions. `bind` returns a `Knot` over any number of operands; `release`
+  returns a `Dart` and is anti-commutative, `release(a, b) == inverse(release(b,
+  a))`. Both accept any hypervector, so a quantized vector and a composite mix
+  freely.
+
+- **`hv.alignment(x, y)`** — the true cosine between two hypervectors read as
+  phasors, `(1/M) * sum_i Re(chi(x_i) * conj(chi(y_i)))`. Every segment is a
+  unit phasor, so both norms are exactly `sqrt(M)` and the `/M` IS the
+  normalization: the result is cosine similarity with no approximation.
+  `1 - alignment` is cosine distance (not a metric); `acos(alignment)/pi` is the
+  angular distance, which is. Unlike overlap it gives partial credit for a
+  near-miss offset.
+
+- **`hv.phasor_table(model)`** — the ring's unit phasors as a numpy
+  `complex64` array, so lifting offsets to phasors is `table[offsets]`, a
+  gather, measured 10x faster than `exp(2j*pi*O/W)` per element and
+  bit-identical. And **`real=True`** on `hyper_phaser_to_np` and
+  `phasor_table` returns (N, 2) `float32` instead of `complex64`, for the torch
+  layers that reject complex dtypes; `hyper_phaser_from_np` takes that shape
+  back. See the SparseSegmented and HyperPhaser pages for both.
+
+- **`HyperPhaser.mass()` and `.coherence()`** — the total weight bundled, and
+  rho in [0, 1], the share of it that agrees. The magnitudes gave neither: N
+  unrelated observations and sqrt(N) agreeing ones both read `|z_i| ~ sqrt(N)`.
+  Three readings change meaning as a result — `alignment()` returns
+  `mass * coherence`, so divide by `coherence()` for the observation count;
+  `magnitude_squared()` is linear in the mass only for INCOHERENT content; and
+  `quantized_magnitudes()` carries nothing once the observations agree. The
+  docstrings now give the law, the regimes and the measurements.
+
+- **`HyperPhaser.merge(other)`** — add another accumulator in, masses included:
+  the state ONE accumulator would have reached over both streams, so shards
+  trained apart combine. `bundle` cannot stand in — its operand is a
+  hypervector, so `quantize()` flattens the per-segment evidence first.
+
+- **`HyperPhaser.from_quantized(q)`**, was `from_vector` — lift a hypervector
+  into a fresh accumulator at `mass() == 1`, one UNIT phasor per segment at the
+  angle its offset encodes. The vector supplies the model, domain and pod.
+  QUANTIZED names the OPERAND, as for `bind`'s quantized form, which is why the
+  magnitudes `quantize()` dropped do not come back.
+
+- **`SparseSegmented.from_offsets_buffer(model, domain, pod, buf)` and
+  `from_codes_buffer(...)`** — the inverses of `offsets_buffer` /
+  `codes_buffer`, closing the numpy round trip. 61x the old `from_offsets`
+  list path and within 1.1x of the export. They take the `(domain, pod)` the
+  buffer cannot carry. `bytes`, `bytearray` and `memoryview` all work, so
+  `memoryview(arr).cast("B")` is the zero-copy numpy route.
+
+  Only the LENGTH is enforced; an offset wider than the segment is masked into
+  it, as every write path already does.
+
+- **`HyperPhaser.proto_bytes()` / `HyperPhaser.from_proto_bytes(data)`** — the
+  accumulator's supported serialization, LOSSLESS. Every phasor rides along, so
+  training resumes from what comes back, where `quantize()` keeps angles only
+  and cannot be resumed. The message is `HyperPhaserProto`, separate from
+  `HyperBinaryProto` because an accumulator is not a hypervector and no hint
+  would select it; `hv.to_message` / `from_message` route by type, so
+  `hv.from_proto_bytes` still refuses these bytes.
+
+  Domain and pod travel with it, so what comes back exports under the same
+  address, and so does the mass, which `coherence()` needs. The phasor COUNT
+  against the model's cardinality is the whole integrity check — any float pair is a legal phasor, a NaN or an infinity
+  included, since both are reachable in memory and a format that could not
+  carry a live state would be the worse trap. 12 bytes a segment, 1.5x the raw
+  accumulator, and byte-identical between Go and Rust.
+
+- **`hv.hyper_phaser_to_np(accumulator)` / `hyper_phaser_from_np(model,
+  domain, pod, array)`** — the accumulator as a numpy `complex64` array and
+  back, 447x the per-segment route. LOSSLESS, unlike `quantize()`, and not a
+  serialization format: no version, no hint. The byte accessors beneath are
+  plumbing, not API — underscored in Python, unexported in Go, hidden in
+  Rust.
+
+- **`hv.code_to_np(vector)` / `code_from_np(model, domain, pod, array)`, and
+  `codes_to_np(vectors)` / `codes_from_np(...)`** — offsets as numpy arrays and
+  back, single or batched. All four are package-level functions, matching
+  `hyper_phaser_to_np`. `code_to_np` materializes a composite, so it takes any
+  hypervector; `codes_to_np` hands back shape (n, M), one row per vector.
+
+### Improvements
+
+- **A wrong operand TYPE now raises `TypeError`, not `ValueError`.** Passing a
+  non-hypervector where one is expected is a type error and reads as one under
+  `except TypeError`. A hypervector with the wrong CONTENT still raises
+  `ValueError`.
+
 ## v10.0.0 (2026-11-06)
 
 ### Breaking changes
@@ -630,38 +839,3 @@ Only the latest 10 releases are shown.
   later writes (copy-on-write), `Power(1)` included.
 - Knot parts are canonically ordered; composite `Power(0)` returns the
   typed identity; exponents fold into member recipes (exp-1 shells).
-
-## v5.1.0 (2026-08-28)
-
-### Breaking changes
-
-- **Stored substrates from v5.0.0 cannot be read.** Three wire-format
-  changes land together.
-- **`LearnerPool(model, member_domain, total)`** — the two trailing seed
-  arguments (ignored since the write seed was dropped) are removed.
-- **`Learner.full()` removed** (reconstruction stays engine-side);
-  `HyperBinarySet` is retired — `Parcel` answers the member queries.
-- **The train subsystem is removed** (`Train*` producers and carriages).
-
-### New features
-
-- **zh corpus 995 → 4231 sentences** (parity with en); combined substrate
-  retrained.
-- **`Learner.blank()`** in Python; pool `load()` / `unique_estimated()`
-  are tracked incrementally.
-- `lazy_selector_iter` raises on truncation instead of silently clipping.
-
-### Performance
-
-- Serialization: Parquet row groups 1K → 16K and reader batching — much
-  faster substrate load; footers stamp pre-compression size.
-- Learner hot path: support reads borrow offsets (no per-probe copies),
-  deferred lists replay into recycled scratch, identity hashes memoized.
-
-### Fixes
-
-- The Dart producer's documented formula matched its inverse; corrected to
-  `Inv(tail) ⊗ head` (Go, Rust, Python docstrings).
-- `Revitalize` rescales correctly in list mode; blank-learner age/weights
-  stay in sync.
-- Empty-prefix scans work again (the reject guard had broken export).
