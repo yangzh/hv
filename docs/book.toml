@@ -39,3 +39,8 @@ renderers = ["html", "pdf"]
 
 [output.pdf]
 title = "Kongming HV Documentation"
+# mdbook-pdf's own retry path is DEAD CODE at the default: trying_times = 1
+# makes `for time in 1..(1+1)` a single pass, and the first error then hits
+# `if time == trying_times` and panics without ever retrying. 3 buys two real
+# retries, with a 1s and 2s backoff, against a transient Chrome print collision.
+trying-times = 3

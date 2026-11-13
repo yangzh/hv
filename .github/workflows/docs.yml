@@ -19,7 +19,13 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # PINNED deliberately -- do not restore ubuntu-latest. mdbook-pdf 0.1.13
+    # bundles an old headless_chrome that collides with the Chrome in 26.04 and
+    # dies with "-32000 Page is already being printed". v11.0.0's docs deploy
+    # failed the moment ubuntu-latest rolled 24.04 -> 26.04; this file and
+    # book.toml were byte-identical to v10.0.0, which passed on 24.04. Re-pin
+    # only together with an mdbook-pdf upgrade, and watch the PDF step.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
         with:
@@ -41,9 +47,23 @@ jobs:
       - name: Install tab assets
         run: cd docs && mdbook-tabs install
       - name: Build docs
-        run: mdbook build docs
+        # mdbook finishes the html backend and writes it to disk BEFORE the pdf
+        # backend starts, so a broken pdf renderer need not cost us the site.
+        # It did once: v11.0.0 shipped to PyPI while the published docs stayed
+        # on v10.0.0, because the pdf panicked after the html had been written.
+        # The html book is required; the PDF is a site asset, not a gate.
+        run: |
+          if ! mdbook build docs; then
+            echo "::warning::mdbook reported a failure -- continuing only if the HTML book was written"
+          fi
+          test -f docs/book/html/index.html
       - name: Copy PDF into HTML site
-        run: cp docs/book/pdf/output.pdf docs/book/html/kongming-hv.pdf
+        run: |
+          if [ -f docs/book/pdf/output.pdf ]; then
+            cp docs/book/pdf/output.pdf docs/book/html/kongming-hv.pdf
+          else
+            echo "::warning::no PDF produced; deploying HTML without refreshing kongming-hv.pdf"
+          fi
       - name: Include demos
         run: |
           if [ -d demo ]; then
@@ -56,7 +76,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
