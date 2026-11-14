@@ -32,7 +32,7 @@ carries an **ordinal** meaning:
 |---|---|---|
 | `Sparkle`, `Learner`, composites | **yes** — offsets are unrelated random draws, so "how far" is noise | no |
 | `Point` (fractional-power encoding) | yes, but it collapses to noise as positions separate | **yes** — graded in the coordinate gap |
-| a `HyperPhaser.quantize()` result | **no** — two phasors one step apart share no offset yet are nearly identical | **yes** — the offsets are phases |
+| a `HyperPhasor.quantize()` result | **no** — two phasors one step apart share no offset yet are nearly identical | **yes** — the offsets are phases |
 
 Lee is reported **per segment**: the sum divided by `M`. That keeps it
 comparable across models — chance is `W/4` and the diameter `W/2` whatever `M`

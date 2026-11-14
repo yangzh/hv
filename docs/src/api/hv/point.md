@@ -128,7 +128,7 @@ genuine origin Point reads as the anchor too, so content alone cannot.
 
 ## Recovering coordinates from raw offsets
 
-Given a frame and a bare `SparseSegmented`, the coordinates can be solved for.
+Given a frame and a bare `PhasorBand`, the coordinates can be solved for.
 Three functions, in increasing cost and tolerance:
 
 {{#tabs global="lang"}}
@@ -229,5 +229,5 @@ Both inherited from fractional-power encoding, and both easy to trip:
 
 - [Utilities](common/utilities.md#similarity) — `lee_distance`, the graded read.
 - [Operators](operators.md) — `power`, and what fractional exponents mean.
-- [HyperPhaser 🧭](hyper_phaser.md) — the accumulator, and the other place offsets
+- [HyperPhasor 🧭](hyper_phasor.md) — the accumulator, and the other place offsets
   are read as ordinal rather than as labels.

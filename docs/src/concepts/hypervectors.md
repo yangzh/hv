@@ -73,7 +73,7 @@ Lee is NOT a restatement of overlap the way Hamming is. Overlap only ever asks w
 
 ## Supported Models
 
-A [Model](../api/hv/common/models.md) is named for its one free parameter: the segment size in bits. Cardinality equals the segment size, so an $n$-bit model carries $2^n$ offsets of $n$ bits each — and a [HyperPhaser](../api/hv/hyper_phaser.md) carries $2^n$ phasors on a ring of $2^n$. The binary width $N = 2^{2n}$ follows from that one choice and matters only to the binary form; the storage and compute characteristics follow from all three.
+A [Model](../api/hv/common/models.md) is named for its one free parameter: the segment size in bits. Cardinality equals the segment size, so an $n$-bit model carries $2^n$ offsets of $n$ bits each — and a [HyperPhasor](../api/hv/hyper_phasor.md) carries $2^n$ phasors on a ring of $2^n$. The binary width $N = 2^{2n}$ follows from that one choice and matters only to the binary form; the storage and compute characteristics follow from all three.
 
 | Model | Width $N$ | Sparsity Bits | Cardinality $M$  | Segment Size $W$ |
 |-------|-------|---------------|-------------|----------------------|
@@ -113,7 +113,7 @@ In general, larger models provide more orthogonal space (lower collision probabi
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-The storage consideration above applies to **SparseSegmented**, the particular type containing raw offsets. There are other types of **sparse binary hypervector**, typically defined by a **recipe**: a seed, or a seed plus members, and carries only that instead of raw offsets. For example, **Sparkle** stores its seed and derives its offsets on demand; composites such as **Set** and **Sequence** hold references to their members, so they cost far less than a materialized vector both in memory and on the wire.
+The storage consideration above applies to **PhasorBand**, the particular type containing raw offsets. There are other types of **sparse binary hypervector**, typically defined by a **recipe**: a seed, or a seed plus members, and carries only that instead of raw offsets. For example, **Sparkle** stores its seed and derives its offsets on demand; composites such as **Set** and **Sequence** hold references to their members, so they cost far less than a materialized vector both in memory and on the wire.
 
 Additionally, the bits are computed on first observation and cached, then released again on `compact()`. Constructing a vector you never observe therefore costs almost nothing — see [lazy materialization](../api/hv/types.md#lazy-materialization).
 

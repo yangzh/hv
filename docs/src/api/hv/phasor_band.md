@@ -1,6 +1,6 @@
-# SparseSegmented 🍡
+# PhasorBand 🍡
 
-The most foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at the recorded offset location. All other types (Sparkle, Set, Sequence, etc.) ultimately contain a `SparseSegmented` in memory for processing, whenever necessary.
+The most foundational vector type — a sparse binary hypervector where each segment has exactly one ON bit at the recorded offset location. All other types (Sparkle, Set, Sequence, etc.) ultimately contain a `PhasorBand` in memory for processing, whenever necessary.
 
 ## Structure
 
@@ -22,7 +22,7 @@ The offsets are bit-packed according to the model's sparsity bits — they do **
 {{#tab name="Python"}}
 ```python
 # Identity
-ss = hv.SparseSegmented.identity(model)
+ss = hv.PhasorBand.identity(model)
 ```
 {{#endtab}}
 {{#endtabs}}

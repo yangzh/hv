@@ -15,7 +15,7 @@ for `weighted_schedule.py --plot`.
 | [Bulk Storage](bulk_storage/) | Populate in-memory / embedded substrates with thousands of chunks and measure retrieval. |
 | [Operators from Scratch](operators/) | Reimplement `bind` and `bundle` in pure Python — the core math underneath the library. |
 | [LISP Interpreter](pylisp/) | A full LISP where every atom, cons cell, and environment is a hypervector. |
-| [Point in a Frame](point/) | A coordinate pair/triple encoded as `b0**c0 (x) b1**c1`, then SOLVED back out of the bare `SparseSegmented` — exactly, with a lattice on a fractional grid, and by consensus when offsets are corrupted. |
+| [Point in a Frame](point/) | A coordinate pair/triple encoded as `b0**c0 (x) b1**c1`, then SOLVED back out of the bare `PhasorBand` — exactly, with a lattice on a fractional grid, and by consensus when offsets are corrupted. |
 | [Learner Revisited](learner_revisited/) | What a `Learner` holds: each segment is a weighted reservoir, and the write weights choose whether occupancy measures $P$, $\log P$, or $P/N$. |
 
 ## Running

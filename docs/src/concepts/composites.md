@@ -6,7 +6,7 @@ Composites combine multiple hypervectors into higher-level conceptual structures
 
 Before any composite, there is the **Sparkle** ✨: the atomic, *seeded* hypervector everything below is built upon.
 
-A raw [SparseSegmented 🍡](../api/hv/sparse_segmented.md) is just a bit pattern. A Sparkle ✨ is a deterministic hypervector built from a seed of two parts:
+A raw [PhasorBand 🍡](../api/hv/phasor_band.md) is just a bit pattern. A Sparkle ✨ is a deterministic hypervector built from a seed of two parts:
 
 - the **Domain** — a semantic namespace, such as "animals", "role", or "country";
 - the **Pod** — the individual within it: a word, a numeric seed, or a constant pre-defined by the package.
@@ -110,7 +110,7 @@ Here are some of the important subtypes of hypervectors supported in this packag
 
 | Type | Composition | Order? | Use Case |
 |------|------------|--------|----------|
-| **SparseSegmented** | None — raw per-segment offsets | — | The materialized form every other type reduces to |
+| **PhasorBand** | None — raw per-segment offsets | — | The materialized form every other type reduces to |
 | **Sparkle** | Primitive — seed expansion, no members | — | Named atomic identities |
 | **Set** | set of primitives | No | Unordered groups |
 | **Sequence** | sequence of primitives | Yes | Ordered lists |

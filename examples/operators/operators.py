@@ -10,7 +10,7 @@ The only low-level API used:
   - hv.overlap(a, b)                   → count of shared ON bits (for verification)
   - a.cardinality()                    → number of segments
   - core().offset(seg)                 → ON-bit offset for a single segment
-  - hv.SparseSegmented.from_offsets()  → construct from per-segment offsets
+  - hv.PhasorBand.from_offsets()  → construct from per-segment offsets
   - hv.SparseOperation.uint64()        → same PRNG as used internally
 
 This script does NOT call hv.bind() or hv.bundle() for computation — it
@@ -38,7 +38,7 @@ def pure_python_bind(model, a, b):
     For sparse binary vectors, each segment has exactly one ON bit.
     Binding adds the two ON-bit positions modulo the segment size.
 
-    Returns a SparseSegmented with the result.
+    Returns a PhasorBand with the result.
 
     Precondition:
     1. `a` and `b` are of the same model (and thus the same sparsity, dimension, etc);
@@ -52,7 +52,7 @@ def pure_python_bind(model, a, b):
     for seg in range(cardinality):
         offsets.append((core_a.offset(seg) + core_b.offset(seg)) % seg_size)
 
-    return hv.SparseSegmented.from_offsets(model, offsets)
+    return hv.PhasorBand.from_offsets(model, offsets)
 
 
 def pure_python_release(model, composite, key):
@@ -60,7 +60,7 @@ def pure_python_release(model, composite, key):
 
     release(composite, key) = bind(composite, key.power(-1))
 
-    Returns a SparseSegmented with the result.
+    Returns a PhasorBand with the result.
 
     Precondition:
     1. `composite` and `key` are of the same model (and thus the same sparsity, dimension, etc);
@@ -74,7 +74,7 @@ def pure_python_release(model, composite, key):
     for seg in range(cardinality):
         offsets.append((core_c.offset(seg) - core_k.offset(seg)) % seg_size)
 
-    return hv.SparseSegmented.from_offsets(model, offsets)
+    return hv.PhasorBand.from_offsets(model, offsets)
 
 
 def pure_python_bundle(model, so, vectors, weights=None):
@@ -98,7 +98,7 @@ def pure_python_bundle(model, so, vectors, weights=None):
 
     Each uint64() call provides randomness for 4 segments (4 × 16 bits).
 
-    Returns a SparseSegmented with the result.
+    Returns a PhasorBand with the result.
 
     Precondition:
     1. at least one vector in the input;
@@ -131,7 +131,7 @@ def pure_python_bundle(model, so, vectors, weights=None):
                     break
             offsets.append(cores[chosen].offset(seg + j))
 
-    return hv.SparseSegmented.from_offsets(model, offsets)
+    return hv.PhasorBand.from_offsets(model, offsets)
 
 
 def main():

@@ -1,29 +1,29 @@
-# HyperPhaser 🧭
+# HyperPhasor 🧭
 
 A second way to bundle a stream of observations. A [Learner 💫](learner.md) reads
 each offset as a **label** and compares by overlap; a phasor bundle reads it as a
 **phase** and compares by [Lee distance](common/utilities.md#similarity) or
 [alignment](common/utilities.md#similarity).
 
-Recall from [concepts](../../concepts/hypervectors.md) that a SparseSegmented
+Recall from [concepts](../../concepts/hypervectors.md) that a PhasorBand
 vector is already a list of phasors — the ON bit's offset within its segment is
-a discretized phase. A `HyperPhaser` takes that literally: it superposes unit
+a discretized phase. A `HyperPhasor` takes that literally: it superposes unit
 phasors and keeps the resulting angle, which is FHRR's bundle operator living
 inside kongming's existing representation.
 
 So there is no separate "phasor vector" type: **every hypervector already is
-one.** What a `HyperPhaser` adds is the accumulator — the one form that is NOT a
+one.** What a `HyperPhasor` adds is the accumulator — the one form that is NOT a
 hypervector:
 
-| | `HyperPhaser` | any `HyperBinary` |
+| | `HyperPhasor` | any `HyperBinary` |
 |---|---|---|
 | state | dense complex, $M$ components | one offset per segment |
 | is a `HyperBinary`? | **no** — no wire form | **yes** |
 | role | accumulate | compare, store |
 | magnitudes | kept, per segment | dropped — angle only |
 
-`HyperPhaser.quantize()` crosses from the accumulator to a
-[SparseSegmented 🎞️](sparse_segmented.md), one way — the name says the cost: it
+`HyperPhasor.quantize()` crosses from the accumulator to a
+[PhasorBand 🎞️](phasor_band.md), one way — the name says the cost: it
 rounds each phase to the ring and drops the magnitudes.
 
 ## What it estimates
@@ -44,7 +44,7 @@ buys ranking resolution rather than fidelity.
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-ph = hv.HyperPhaser(model, hv.d0(), hv.p0())
+ph = hv.HyperPhasor(model, hv.d0(), hv.p0())
 
 ph.bundle(a, 1.0)       # one whole observation
 
@@ -233,7 +233,7 @@ do you find one without trying the whole codebook? The answer is that **the
 search is ordinary [near-neighbor search](../memory/selectors/near_neighbor.md)**,
 and it needs nothing new:
 
-| the question | HyperBinary | HyperPhaser |
+| the question | HyperBinary | HyperPhasor |
 |---|---|---|
 | how close are **these two**? | `hv.overlap(a, b)` | `ph.alignment(c)` |
 | which stored vector is **my probe**? | NNS over the index | **the same NNS** |
@@ -277,7 +277,7 @@ that key was bound to, without ever enumerating the bundle:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-ph = hv.HyperPhaser(model, hv.d0(), hv.p0())
+ph = hv.HyperPhasor(model, hv.d0(), hv.p0())
 ph.bundle(hv.bind(role, filler), 1.0)
 
 ph.release(role)
@@ -290,7 +290,7 @@ ph.alignment(filler)        # ~1.0 — the filler, recovered
 
 | operand | contributes | magnitudes |
 |---|---|---|
-| a `HyperPhaser` | its **exact** phase *and* its magnitude | **multiply** |
+| a `HyperPhasor` | its **exact** phase *and* its magnitude | **multiply** |
 | any `HyperBinary` | a phase off the model's ring, read as a **unit** phasor | untouched |
 
 A hypervector operand is therefore a pure rotation: it moves the accumulator
@@ -322,17 +322,17 @@ multiplied in divides back out. Two consequences worth knowing:
 {{#tabs global="lang"}}
 {{#tab name="Python"}}
 ```python
-v = ph.quantize()                # a SparseSegmented: ANGLES ONLY
+v = ph.quantize()                # a PhasorBand: ANGLES ONLY
 
 block = ph.quantized_magnitudes()   # the confidences, to keep yourself
 
 # LOSSLESS, unlike quantize(): the accumulator as complex64, and back.
-z = hv.hyper_phaser_to_np(ph)                       # (M,) complex64
+z = hv.hyper_phasor_to_np(ph)                       # (M,) complex64
 # (re, im) per segment instead — the same bytes, for torch layers that
-# reject complex dtypes. hyper_phaser_from_np takes this shape back.
-r = hv.hyper_phaser_to_np(ph, real=True)            # (M, 2) float32
+# reject complex dtypes. hyper_phasor_from_np takes this shape back.
+r = hv.hyper_phasor_to_np(ph, real=True)            # (M, 2) float32
 # The array carries no mass, so pass it: without it coherence() reads 0.
-ph2 = hv.hyper_phaser_from_np(model, hv.d0(), hv.p0(), z, ph.mass())
+ph2 = hv.hyper_phasor_from_np(model, hv.d0(), hv.p0(), z, ph.mass())
 
 # Or let numpy coerce it: an accumulator IS an array where numpy looks.
 same = numpy.asarray(ph)                            # (M,) complex64, == z
@@ -343,7 +343,7 @@ pair = numpy.array([ph, ph2])                       # (2, M), no call per item
 
 ### An accumulator is a numpy array
 
-`HyperPhaser` implements numpy's `__array__`, so it needs no conversion call
+`HyperPhasor` implements numpy's `__array__`, so it needs no conversion call
 to be one: `np.asarray(ph)` is the `complex64` vector, `np.array([...])` over a
 list is an `(n, M)` block, and `np.abs`, `np.angle` or a matmul take it
 directly. All-pairs is then one `B @ B.conj().T`, whose off-diagonal entries
@@ -351,7 +351,7 @@ are exactly `hv.hermitian_inner(a, b)` and whose diagonal is
 `magnitude_squared()`. Note it is **not** a cosine: an accumulator's segments
 are not unit-magnitude, so normalize by `magnitude_squared()` if that is what
 you want. `dtype=` and numpy 2's `copy=` are both honored — the default
-is the same read-only zero-copy view `hyper_phaser_to_np` returns, and
+is the same read-only zero-copy view `hyper_phasor_to_np` returns, and
 `copy=True` hands you a writable one.
 
 <div class="callout callout-note">
@@ -361,9 +361,9 @@ is the same read-only zero-copy view `hyper_phaser_to_np` returns, and
 would be its **ring offsets**, where offset 0 and $W-1$ are one step apart yet
 read as maximally distant — and `np.asarray` is reached *implicitly*, from
 inside libraries you never see the inside of, so there would be no line of
-your own code to suspect. [`code_to_np()`](sparse_segmented.md#bulk-export-to-numpy)
+your own code to suspect. [`code_to_np()`](phasor_band.md#bulk-export-to-numpy)
 keeps the export explicit, and
-[`phasor_table()`](sparse_segmented.md#offsets-are-ring-angles-so-lift-before-you-compute)
+[`phasor_table()`](phasor_band.md#offsets-are-ring-angles-so-lift-before-you-compute)
 is the lift that makes the numbers mean what they look like.
 
 An accumulator carries no such ambiguity: it already *is* the complex vector,
@@ -372,7 +372,7 @@ and distance on it is the distance.
 </div>
 
 `quantize()` gives one phase per segment — the same bytes, packing and
-footprint as any `SparseSegmented`, exactly $\sqrt{M}$ long. That makes it a
+footprint as any `PhasorBand`, exactly $\sqrt{M}$ long. That makes it a
 vector which composes under bind and permute like any other.
 
 **The quantized form carries angles only.** Reading it as unit phasors costs roughly
@@ -418,7 +418,7 @@ v.power(5, 4)       # the quantized form: the phases, scaled — DEFERRED
 
 ### On the accumulator: the full complex power
 
-`HyperPhaser.power` is `z**a = r**a * exp(i*a*theta)` — the **magnitude is
+`HyperPhasor.power` is `z**a = r**a * exp(i*a*theta)` — the **magnitude is
 raised alongside the phase**.
 
 A materialized vector's `power` scales only offsets because every one of its
@@ -441,7 +441,7 @@ all-zero vector.
 
 ### On the quantized form: deferred, so chains compose
 
-`SparseSegmented.power` scales the phases, which are the offsets. What differs
+`PhasorBand.power` scales the phases, which are the offsets. What differs
 from a step-by-step scaling is *when*: the vector keeps the **unscaled** offsets
 plus the exponent applied to them, so a chain of powers composes on the rational
 and the scaling is applied **once**, from the base.

@@ -71,7 +71,7 @@ print(s_half)         # ✨:🔗pos,🌱step,💪1/2
 Fractional scaling truncates toward zero, so it is lossy *once the vector is
 materialized*. On a lazy `Sparkle` the exponents compose first, so
 `s.power(1, 2).power(2, 1)` returns to `s` exactly; on a materialized
-`SparseSegmented` it does not. See
+`PhasorBand` it does not. See
 [Fractional powers](../../api/hv/sparkle.md#fractional-powers).
 
 ## Online Learning with Learner

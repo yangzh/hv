@@ -9,7 +9,7 @@
     - [Near-neighbor search](concepts/near_neighbor_search.md)
     - [Learner](concepts/learner.md)
     - [LearnerPool](concepts/learner_pool.md)
-    - [HyperPhaser](concepts/hyper_phaser.md)
+    - [HyperPhasor](concepts/hyper_phasor.md)
 
 # API Reference
 
@@ -21,7 +21,7 @@
         - [SparseOperation](api/hv/common/sparse_operation.md)
         - [Utilities](api/hv/common/utilities.md)
     - [HyperBinary Types](api/hv/types.md)
-        - [SparseSegmented 🍡](api/hv/sparse_segmented.md)
+        - [PhasorBand 🍡](api/hv/phasor_band.md)
         - [Sparkle ✨](api/hv/sparkle.md)
         - [Learner 💫](api/hv/learner.md)
         - [LearnerPool 🎱](api/hv/learner_pool.md)
@@ -34,7 +34,7 @@
         - [Point 📍](api/hv/point.md)
         - [Cyclone 🌀](api/hv/cyclone.md)
     - [Operators](api/hv/operators.md)
-    - [HyperPhaser 🧭](api/hv/hyper_phaser.md)
+    - [HyperPhasor 🧭](api/hv/hyper_phasor.md)
     - [Customizing Run-time Behavior](api/hv/runtime.md)
     - [Misc](api/hv/misc.md)
 - [Memory](api/memory/overview.md)

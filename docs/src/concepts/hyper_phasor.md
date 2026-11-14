@@ -1,8 +1,8 @@
-# HyperPhaser
+# HyperPhasor
 
-A **HyperPhaser** bundles a stream of observations, much like a [Learner](learner.md) does — but it reads each offset as a **phase** rather than as a label, and that one change of interpretation changes its character throughout.
+A **HyperPhasor** bundles a stream of observations, much like a [Learner](learner.md) does — but it reads each offset as a **phase** rather than as a label, and that one change of interpretation changes its character throughout.
 
-Recall from [Hypervectors](hypervectors.md#sparse-binary-representation) that a sparse-segmented vector is *already* a list of phasors: the offset of the ON bit within its segment is a discretized phase around the unit circle. A Learner treats that offset as an opaque identity and only ever asks whether two of them match. A HyperPhaser takes the phasor reading literally — it superposes unit phasors and keeps the resulting angle.
+Recall from [Hypervectors](hypervectors.md#sparse-binary-representation) that a sparse-segmented vector is *already* a list of phasors: the offset of the ON bit within its segment is a discretized phase around the unit circle. A Learner treats that offset as an opaque identity and only ever asks whether two of them match. A HyperPhasor takes the phasor reading literally — it superposes unit phasors and keeps the resulting angle.
 
 For segment $s$ of a vector with segment size $W$, an observation contributing offset $o_{sj}$ with weight $w_j$ enters as a unit phasor at angle $\theta_{sj} = 2\pi o_{sj} / W$, and the accumulator holds the complex sum:
 
@@ -22,9 +22,9 @@ That single fact sets the expectations. The readout is **scale-free** — re-pre
 
 ## Accumulating versus sampling
 
-The contrast with a Learner is the useful way to hold this. A Learner is a **sample**: each write draws on randomness to claim a share of a fixed budget of $M$ segments. A HyperPhaser is an **accumulator**: every write adds deterministically into every segment.
+The contrast with a Learner is the useful way to hold this. A Learner is a **sample**: each write draws on randomness to claim a share of a fixed budget of $M$ segments. A HyperPhasor is an **accumulator**: every write adds deterministically into every segment.
 
-| | Learner 💫 | HyperPhaser 🧭 |
+| | Learner 💫 | HyperPhasor 🧭 |
 |---|---|---|
 | write | reservoir sampling, draws randomness | deterministic and linear |
 | repeated observation | a fresh draw | identical to one write at double weight |
@@ -45,8 +45,8 @@ Every hypervector answers all of them, so the choice is yours to make and yours 
 
 The accumulator and the thing you store are deliberately separate — and only the accumulator is a distinct type, because **every** hypervector is already a vector of phasors.
 
-A **HyperPhaser** is the trainable form: a dense complex accumulator holding $M$ components, each with an angle *and* a magnitude. It is not itself a hypervector and has no wire format. The magnitude matters while training — it is a per-segment **confidence**, recording how much the contributing phases reinforced or cancelled there, and a segment whose phases nearly cancelled holds an angle decided by rounding residuals rather than by evidence. It also behaves as per-segment plasticity.
+A **HyperPhasor** is the trainable form: a dense complex accumulator holding $M$ components, each with an angle *and* a magnitude. It is not itself a hypervector and has no wire format. The magnitude matters while training — it is a per-segment **confidence**, recording how much the contributing phases reinforced or cancelled there, and a segment whose phases nearly cancelled holds an angle decided by rounding residuals rather than by evidence. It also behaves as per-segment plasticity.
 
 `quantize()` crosses to the published form: one angle per segment, an ordinary sparse-segmented vector. It goes **one way** and keeps angles only — so the per-segment confidences live on the accumulator, and a caller who wants them keeps them alongside deliberately.
 
-Jump to the API reference for [HyperPhaser](../api/hv/hyper_phaser.md).
+Jump to the API reference for [HyperPhasor](../api/hv/hyper_phasor.md).

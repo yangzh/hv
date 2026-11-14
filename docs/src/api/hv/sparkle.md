@@ -46,7 +46,7 @@ hv.equal(s0, s0_square)   # s0_square = s0^2, different from original s0.
 s0_half=s0.power(1, 2)          # Fractional power: s0^(1/2)
 s0_half=s0.power(1, denominator_ls=1)   # Same as above, denominator as 2**ls
 
-core0=s0.core()     # Returns underlying SparseSegmented
+core0=s0.core()     # Returns underlying PhasorBand
 core0.offsets()    # The raw offsets for each segment.
 ```
 {{#endtab}}
@@ -57,8 +57,8 @@ core0.offsets()    # The raw offsets for each segment.
 
 `power(0)` returns the identity vector, which every type supports: the result
 keeps its concrete type but holds identity's content, so it serializes in the
-canonical `SparseSegmented` nil-offsets form and reports
-[`hint()`](types.md#hint-the-type-on-the-wire) `HINT_SPARSE_SEGMENTED`.
+canonical `PhasorBand` nil-offsets form and reports
+[`hint()`](types.md#hint-the-type-on-the-wire) `HINT_PHASOR_BAND`.
 `power(-1)` returns the inverse.
 </div>
 
@@ -117,7 +117,7 @@ hv.equal(ss, ss.power(1, 2).power(2, 1))   # True
 
 Both hold because chaining composes the exponents and scales once, rather than
 scaling at each step. See
-[chained powers are exact](sparse_segmented.md#chained-powers-are-exact).
+[chained powers are exact](phasor_band.md#chained-powers-are-exact).
 
 Note that `core()` is the materialization step: it computes the offsets with
 every exponent folded in, so what it returns reports `exponent() == (1, 1)`.

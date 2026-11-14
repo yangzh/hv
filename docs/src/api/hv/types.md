@@ -25,7 +25,7 @@ v.hint()         # HINT_* constant — the type this vector serializes as
 
 | Constant | Type |
 |----------|------|
-| `HINT_SPARSE_SEGMENTED` | [SparseSegmented 🍡](sparse_segmented.md) |
+| `HINT_PHASOR_BAND` | [PhasorBand 🍡](phasor_band.md) |
 | `HINT_SPARKLE` | [Sparkle ✨](sparkle.md) |
 | `HINT_LEARNER` | [Learner 💫](learner.md) |
 | `HINT_SET` | [Set 🫧](set.md) |
@@ -46,15 +46,15 @@ s = hv.Set(seed, a, b)
 s.hint()                       # HINT_SET
 hv.from_message(hv.to_message(s)).hint() == s.hint()   # True
 
-s.power(0).hint()              # HINT_SPARSE_SEGMENTED — see below
+s.power(0).hint()              # HINT_PHASOR_BAND — see below
 ```
 
 <div class="callout callout-note">
 <div class="callout-title">Note</div>
 
-An identity vector has one canonical wire form, `SparseSegmented` with no
+An identity vector has one canonical wire form, `PhasorBand` with no
 offsets, whatever type produced it. So `hint()` reports
-`HINT_SPARSE_SEGMENTED` for any identity — matching what serialization
+`HINT_PHASOR_BAND` for any identity — matching what serialization
 actually writes, and what a round-trip hands back.
 
 `Learner` is the exception: an age-0 Learner still serializes its own payload,
@@ -63,19 +63,19 @@ because the RNG state has to survive. It reports `HINT_LEARNER` at every age.
 
 ## Lazy materialization
 
-Every type except `SparseSegmented` is defined by a **recipe** — much more compact than raw offsets.
+Every type except `PhasorBand` is defined by a **recipe** — much more compact than raw offsets.
 
 The raw offsets will be computed and cached on first usage by APIs such as 
-`core()`, `stable_hash()`, overlap and similarity, serialization of `SparseSegmented`, etc. Other API calls, such as `model()`, `domain()`, `pod()`, `exponent()`, never materialize anything.
+`core()`, `stable_hash()`, overlap and similarity, serialization of `PhasorBand`, etc. Other API calls, such as `model()`, `domain()`, `pod()`, `exponent()`, never materialize anything.
 
 This is invisible to callers: the vector holds the same semantic content whenever you ask, but it means constructing vectors you never observe is nearly free, which is the typical and common use case for hypervectors.
 
 `compact()` releases the cached content again, recursively through members. The recipe is retained, so the next observation recomputes exactly the same bits.
 
 `core()` is the explicit crossing from recipe to bits: it computes the offsets
-with any exponent folded in, and hands back a `SparseSegmented` reporting
+with any exponent folded in, and hands back a `PhasorBand` reporting
 `exponent() == (1, 1)`. That holds for every type. See
-[SparseSegmented](sparse_segmented.md#chained-powers-are-exact).
+[PhasorBand](phasor_band.md#chained-powers-are-exact).
 
 ## The tale of two equalities
 
@@ -94,7 +94,7 @@ Two levels are available, differing only in how hard they work:
 
 | Type | Description |
 |------|-------------|
-| [SparseSegmented 🍡](sparse_segmented.md) | Foundational vector — packed per-segment offsets |
+| [PhasorBand 🍡](phasor_band.md) | Foundational vector — packed per-segment offsets |
 | [Sparkle ✨](sparkle.md) | Seeded, deterministic hypervector |
 | [Learner 💫](learner.md) | Online Hebbian learning |
 | [Set 🫧](set.md) | Unordered collection |

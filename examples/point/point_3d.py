@@ -11,7 +11,7 @@ redundancy. Bind is not additive on fractional powers: `K**u (x) K**v` agrees
 with `K**(u+v)` on only about half the segments, because flooring each factor
 separately loses what flooring the sum keeps. So arithmetic on an encoded value
 cannot be done on the vector — it has to happen on the rationals and truncate
-ONCE, at materialization. A Point can do that. A bare `SparseSegmented`, having
+ONCE, at materialization. A Point can do that. A bare `PhasorBand`, having
 already spent its exponents into its offsets, cannot.
 
 Reading coordinates back off a raw vector has three routines, one per regime,
@@ -63,7 +63,7 @@ def corrupt(raw, bad, rng, model=MODEL):
     size = hv.cardinality(model)
     for seg in rng.sample(range(size), bad):
         o[seg] = (o[seg] + 3) % size
-    return hv.SparseSegmented.from_offsets(model, o)
+    return hv.PhasorBand.from_offsets(model, o)
 
 
 # --------------------------------------------------------------------------

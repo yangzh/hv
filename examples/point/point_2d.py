@@ -13,7 +13,7 @@ Point(0, 0) would be the all-zero-offset vector that unrelated frames collide
 on. Anchored, the origin is just another sparkle.
 
 Nothing is stored "beside" the vector to make that readable. `.core()` hands
-back a bare `SparseSegmented` — 1024 integer offsets, no coordinates in sight —
+back a bare `PhasorBand` — 1024 integer offsets, no coordinates in sight —
 and the coordinates are still fully determined by it, GIVEN the frame. Reading
 them back is not a search over candidate positions. It is a linear solve:
 
@@ -73,7 +73,7 @@ def claim_frame_rules():
     # coordinate would be arbitrary between them. An IDENTITY basis is worse:
     # I**c == I for every c, so that axis has one spelling for ALL positions
     # and its coordinate is not ambiguous but absent.
-    identity = hv.SparseSegmented.identity(MODEL)
+    identity = hv.PhasorBand.identity(MODEL)
     cases = [
         ("empty frame", lambda: hv.Point(*ANCHOR, [], [1]), "empty frame"),
         ("duplicate basis", lambda: hv.Point(*ANCHOR, [a, a], [1, 2]), "same basis"),
@@ -129,7 +129,7 @@ def claim_is_the_bind():
 
 
 # --------------------------------------------------------------------------
-# "The raw SparseSegmented holds no coordinates, yet determines them exactly."
+# "The raw PhasorBand holds no coordinates, yet determines them exactly."
 # --------------------------------------------------------------------------
 def claim_recover_from_raw():
     print("\nrecover_point solves the coordinates back out of a bare vector")
@@ -288,7 +288,7 @@ def claim_noisy():
         for i in range(n):
             seg = (i * 37) % W
             o[seg] = (o[seg] + 3) % W
-        return hv.SparseSegmented.from_offsets(MODEL, o)
+        return hv.PhasorBand.from_offsets(MODEL, o)
 
     # The exact solve is BRITTLE, and deliberately so. Coordinates live in a
     # modular group, where there is no notion of "close": if a corrupted

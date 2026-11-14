@@ -3,7 +3,7 @@
 A model is named for its segment size in bits: `MODEL_8BIT` divides the space into
 segments of 256 offsets, and carries 256 of them. The binary width follows from that
 one number (65,536 here) and is deliberately not part of the name — it describes the
-binary form alone, and says nothing about a [HyperPhaser](../hyper_phaser.md) over the
+binary form alone, and says nothing about a [HyperPhasor](../hyper_phasor.md) over the
 same model.
 
 See [Concepts: Hypervectors](../../../concepts/hypervectors.md#model-properties) for the full overview.
