@@ -324,8 +324,6 @@ multiplied in divides back out. Two consequences worth knowing:
 ```python
 v = ph.quantize()                # a PhasorBand: ANGLES ONLY
 
-block = ph.quantized_magnitudes()   # the confidences, to keep yourself
-
 # LOSSLESS, unlike quantize(): the accumulator as complex64, and back.
 z = hv.hyper_phasor_to_np(ph)                       # (M,) complex64
 # (re, im) per segment instead — the same bytes, for torch layers that
@@ -377,26 +375,10 @@ vector which composes under bind and permute like any other.
 
 **The quantized form carries angles only.** Reading it as unit phasors costs roughly
 10% on similarity and all of *distributional* analogy (`b - a + c`), which needs
-the radial component. The magnitudes stay on the accumulator, where
-`quantized_magnitudes()` packs them onto a fixed 4-bit grid, two per byte — so a
-caller who wants the per-segment confidences keeps that block beside the quantized form
-themselves.
-
-They are normalized by the accumulator's **own** rms, and the scale is not
-included: a global per-vector factor cancels in both Lee and cosine, so no
-comparison needs it, and what survives is the confidence *ordering*. Four bits
-is the knee — measured, it matches fp32 on both similarity and analogy.
-
-**The fixed grid serves incoherent content only.** It is parameter-free there,
-the normalized magnitude being Rayleigh with scale $1/\sqrt{2}$ whatever the
-word, its support or the model. Once the observations agree the block carries
-nothing: measured at 10-bit, 32 unrelated words use 11 of the 16 levels as
-intended, while 32 jittered copies of one word put **every** segment on a single
-level. The per-segment spread is $\mathrm{sd}(r)/\mathrm{mean}(r) \sim
-(1-\rho)\sqrt{2N}/N$, which *shrinks* as evidence accumulates — 0.0116 at
-$\rho = 0.956$ against a grid step of $4/15$ — so no renormalization recovers
-it. Skip the block when `coherence()` runs high; that reading is what carries
-the information instead.
+the radial component. The magnitudes stay on the accumulator: hold on to it, or
+take them losslessly through `hyper_phasor_to_np()`, which hands back the complex
+vector itself. `coherence()` reports whether they still carry anything — once the
+observations agree, that reading is the information.
 
 ## Raising to a power
 
