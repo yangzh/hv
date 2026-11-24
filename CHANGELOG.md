@@ -3,6 +3,118 @@
 All notable changes to `kongming-rs-hv` are documented here.
 Only the latest 10 releases are shown.
 
+## v12.0.0 (2026-11-24)
+
+### Breaking changes
+
+- **`kongming-rs-hv` now requires `protobuf>=6.33.0`, where it required
+  `>=5.29.3`.** Every generated `_pb2.py` carries a runtime version gate, and the
+  codegen plugin's version IS the floor that gate enforces. Nothing else about the
+  generated code depends on it: across the move, each module differs only in its
+  header comment and the gate's four arguments, and every serialized descriptor
+  comes out byte-identical.
+
+- **`SparseSegmented` is now `PhasorBand`, and every `Phaser` spelling becomes
+  `Phasor`.** v11 retired the `Phasers` type on the grounds that every
+  hypervector already IS a vector of phasors — an offset per segment is an angle
+  on the model's ring. The type names now say so. `HyperPhasor` holds that band
+  at full complex precision; `PhasorBand` holds the same band with every phasor
+  snapped to the ring, which is exactly what `quantize()` returns.
+
+  RENAMED. `hv.SparseSegmented` → `hv.PhasorBand`, `hv.HyperPhaser` →
+  `hv.HyperPhasor`, `hyper_phaser_from_np`/`_to_np` → `hyper_phasor_from_np`/
+  `_to_np`, `HyperPhaserProto` → `HyperPhasorProto` with its repeated `Phaser
+  phasers` now `Phasor phasors`, and the `SPARSE_SEGMENTED` hint is
+  `PHASOR_BAND`. The element struct, `phasor_table` and `quantizePhase` already
+  used this spelling and are untouched.
+
+  THE WIRE IS UNCHANGED. The hint keeps enum number 1, the phasor field keeps
+  tag 4, and no layout moves, so every persisted substrate and stored payload
+  loads as before. Only generated NAMES move: a source break, not a format one.
+
+  The retired `PHASERS` hint keeps its historical spelling where the source
+  records it — `reserved 11` still reads "Was PHASERS".
+
+- **`exponent()` returns an `hv.Exponent`, not a `(numerator, denominator)`
+  pair, and `Point.coords()` returns a list of them.** The vestigial `hv.Exp`
+  int wrapper, which no API ever consumed, is gone and `hv.Exponent` takes the
+  name. A rational is no longer the only exponent there is, so a pair can no
+  longer carry one: an `Exponent` may instead hold a float that no fraction
+  names.
+
+  MIGRATION. `num, den = x.exponent()` becomes `num, den =
+  x.exponent().fractional()`. Equality compares the FORM, matching Go and Rust,
+  with `compare()` for value order.
+
+- **`HyperPhasor.power()` and `HyperPhasor.quantized_magnitudes()` are gone.**
+  Neither had a caller outside its own tests. `quantize()` returns the band as a
+  `PhasorBand`, which is what reading the quantized magnitudes was for.
+
+- **`hv_pb2.Exponent` no longer carries `denominator_ls`; field 3 is reserved.**
+  It spelled a power-of-two denominator as a shift to save one or two varint
+  bytes, and nothing ever read it — both ports choose the shift kernel from the
+  denominator's VALUE. Writers stopped emitting it earlier in this cycle and
+  readers stopped honoring it, so a stored message that still carries one reads
+  as the bare numerator, exactly as it did before the field was removed.
+
+  `power(denominator_ls=...)` is UNAFFECTED: the keyword computes `2 ** ls` and
+  never reached the field.
+
+### New features
+
+- **`power()` takes any exponent spelling: an int, a `(numerator, denominator)`
+  pair, a float, or an `hv.Exponent`.** The class carries `times()`, `neg()`,
+  `compare()`, `fractional()` and the `is_float()`, `is_rational()` and
+  `is_fractional()` predicates, plus `is_unit()`, `is_zero()` and
+  `is_negative()`; `float(e)` and `-e` work and it is hashable. Its float form
+  (proto field `exp`, read only when numerator and denominator are both 0) holds
+  the exponents no fraction names. The fraction stays PREFERRED, being exact,
+  and a wrong spelling raises `ValueError` rather than panicking.
+
+- **`Point.from_frame_coords_float(domain, pod, frame, coords, keep_frame=True)`
+  builds a Point from float coordinates.** The fraction is taken wherever one
+  fits, so `4.0` lands exactly where `Point(...)` puts it and `1.75` where
+  `Point.fractional(...)` does — same coordinates, same wire. What stays a float
+  has no recover path: `0.8` is 3602879701896397/2^52, which no `Exponent`
+  names, so `recover_point_fractional` REJECTS that Point at every level rather
+  than snapping it to a neighbouring grid point.
+
+- **A new `kongming.vfa` module encodes real-valued vectors as Vector Function
+  Architecture features.** This is Equation 2 of Hernández-Cano, Ni, Zou, Zakeri
+  and Imani, "Hyperdimensional computing with holographic and adaptive encoder",
+  Frontiers in Artificial Intelligence 7:1371988 (2024).
+
+  `vfa.Encoder(model, bases, seed_high=7, seed_low=1)` composes one phase per
+  segment from one basis hypervector per input feature; `encode(input)` returns
+  the `PhasorBand` and `features(input)` the real feature map. Whatever angle
+  distribution the bases carry IS the kernel it realizes. `vfa.Regressor.train(
+  encoder, inputs, targets, lam)` fits a ridge head on top and `predict(input)`
+  reads it back, and `vfa.real_part(band)` lifts an already-encoded band to its
+  feature values.
+
+### Deprecations
+
+- **`alignment` is now `cosine_similarity`.** The function is exactly the cosine
+  of two hypervectors read as phasors.
+
+### Fixes
+
+- **`stable_hash` on the wire now names the actual content, after the power is
+  applied.**
+
+- **`kongming_rs.api.v1.chunk_pb2` and `kongming_rs.api.v1.memory_pb2` import
+  again.** The vendored modules reach their own dependencies by the canonical
+  path — `from kongming.api.v1 import hv_pb2` — which the wheel never shipped, so
+  both raised `ModuleNotFoundError: No module named 'kongming.api.v1'` in v11.0.0
+  and in every earlier release.
+
+### Notes
+
+- **`lee_distance` documented a sum; it has always returned the per-segment
+  mean.** Only the headline was wrong, in all three ports — no behaviour
+  changed. The overlap bound and the fractional-power product law are the sum
+  ones, which is where the confusion started.
+
 ## v11.0.0 (2026-11-12)
 
 ### Breaking changes
@@ -805,37 +917,3 @@ Only the latest 10 releases are shown.
 - Set-member reads ignore hits at the NNS noise floor.
 - Bundled notebooks regenerated; their outputs had been stale for several
   releases.
-
-## v5.2.0 (2026-09-03)
-
-### Breaking changes
-
-- **`Learner.has_cached_data()` / `cached_data()` renamed** to
-  `has_deferred_data()` / `deferred_data()` (wire fields likewise
-  `deferred_*`; wire-compatible by field number).
-- **Misuse now panics instead of erroring**: bundling or reading an
-  uninitialized pool, and constructing a zero-member pool, raise
-  `PanicException` (they were errors or silent before).
-- Deferred-mode `support()` reads are noise-corrected estimates and can
-  read ~1 lower than the spilled path for the same content.
-
-### New features
-
-- **`Learner(model, seed, initial=None, *, rng_hint=None)`** — pin the RNG
-  backend per learner (`hv.RNG_*`); pools, the deserializer, and producers
-  thread their own hints instead of falling back to the process default.
-- Multi-attractor NNS: one pushed-down scan over the access-circle union.
-
-### Performance
-
-- Learner reads retain the multi-entry mixture fill (computed once, reused
-  across reads, dropped on writes); pool member reads are one lazy Bind.
-
-### Fixes
-
-- A failed `hydrate()` no longer leaves the pool half-initialized — the
-  loader can be corrected and retried.
-- Learner snapshot/exposure holes closed: escaped views stay stable across
-  later writes (copy-on-write), `Power(1)` included.
-- Knot parts are canonically ordered; composite `Power(0)` returns the
-  typed identity; exponents fold into member recipes (exp-1 shells).
