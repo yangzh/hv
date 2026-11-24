@@ -12,7 +12,7 @@ v.width()
 v.cardinality()
 v.stable_hash()  # unique hash for this vector
 v.seed128()
-v.exponent()     # (numerator, denominator), in lowest terms
+v.exponent()     # hv.Exponent, in lowest terms; .fractional() gives (num, den)
 v.hint()         # HINT_* constant — the type this vector serializes as
 ```
 {{#endtab}}

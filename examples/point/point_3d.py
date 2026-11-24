@@ -295,7 +295,7 @@ def claim_why_coords_are_kept():
     a, b, c = axes()
     # One shared denominator, so the integer axes scale up to it: 1 -> den/den.
     p = hv.Point.fractional(*ANCHOR, [a, b, c], [den + 300, den, 2 * den], den)
-    num, d = p.coords()[0]
+    num, d = p.coords()[0].fractional()
     check(
         "a Point stores the exact rational (reduced, not rounded)",
         num * den == (den + 300) * d,

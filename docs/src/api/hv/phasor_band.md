@@ -151,9 +151,9 @@ offsets:
 ```python
 ss = hv.Sparkle.from_word(model, "pos", "step").core()
 
-ss.exponent()                  # (1, 1) — unpowered
-ss.power(3).exponent()         # (3, 1)
-ss.power(3).core().exponent()  # (1, 1) — core() folds it in
+ss.exponent()                  # Exponent(1) — unpowered
+ss.power(3).exponent()         # Exponent(3)
+ss.power(3).core().exponent()  # Exponent(1) — core() folds it in
 ```
 {{#endtab}}
 {{#endtabs}}
@@ -190,8 +190,8 @@ pod are written too — they identify the offsets rather than transform them.
 ```python
 half = hv.Set(seed, a, b).power(1, 2)
 
-half.exponent()          # (1, 2) — the composite still describes itself
-half.core().exponent()   # (1, 1) — the returned offsets already include the 1/2
+half.exponent()          # Exponent(1, 2) — the composite still describes itself
+half.core().exponent()   # Exponent(1) — the returned offsets already include the 1/2
 ```
 {{#endtab}}
 {{#endtabs}}

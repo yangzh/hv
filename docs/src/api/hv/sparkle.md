@@ -38,7 +38,7 @@ s5 = hv.Sparkle(model, "animals", pod)
 ```python
 s0.model()         # Model enum
 s0.stable_hash()   # Deterministic and unique hash
-s0.exponent()      # Current exponent, as (numerator, denominator): (1, 1) for a base vector
+s0.exponent()      # Current exponent as an hv.Exponent: Exponent(1) for a base vector
 
 s0_square=s0.power(2)     # Returns p-th power (new Sparkle)
 hv.equal(s0, s0_square)   # s0_square = s0^2, different from original s0.
@@ -73,9 +73,9 @@ that `power(1)` walks in one step.
 ```python
 s = hv.Sparkle.from_word(model, "pos", "step")
 
-s.power(1, 2).exponent()    # (1, 2)
-s.power(-3, 4).exponent()   # (-3, 4) — the sign always rides on the numerator
-s.power(6, 2).exponent()    # (3, 1) — reduced to lowest terms, so this is the
+s.power(1, 2).exponent()    # Exponent(1, 2)
+s.power(-3, 4).exponent()   # Exponent(-3, 4) — the sign always rides on the numerator
+s.power(6, 2).exponent()    # Exponent(3) — reduced to lowest terms, so this is the
                             #          integer power, and takes the integer path
 
 # A fractional power is near-orthogonal to the base AND to the integer powers.

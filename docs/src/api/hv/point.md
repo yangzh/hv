@@ -81,7 +81,7 @@ uses, so the denominator belongs to the call and not to each axis.
 {{#tab name="Python"}}
 ```python
 p.rank()        # axis count — len(coords), whether or not the frame is held
-p.coords()      # [(numerator, denominator), ...] in lowest terms
+p.coords()      # [hv.Exponent, ...] in lowest terms; .fractional() gives (num, den)
 p.frame()       # the basis vectors, empty when not retained
 p.is_ready()    # bool: whether the frame is held
 ```

@@ -61,9 +61,9 @@ s_inv = s.power(-1)
 s_half = s.power(1, 2)          # s^(1/2)
 s_half = s.power(1, denominator_ls=1)   # same, denominator as 2**ls
 
-s.exponent()          # (1, 1) — always a (numerator, denominator) pair
-s_half.exponent()     # (1, 2)
-s.power(6, 2).exponent()   # (3, 1) — reduced, so it IS the integer power
+s.exponent()          # Exponent(1) — an hv.Exponent, not a pair; == (1, 1)
+s_half.exponent()     # Exponent(1, 2); .fractional() gives (1, 2)
+s.power(6, 2).exponent()   # Exponent(3) — reduced, so it IS the integer power
 
 print(s_half)         # ✨:🔗pos,🌱step,💪1/2
 ```
